@@ -31,5 +31,83 @@
             </form>
         </div>
     </main>
+    <script>
+        // यह JavaScript एडमिन पैनल को चलाएगा
+        
+        const loginSection = document.getElementById('login-section');
+        const adminSection = document.getElementById('admin-section');
+        const loginForm = document.getElementById('login-form');
+        const shlokaForm = document.getElementById('shloka-form');
+
+        // चेक करें कि क्या हमारे पास पहले से टोकन है (localStorage में)
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            // अगर टोकन है, तो सीधा एडमिन पैनल दिखाओ
+            loginSection.style.display = 'none';
+            adminSection.style.display = 'block';
+        }
+
+        // 1. लॉगिन फॉर्म सबमिट
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // लॉगिन सफल! टोकन को सेव करो
+                localStorage.setItem('adminToken', data.token);
+                // एडमिन पैनल दिखाओ
+                loginSection.style.display = 'none';
+                adminSection.style.display = 'block';
+            } else {
+                alert(data.message || 'Login failed!');
+            }
+        });
+
+        // 2. श्लोक फॉर्म सबमिट
+        shlokaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentToken = localStorage.getItem('adminToken');
+            if (!currentToken) {
+                alert('Login token missing. Please login again.');
+                return;
+            }
+            
+            const response = await fetch('/api/shlokas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}` // टोकन को साथ भेजो
+                },
+                body: JSON.stringify({
+                    adhyay: document.getElementById('adhyay').value,
+                    shloka: document.getElementById('shloka').value,
+                    text: document.getElementById('text').value,
+                    video_url: document.getElementById('video_url').value
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert('Shloka added successfully!');
+                shlokaForm.reset(); // फॉर्म खाली करो
+            } else {
+                alert(data.message || 'Failed to add shloka.');
+            }
+        });
+    </script>
+    <footer class="footer">
+        <p>By: Aaradhya Soni</p>
+        <p>Contact: 9243714402</p>
+        <p>&copy; 2025 - All Rights Reserved.</p>
 </body>
 </html>
