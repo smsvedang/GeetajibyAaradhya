@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #FFF8E1;
+    color: #4E342E;
+}
+.header {
+    background-color: #FF9800;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+.header h1 { margin: 0; }
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+}
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #5D4037;
+    color: white;
+    margin-top: 40px;
+}
+/* फॉर्म स्टाइलिंग */
+input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* यह padding को width में शामिल करता है */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+button {
+    background-color: #FF9800;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}

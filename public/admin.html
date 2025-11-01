@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>एडमिन पैनल</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <h1>एडमिन पैनल</h1>
+    </header>
+
+    <main class="container">
+        <div id="login-section">
+            <h2>लॉगिन</h2>
+            <form id="login-form">
+                <input type="password" id="password" placeholder="पासवर्ड" required>
+                <button type="submit">लॉगिन</button>
+            </form>
+        </div>
+
+        <div id="admin-section" style="display:none;">
+            <h2>नया श्लोक जोड़ें</h2>
+            <form id="shloka-form">
+                <input type="text" id="adhyay" placeholder="अध्याय (जैसे: 1)" required>
+                <input type="text" id="shloka" placeholder="श्लोक (जैसे: 2)" required>
+                <textarea id="text" placeholder="श्लोक का टेक्स्ट..." rows="4"></textarea>
+                <input type="text" id="video_url" placeholder="यूट्यूब वीडियो ID (सिर्फ ID)" required>
+                <button type="submit">श्लोक जोड़ें</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
