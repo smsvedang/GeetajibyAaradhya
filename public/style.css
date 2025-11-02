@@ -29,25 +29,27 @@ body {
 /* --- MAIN TABS (Home Page) - UPDATED --- */
 .main-tabs {
     display: flex;
-    justify-content: center; /* Center karein */
-    flex-wrap: wrap; /* YEH NAYA HAI: Zaroorat padne par agli line mein bhej dega */
+    /* justify-content: center; HATA DIYA GAYA */
+    /* flex-wrap: wrap; HATA DIYA GAYA */
+    width: 100%; /* NAYA: Poori width lein */
     border-bottom: 2px solid #FFECB3;
     margin-top: 20px;
-    /* overflow-x: auto; HATA DIYA GAYA */
-    /* white-space: nowrap; HATA DIYA GAYA */
 }
 .main-tab-button {
-    padding: 15px 20px; /* Padding thodi kam ki gayi */
+    flex-grow: 1; /* NAYA: Barabar space lein */
+    flex-basis: 0; /* NAYA: Barabar space ke liye zaroori */
+    text-align: center; /* NAYA: Text ko center karein */
+    
+    padding: 15px 10px; /* Padding kam ki gayi */
     cursor: pointer;
     border: none;
     background-color: transparent;
-    font-size: 1.0em; /* Font thoda chhota kiya */
+    font-size: 1.0em; 
     color: #5D4037;
     font-weight: 500;
     transition: all 0.2s ease;
     margin-bottom: -2px; 
     border-bottom: 3px solid transparent;
-    /* flex-shrink: 0; HATA DIYA GAYA (taaki shrink ho sake) */
 }
 .main-tab-button:hover {
     background-color: #FFF3E0;
@@ -115,8 +117,8 @@ body {
 }
 .gallery-item {
     flex-shrink: 0;
-    width: 831px; 
-    height: 522px; 
+    width: 350px; 
+    height: 280px; 
     margin: 0 10px; 
     border-radius: 8px;
     overflow: hidden;
@@ -300,8 +302,8 @@ button.cancel-button {
         font-size: 1.2em; 
     }
     .main-tab-button {
-        padding: 12px 15px; 
-        font-size: 1.0em;
+        padding: 12px 10px; /* Padding aur kam ki gayi */
+        font-size: 0.9em; /* Font aur chhota kiya */
     }
     .adhyay-title {
         font-size: 1.5em;
