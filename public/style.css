@@ -117,8 +117,8 @@ body {
 }
 .gallery-item {
     flex-shrink: 0;
-    width: 350px; 
-    height: 280px; 
+    width: 450px; 
+    height: 380px; 
     margin: 0 10px; 
     border-radius: 8px;
     overflow: hidden;
