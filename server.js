@@ -49,15 +49,9 @@ app.get('/api/shlokas', async (req, res) => {
     try {
         const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
         res.json(shlokas);
-    } 
-   catch (err) {
-    console.error('❌ Error updating About section:', err.message, err.stack);
-    res.status(500).json({ 
-        message: 'Error updating about text', 
-        error: err.message 
-    });
-}
-
+    } catch (err) {
+        res.status(500).json({ message: 'Shlokas laane mein error' });
+    }
 });
 
 // POST: Login
@@ -66,7 +60,7 @@ app.post('/api/login', (req, res) => {
     if (password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true });
     } else {
-        res.status(401).json({ success: false, message: 'Galat Password!' });
+        res.status(401).json({ message: 'Galat Password!' });
     }
 });
 
