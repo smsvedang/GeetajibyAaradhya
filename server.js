@@ -53,7 +53,7 @@ app.get('/api/shlokas', async (req, res) => {
     }
 });
 
-// POST: Login (Yeh 'POST' hai, 'GET' nahi)
+// POST: Login
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
     if (password === process.env.ADMIN_PASSWORD) {
@@ -82,6 +82,8 @@ app.post('/api/shlokas', async (req, res) => {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
     }
 });
+
+// --- 'ABOUT' SECTION API (Yeh hissa missing tha) ---
 
 // GET: 'About' content
 app.get('/api/about', async (req, res) => {
@@ -122,7 +124,7 @@ app.post('/api/about', async (req, res) => {
     }
 });
 
-// --- ARTWORK APIS ---
+// --- ARTWORK APIS (Yeh hissa bhi zaroori hai) ---
 
 // GET: Saare artwork
 app.get('/api/artwork', async (req, res) => {
@@ -172,4 +174,5 @@ app.listen(PORT, () => {
     console.log(`Server ${PORT} par chal raha hai`);
 });
 
+// Vercel ke liye zaroori
 module.exports = app;
