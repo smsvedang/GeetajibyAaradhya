@@ -21,50 +21,87 @@
             </form>
         </div>
 
-        <div id="admin-section" style="display:none;">
-            <h2>Add New Shloka</h2>
-            <form id="shloka-form">
-                <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
-                <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
-                <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
-                <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
-                <button type="submit">Add Shloka</button>
-            </form>
-        </div>
+        <div id="admin-dashboard" style="display:none;">
 
-        <div id="about-section" style="display:none; border-top: 2px solid #ff9800; margin-top: 30px; padding-top: 20px;">
-            <h2>Update "About Aaradhya" Section</h2>
-            <form id="about-form">
-                <textarea id="about-text-input" rows="10" placeholder="Enter text for the 'About' section..."></textarea>
-                <button type="submit">Save About Text</button>
-            </form>
-        </div>
+            <div class="admin-tabs">
+                <button class="tab-button active" data-tab="tab-shloka">Manage Shlokas</button>
+                <button class="tab-button" data-tab="tab-about">Update About</button>
+                <button class="tab-button" data-tab="tab-artwork">Manage Artwork</button>
+            </div>
 
+            <div id="tab-shloka" class="tab-content active">
+                <h2>Add New Shloka</h2>
+                <form id="shloka-form">
+                    <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
+                    <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
+                    <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
+                    <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
+                    <button type="submit">Add Shloka</button>
+                </form>
+                
+                </div>
+
+            <div id="tab-about" class="tab-content">
+                <h2>Update "About Aaradhya" Section</h2>
+                <form id="about-form">
+                    <label for="about-image-url">About Photo URL:</label>
+                    <input type="text" id="about-image-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)">
+                    
+                    <label for="about-text-input">About Text:</label>
+                    <textarea id="about-text-input" rows="10" placeholder="Enter text for the 'About' section..."></textarea>
+                    <button type="submit">Save About Text</button>
+                </form>
+            </div>
+
+            <div id="tab-artwork" class="tab-content">
+                <h2>Manage Artwork Gallery</h2>
+                <p>Artwork admin panel will be built here.</p>
+            </div>
+
+        </div>
     </main>
-    
+
     <script>
         // Saara Admin JavaScript
         
         const loginSection = document.getElementById('login-section');
-        const adminSection = document.getElementById('admin-section');
+        const adminDashboard = document.getElementById('admin-dashboard');
         const loginForm = document.getElementById('login-form');
         const shlokaForm = document.getElementById('shloka-form');
-
-        // Naye 'About' section ke elements
-        const aboutSection = document.getElementById('about-section');
         const aboutForm = document.getElementById('about-form');
         const aboutTextInput = document.getElementById('about-text-input');
+        const aboutImageUrlInput = document.getElementById('about-image-url');
         
-        // Password ko save karne ke liye variable
         let adminPassword = '';
 
-        // Function: Maujooda 'About' text ko load karega
-        async function loadAboutText() {
+        // --- NAYA TAB SWITCHING CODE ---
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Sabhi tabs se 'active' hatao
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Current tab par 'active' lagao
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // --- 'About' Section Code ---
+        async function loadAboutContent() {
             try {
                 const response = await fetch('/api/about');
                 const data = await response.json();
-                if (data && data.content) {
-                    aboutTextInput.value = data.content;
+                if (data) {
+                    if (data.content) {
+                        aboutTextInput.value = data.content;
+                    }
+                    if (data.imageUrl) {
+                        aboutImageUrlInput.value = data.imageUrl;
+                    }
                 }
             } catch (err) {
                 console.error('Failed to load about text');
@@ -85,16 +122,11 @@
             const data = await response.json();
             
             if (data.success) {
-                // Login safal! Password ko variable mein save karo
                 adminPassword = password;
-                
-                // Dono sections dikhao
                 loginSection.style.display = 'none';
-                adminSection.style.display = 'block';
-                aboutSection.style.display = 'block'; 
+                adminDashboard.style.display = 'block'; // Poora dashboard dikhao
                 
-                // 'About' text ko database se load karo
-                loadAboutText(); 
+                loadAboutContent(); // 'About' content load karo
             } else {
                 alert(data.message || 'Login failed!');
             }
@@ -103,49 +135,40 @@
         // 2. Shloka Form Submit
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!adminPassword) {
-                alert('Aap logged in nahi hain. Page refresh karke login karen.');
-                return;
-            }
+            if (!adminPassword) return alert('Please login first.');
             
             const response = await fetch('/api/shlokas', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     adhyay: document.getElementById('adhyay').value,
                     shloka: document.getElementById('shloka').value,
                     text: document.getElementById('text').value,
                     video_url: document.getElementById('video_url').value,
-                    password: adminPassword // Har baar password saath bhejenge
+                    password: adminPassword 
                 })
             });
             
             const data = await response.json();
-            
             if (response.ok) {
                 alert('Shloka added successfully!');
-                shlokaForm.reset(); // Form khaali karo
+                shlokaForm.reset(); 
             } else {
                 alert(data.message || 'Failed to add shloka.');
             }
         });
 
-        // 3. 'About' Form ke liye naya listener
+        // 3. 'About' Form Submit
         aboutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!adminPassword) {
-                alert('Please login first.');
-                return;
-            }
+            if (!adminPassword) return alert('Please login first.');
             
             const response = await fetch('/api/about', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     newText: aboutTextInput.value,
+                    newImageUrl: aboutImageUrlInput.value, // Naya URL bhejo
                     password: adminPassword 
                 })
             });
