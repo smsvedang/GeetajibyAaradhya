@@ -32,8 +32,13 @@
             <div id="tab-shloka" class="tab-content active">
                 <h2>Add New Shloka</h2>
                 <form id="shloka-form">
-                    </form>
-                </div>
+                    <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
+                    <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
+                    <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
+                    <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
+                    <button type="submit">Add Shloka</button>
+                </form>
+            </div>
 
             <div id="tab-about" class="tab-content">
                 <h2>Update "About Aaradhya" Section</h2>
@@ -54,7 +59,6 @@
                     <input type="text" id="artwork-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)" required>
                     <button type="submit">Add Artwork</button>
                 </form>
-
                 <h2>Existing Artwork</h2>
                 <div id="artwork-list">
                     </div>
@@ -73,7 +77,6 @@
         const aboutTextInput = document.getElementById('about-text-input');
         const aboutImageUrlInput = document.getElementById('about-image-url');
         
-        // Naye Artwork Elements
         const artworkForm = document.getElementById('artwork-form');
         const artworkListContainer = document.getElementById('artwork-list');
 
@@ -92,15 +95,22 @@
         });
 
         // --- Data Loading Functions ---
-        async function loadAboutContent() { /* ... (Pehle jaisa) ... */ }
+        async function loadAboutContent() {
+            try {
+                const response = await fetch('/api/about');
+                const data = await response.json();
+                if (data) {
+                    if (data.content) aboutTextInput.value = data.content;
+                    if (data.imageUrl) aboutImageUrlInput.value = data.imageUrl;
+                }
+            } catch (err) { console.error('Failed to load about text'); }
+        }
         
-        // NAYA: Artwork load karne ka function
         async function loadArtwork() {
             try {
                 const response = await fetch('/api/artwork');
                 const artworks = await response.json();
-                artworkListContainer.innerHTML = ''; // List ko saaf karo
-                
+                artworkListContainer.innerHTML = ''; 
                 artworks.forEach(artwork => {
                     const item = document.createElement('div');
                     item.className = 'artwork-admin-item';
@@ -111,87 +121,110 @@
                     `;
                     artworkListContainer.appendChild(item);
                 });
-            } catch (err) {
-                console.error('Failed to load artwork');
-            }
+            } catch (err) { console.error('Failed to load artwork'); }
         }
 
         // --- Event Listeners ---
         
-        // 1. Login
+        // 1. Login (Yahaan POST method hai)
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = document.getElementById('password').value;
-            const response = await fetch('/api/login', { /* ... */ });
+            const response = await fetch('/api/login', {
+                method: 'POST', // YEH 'POST' HONA ZAROORI HAI
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            });
+            
             const data = await response.json();
             
             if (data.success) {
                 adminPassword = password;
                 loginSection.style.display = 'none';
                 adminDashboard.style.display = 'block';
-                
-                // Login ke baad sab kuch load karo
                 loadAboutContent();
-                loadArtwork(); // NAYA
+                loadArtwork();
             } else {
                 alert(data.message || 'Login failed!');
             }
         });
 
         // 2. Shloka Form
-        shlokaForm.addEventListener('submit', async (e) => { /* ... (Pehle jaisa) ... */ });
+        shlokaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminPassword) return alert('Please login first.');
+            const response = await fetch('/api/shlokas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adhyay: document.getElementById('adhyay').value,
+                    shloka: document.getElementById('shloka').value,
+                    text: document.getElementById('text').value,
+                    video_url: document.getElementById('video_url').value,
+                    password: adminPassword 
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Shloka added successfully!');
+                shlokaForm.reset(); 
+            } else { alert(data.message || 'Failed to add shloka.'); }
+        });
 
         // 3. 'About' Form
-        aboutForm.addEventListener('submit', async (e) => { /* ... (Pehle jaisa) ... */ });
+        aboutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminPassword) return alert('Please login first.');
+            const response = await fetch('/api/about', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    newText: aboutTextInput.value,
+                    newImageUrl: aboutImageUrlInput.value,
+                    password: adminPassword 
+                })
+            });
+            const data = await response.json();
+            if (response.ok) { alert('About section saved successfully!'); } 
+            else { alert(data.message || 'Failed to save.'); }
+        });
 
-        // 4. NAYA: Artwork Form Submit
+        // 4. Artwork Form Submit
         artworkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
-
-            const title = document.getElementById('artwork-title').value;
-            const imageUrl = document.getElementById('artwork-url').value;
-            
             const response = await fetch('/api/artwork', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    title: title,
-                    imageUrl: imageUrl,
+                    title: document.getElementById('artwork-title').value,
+                    imageUrl: document.getElementById('artwork-url').value,
                     password: adminPassword 
                 })
             });
-            
             if (response.ok) {
                 alert('Artwork added!');
                 artworkForm.reset();
-                loadArtwork(); // List ko refresh karo
-            } else {
-                alert('Failed to add artwork.');
-            }
+                loadArtwork(); 
+            } else { alert('Failed to add artwork.'); }
         });
 
-        // 5. NAYA: Artwork Delete Button Click
+        // 5. Artwork Delete Button Click
         artworkListContainer.addEventListener('click', async (e) => {
-            // Check karo ki delete button par click hua hai
             if (!e.target.classList.contains('delete-button')) return;
             if (!adminPassword) return alert('Please login first.');
-
             const id = e.target.dataset.id;
             if (!confirm('Are you sure you want to delete this artwork?')) return;
 
             const response = await fetch(`/api/artwork/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: adminPassword }) // Password bhejo
+                body: JSON.stringify({ password: adminPassword })
             });
-
             if (response.ok) {
                 alert('Artwork deleted!');
-                loadArtwork(); // List ko refresh karo
-            } else {
-                alert('Failed to delete artwork.');
-            }
+                loadArtwork(); 
+            } else { alert('Failed to delete artwork.'); }
         });
     </script>
 </body>
