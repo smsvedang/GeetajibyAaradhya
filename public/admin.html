@@ -1,46 +1,75 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>एडमिन पैनल</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="header">
-        <h1>एडमिन पैनल</h1>
+        <h1>Admin Panel</h1>
     </header>
 
     <main class="container">
+        
         <div id="login-section">
-            <h2>लॉगिन</h2>
+            <h2>Login</h2>
             <form id="login-form">
-                <input type="password" id="password" placeholder="पासवर्ड" required>
-                <button type="submit">लॉगिन</button>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
             </form>
         </div>
 
         <div id="admin-section" style="display:none;">
-            <h2>नया श्लोक जोड़ें</h2>
+            <h2>Add New Shloka</h2>
             <form id="shloka-form">
-                <input type="text" id="adhyay" placeholder="अध्याय (जैसे: 1)" required>
-                <input type="text" id="shloka" placeholder="श्लोक (जैसे: 2)" required>
-                <textarea id="text" placeholder="श्लोक का टेक्स्ट..." rows="4"></textarea>
-                <input type="text" id="video_url" placeholder="यूट्यूब वीडियो ID (सिर्फ ID)" required>
-                <button type="submit">श्लोक जोड़ें</button>
+                <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
+                <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
+                <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
+                <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
+                <button type="submit">Add Shloka</button>
             </form>
         </div>
+
+        <div id="about-section" style="display:none; border-top: 2px solid #ff9800; margin-top: 30px; padding-top: 20px;">
+            <h2>Update "About Aaradhya" Section</h2>
+            <form id="about-form">
+                <textarea id="about-text-input" rows="10" placeholder="Enter text for the 'About' section..."></textarea>
+                <button type="submit">Save About Text</button>
+            </form>
+        </div>
+
     </main>
+    
     <script>
-        // Yeh naya, simple JavaScript hai
+        // Saara Admin JavaScript
         
         const loginSection = document.getElementById('login-section');
         const adminSection = document.getElementById('admin-section');
         const loginForm = document.getElementById('login-form');
         const shlokaForm = document.getElementById('shloka-form');
+
+        // Naye 'About' section ke elements
+        const aboutSection = document.getElementById('about-section');
+        const aboutForm = document.getElementById('about-form');
+        const aboutTextInput = document.getElementById('about-text-input');
         
-        // Ek global variable password store karne ke liye
+        // Password ko save karne ke liye variable
         let adminPassword = '';
+
+        // Function: Maujooda 'About' text ko load karega
+        async function loadAboutText() {
+            try {
+                const response = await fetch('/api/about');
+                const data = await response.json();
+                if (data && data.content) {
+                    aboutTextInput.value = data.content;
+                }
+            } catch (err) {
+                console.error('Failed to load about text');
+            }
+        }
 
         // 1. Login Form Submit
         loginForm.addEventListener('submit', async (e) => {
@@ -59,9 +88,13 @@
                 // Login safal! Password ko variable mein save karo
                 adminPassword = password;
                 
-                // Admin panel dikhao
+                // Dono sections dikhao
                 loginSection.style.display = 'none';
                 adminSection.style.display = 'block';
+                aboutSection.style.display = 'block'; 
+                
+                // 'About' text ko database se load karo
+                loadAboutText(); 
             } else {
                 alert(data.message || 'Login failed!');
             }
@@ -71,7 +104,6 @@
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Agar password nahi hai toh
             if (!adminPassword) {
                 alert('Aap logged in nahi hain. Page refresh karke login karen.');
                 return;
@@ -100,10 +132,31 @@
                 alert(data.message || 'Failed to add shloka.');
             }
         });
+
+        // 3. 'About' Form ke liye naya listener
+        aboutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminPassword) {
+                alert('Please login first.');
+                return;
+            }
+            
+            const response = await fetch('/api/about', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    newText: aboutTextInput.value,
+                    password: adminPassword 
+                })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                alert('About section saved successfully!');
+            } else {
+                alert(data.message || 'Failed to save.');
+            }
+        });
     </script>
-    <footer class="footer">
-        <p>By: Aaradhya Soni</p>
-        <p>Contact: 9243714402</p>
-        <p>&copy; 2025 - All Rights Reserved.</p>
 </body>
 </html>

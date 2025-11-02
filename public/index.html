@@ -23,20 +23,13 @@
                 <div class="about-image">
                     <img src="aaradhya.jpg" alt="Aaradhya Soni">
                 </div>
-                <div class="about-text">
-                    <p>
-                        <strong>Aaradhya Soni</strong> is a 12-year-old student currently in the 7th grade.
-                    </p>
-                    <p>
-                        She began her inspiring journey with the Bhagavad Gita after seeing her 'Badi Mummy' (elder aunt), who was also a dedicated student. 
-                    </p>
-                    <p>
-                        Following in her aunt's footsteps, Aaradhya enrolled in classes with <strong>LearnGeeta</strong> and started her own journey of learning and recitation.
-                    </p>
-                    </div>
+                <div class="about-text" id="about-text-content">
+                    <p>Loading details...</p> 
+                </div>
             </div>
         </div>
     </section>
+
     <section class="gallery">
         <div class="container">
             <h2>Aaradhya's Artwork Gallery</h2>
@@ -44,31 +37,33 @@
                 <div class="gallery-item">
                     <img src="drawing1.jpg" alt="Aaradhya's Drawing 1">
                 </div>
-                
                 <div class="gallery-item">
                     <img src="drawing2.jpg" alt="Aaradhya's Drawing 2">
                 </div>
-
                 <div class="gallery-item">
                     <img src="drawing3.jpg" alt="Aaradhya's Drawing 3">
                 </div>
-
-                </div>
+            </div>
         </div>
     </section>
 
     <main class="shloka-list-container">
-        </main>
+        <div class="container">
+            <h2>Chapters and Shlokas of the Gita</h2>
+            <div id="shloka-container">
+                <p>Loading shlokas...</p>
+            </div>
+        </div>
+    </main>
 
     <footer class="footer">
-        <p>By: Aaradhya Soni</p>
-        <p>Contact: 9243714402</p>
+        <p>Contact: Your Name</p>
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
     <script>
-        // (The JavaScript code for loading shlokas remains exactly the same)
         
+        // Video embed banane ka function
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
@@ -84,11 +79,12 @@
             return videoWrapper;
         }
 
+        // Shloka item banane ka function
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
             
-            // Format the text (replace newlines with <br>)
+            // Text ko format karein (newline ko <br> mein badlein)
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
 
             item.innerHTML = `
@@ -100,17 +96,40 @@
             return item;
         }
 
+        // 'About' section ko load karne ka naya function
+        async function loadAboutSection() {
+            const aboutContainer = document.getElementById('about-text-content');
+            try {
+                const response = await fetch('/api/about');
+                const data = await response.json();
+                if (data && data.content) {
+                    // Text format karein (newlines ko <br> se badlein)
+                    aboutContainer.innerHTML = `<p>${data.content.replace(/\n/g, '<br>')}</p>`;
+                } else {
+                    aboutContainer.innerHTML = '<p>Details could not be loaded.</p>';
+                }
+            } catch (err) {
+                aboutContainer.innerHTML = '<p>Could not load details.</p>';
+            }
+        }
+
+        // Page load hone par sab kuch load karein
         window.addEventListener('load', async () => {
             const container = document.getElementById('shloka-container');
+            
             try {
+                // 1. Shlokas load karein
                 const response = await fetch('/api/shlokas');
                 const shlokas = await response.json();
                 
-                container.innerHTML = ''; // Clear "Loading..."
+                container.innerHTML = ''; // "Loading..." hatao
                 
                 shlokas.forEach(shloka => {
                     container.appendChild(createShlokaItem(shloka));
                 });
+
+                // 2. 'About' text load karein
+                loadAboutSection(); 
                 
             } catch (err) {
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
