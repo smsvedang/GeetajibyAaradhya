@@ -7,24 +7,68 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <h1>Shrimad Bhagavad Gita</h1>
-        <p>Shloka Recitation by Aaradhya Soni</p>
+    
+    <header class="hero-section">
+        <div class="container">
+            <h1>Shrimad Bhagavad Gita</h1>
+            <h2>Shloka Recitation by Aaradhya Soni</h2>
+            <p class="subtitle">A platform dedicated to Aaradhya's journey of learning the Gita. Listen and share her inspiring efforts.</p>
+        </div>
     </header>
 
-    <main class="container" id="shloka-container">
-        <p>Loading shlokas...</p>
-    </main>
+    <section class="about">
+        <div class="container">
+            <h2>About Aaradhya</h2>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="aaradhya.jpg" alt="Aaradhya Soni">
+                </div>
+                <div class="about-text">
+                    <p>
+                        <strong>Aaradhya Soni</strong> is a 12-year-old student currently in the 7th grade.
+                    </p>
+                    <p>
+                        She began her inspiring journey with the Bhagavad Gita after seeing her 'Badi Mummy' (elder aunt), who was also a dedicated student. 
+                    </p>
+                    <p>
+                        Following in her aunt's footsteps, Aaradhya enrolled in classes with <strong>LearnGeeta</strong> and started her own journey of learning and recitation.
+                    </p>
+                    </div>
+            </div>
+        </div>
+    </section>
+    <section class="gallery">
+        <div class="container">
+            <h2>Aaradhya's Artwork Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="drawing1.jpg" alt="Aaradhya's Drawing 1">
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="drawing2.jpg" alt="Aaradhya's Drawing 2">
+                </div>
+
+                <div class="gallery-item">
+                    <img src="drawing3.jpg" alt="Aaradhya's Drawing 3">
+                </div>
+
+                </div>
+        </div>
+    </section>
+
+    <main class="shloka-list-container">
+        </main>
 
     <footer class="footer">
         <p>By: Aaradhya Soni</p>
         <p>Contact: 9243714402</p>
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
+
     <script>
-        // यह JavaScript API से श्लोक लोड करेगा
+        // (The JavaScript code for loading shlokas remains exactly the same)
         
-        // वीडियो बनाने का फंक्शन
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
@@ -40,29 +84,29 @@
             return videoWrapper;
         }
 
-        // श्लोक का आइटम बनाने का फंक्शन
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
             
+            // Format the text (replace newlines with <br>)
+            const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
+
             item.innerHTML = `
                 <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
-                <p class="shloka-text">${shloka.text.replace(/\n/g, '<br>')}</p>
+                <p class="shloka-text">${formattedText}</p>
             `;
             
             item.appendChild(createVideo(shloka.video_id));
             return item;
         }
 
-        // पेज लोड होने पर श्लोक लाएं
         window.addEventListener('load', async () => {
             const container = document.getElementById('shloka-container');
-            
             try {
                 const response = await fetch('/api/shlokas');
                 const shlokas = await response.json();
                 
-                container.innerHTML = ''; // "Loading..." हटाओ
+                container.innerHTML = ''; // Clear "Loading..."
                 
                 shlokas.forEach(shloka => {
                     container.appendChild(createShlokaItem(shloka));
