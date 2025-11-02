@@ -1,51 +1,35 @@
+/* --- Basic Setup --- */
+* {
+    box-sizing: border-box; /* Yeh layout aur mobile problems ko fix karta hai */
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     background-color: #FFF8E1;
     color: #4E342E;
 }
-.header {
-    background-color: #FF9800;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-.header h1 { margin: 0; }
 .container {
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 900px;
+    margin: 0 auto;
     padding: 20px;
-    background: #fff;
-    border-radius: 8px;
 }
-.footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #5D4037;
-    color: white;
-    margin-top: 40px;
-}
-/* फॉर्म स्टाइलिंग */
-input, textarea, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-sizing: border-box; /* यह padding को width में शामिल करता है */
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-button {
+
+/* --- 1. Hero (Welcome) Section --- */
+.hero-section {
     background-color: #FF9800;
     color: white;
-    cursor: pointer;
-    border: none;
-    font-weight: bold;
+    padding: 40px 20px;
+    text-align: center;
 }
+.hero-section h1 { margin: 0; font-size: 2.8em; }
+.hero-section h2 { margin: 10px 0; font-size: 1.5em; font-weight: 300; }
+.hero-section .subtitle { font-size: 1.1em; max-width: 600px; margin: 15px auto 0; line-height: 1.5; }
+
 /* --- 2. About Section --- */
 .about {
     background-color: #ffffff;
     padding: 30px 0;
-    margin-top: -10px; /* Slight overlap */
+    margin-top: -10px;
     border-bottom: 2px solid #FFECB3;
 }
 .about h2 {
@@ -53,37 +37,17 @@ button {
     color: #D84315;
     border-bottom: 2px solid #FF9800;
     padding-bottom: 10px;
-    margin-bottom: 20px; /* Added margin */
+    margin-bottom: 20px;
 }
+.about-content { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 30px; }
+.about-image { flex: 1; min-width: 250px; }
+.about-image img { width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.about-text { flex: 2; min-width: 300px; }
+.about-text p { font-size: 1.1em; line-height: 1.7; margin: 0 0 15px 0; white-space: pre-wrap; }
 
-/* !! ADD THIS NEW CODE !! */
-.about-content {
-    display: flex;
-    flex-wrap: wrap; /* Allows stacking on small screens */
-    align-items: flex-start;
-    gap: 30px; /* Space between image and text */
-}
-.about-image {
-    flex: 1; /* Takes up 1 part of the space */
-    min-width: 250px; /* Ensures image doesn't get too small */
-}
-.about-image img {
-    width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.about-text {
-    flex: 2; /* Takes up 2 parts of the space */
-    min-width: 300px; /* Ensures text has enough space */
-}
-.about-text p {
-    font-size: 1.1em;
-    line-height: 1.7;
-    margin: 0 0 15px 0; /* Spacing for paragraphs */
-}
-/* --- 4. Artwork Gallery Section --- */
+/* --- 3. Artwork Gallery Section --- */
 .gallery {
-    background-color: #FAF8F1; /* A slightly different off-white */
+    background-color: #FAF8F1;
     padding: 30px 0;
 }
 .gallery h2 {
@@ -96,26 +60,114 @@ button {
 }
 .gallery-grid {
     display: grid;
-    /* This creates 3 columns, but they can shrink */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px; /* Space between images */
+    gap: 20px;
 }
 .gallery-item {
     border-radius: 8px;
-    overflow: hidden; /* Ensures image corners are rounded */
+    overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
 }
-.gallery-item img {
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-item:hover { transform: scale(1.03); }
+
+/* --- 4. Shloka List Section --- */
+.shloka-list-container {
+    padding: 20px 0;
+}
+.shloka-list-container h2 {
+    font-size: 2em;
+    text-align: center;
+    color: #5D4037;
+    margin-bottom: 30px;
+}
+
+/* NAYA Adhyay Group Style */
+.adhyay-group {
+    margin-bottom: 30px;
+    border: 1px solid #FFECB3;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.adhyay-title {
+    font-size: 1.8em;
+    font-weight: 600;
+    padding: 20px;
+    cursor: pointer;
+    background-color: #FFF3E0;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+}
+.adhyay-title::after {
+    content: '▼'; /* Down arrow */
+    font-size: 0.8em;
+}
+.adhyay-group[open] .adhyay-title::after {
+    content: '▲'; /* Up arrow */
+}
+
+.shloka-item {
+    padding: 20px;
+    border-top: 1px solid #FFECB3;
+}
+.shloka-item h3 { margin: 0 0 10px 0; color: #D84315; }
+.shloka-text { font-style: italic; color: #6D4C41; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
+
+/* !! VIDEO FIX !! (Pehle jaisa hi hai, par ab box-sizing ke saath sahi chalega) */
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    max-width: 100%; /* Mobile fix */
+}
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Prevents stretching */
-    display: block;
 }
-.gallery-item:hover {
-    transform: scale(1.03); /* Slight zoom effect on hover */
+
+/* --- Footer --- */
+.footer {
+    text-align: center;
+    padding: 30px;
+    background-color: #5D4037;
+    color: #FFFFFF;
+    margin-top: 40px;
 }
-/* --- NAYA ADMIN TABS CSS --- */
+.footer p { margin: 5px 0; }
+
+/* --- Admin Panel Styles --- */
+input, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-sizing: border-box; 
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+button {
+    background-color: #FF9800;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+button.delete-button { /* Naya Delete Button Style */
+    background-color: #D84315;
+    font-size: 0.9em;
+    padding: 8px;
+    width: auto;
+}
+
+/* NAYA ADMIN TABS CSS */
 .admin-tabs {
     display: flex;
     border-bottom: 2px solid #FF9800;
@@ -135,16 +187,38 @@ button {
     color: white;
     font-weight: bold;
 }
-.tab-content {
-    display: none; /* Sabhi content ko chhipao */
-}
-.tab-content.active {
-    display: block; /* Sirf active content ko dikhao */
-}
-/* Form labels ko behtar dikhao */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 #about-form label {
     display: block;
     margin-top: 10px;
+    font-weight: bold;
+    color: #5D4037;
+}
+
+/* NAYA Artwork List Style (Admin) */
+#artwork-list {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+}
+.artwork-admin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.artwork-admin-item img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+.artwork-admin-item p {
+    flex-grow: 1;
+    margin: 0;
     font-weight: bold;
     color: #5D4037;
 }

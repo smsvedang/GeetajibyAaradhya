@@ -25,99 +25,83 @@ const shlokaSchema = new mongoose.Schema({
 });
 const Shloka = mongoose.model('Shloka', shlokaSchema);
 
-// --- 2. SiteContent Model (UPDATED) ---
-// (Ab yeh 'About' text aur image URL dono ko store karega)
+// --- 2. SiteContent Model ('About') ---
 const contentSchema = new mongoose.Schema({
     key: { type: String, unique: true, required: true },
     content: { type: String, required: true },
-    imageUrl: { type: String, required: false } // Naya field photo ke liye
+    imageUrl: { type: String, required: false }
 });
 const SiteContent = mongoose.model('SiteContent', contentSchema);
 
+// --- 3. NAYA Artwork Model ---
+const artworkSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    imageUrl: { type: String, required: true }
+});
+const Artwork = mongoose.model('Artwork', artworkSchema);
 
-// --- 3. API Routes ---
 
-// GET: Saare shlokas (No Change)
-app.get('/api/shlokas', async (req, res) => {
+// --- API Routes ---
+
+// Shloka APIs (No Change)
+app.get('/api/shlokas', async (req, res) => { /* ... (Pehle jaisa) ... */ });
+app.post('/api/login', (req, res) => { /* ... (Pehle jaisa) ... */ });
+app.post('/api/shlokas', async (req, res) => { /* ... (Pehle jaisa) ... */ });
+
+// 'About' APIs (No Change)
+app.get('/api/about', async (req, res) => { /* ... (Pehle jaisa) ... */ });
+app.post('/api/about', async (req, res) => { /* ... (Pehle jaisa) ... */ });
+
+// --- !! NAYE ARTWORK APIS !! ---
+
+// GET: Saare artwork paayein (index.html ke liye)
+app.get('/api/artwork', async (req, res) => {
     try {
-        const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
-        res.json(shlokas);
+        const artworks = await Artwork.find();
+        res.json(artworks);
     } catch (err) {
-        res.status(500).json({ message: 'Shlokas laane mein error' });
+        res.status(500).json({ message: 'Artwork laane mein error' });
     }
 });
 
-// POST: Login (No Change)
-app.post('/api/login', (req, res) => {
-    const { password } = req.body;
-    if (password === process.env.ADMIN_PASSWORD) {
-        res.json({ success: true });
-    } else {
-        res.status(401).json({ success: false, message: 'Galat Password!' });
-    }
-});
-
-// POST: Naya shloka jodein (No Change)
-app.post('/api/shlokas', async (req, res) => {
-    if (req.body.password !== process.env.ADMIN_PASSWORD) {
-        return res.status(401).json({ message: 'Password galat hai' });
-    }
-    try {
-        const newShloka = new Shloka({
-            adhyay: Number(req.body.adhyay),
-            shloka: Number(req.body.shloka),
-            text: req.body.text,
-            video_id: req.body.video_url
-        });
-        await newShloka.save();
-        res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
-    }
-});
-
-// --- 'ABOUT' SECTION API (UPDATED) ---
-
-// GET: 'About' content (Ab text aur image dono bhejega)
-app.get('/api/about', async (req, res) => {
-    try {
-        let about = await SiteContent.findOne({ key: 'aboutText' });
-        if (!about) {
-            about = new SiteContent({ 
-                key: 'aboutText', 
-                content: 'Welcome! Please update this text in the admin panel.',
-                imageUrl: 'placeholder.jpg' // Ek default placeholder
-            });
-            await about.save();
-        }
-        res.json(about); // Poora 'about' object bhej do
-    } catch (err) {
-        res.status(500).json({ message: 'Cannot fetch about text' });
-    }
-});
-
-// POST: 'About' content update karein (Ab text aur image dono save karega)
-app.post('/api/about', async (req, res) => {
+// POST: Naya artwork jodein (admin.html ke liye)
+app.post('/api/artwork', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
     
     try {
-        const { newText, newImageUrl } = req.body; // Dono cheezein lo
-        await SiteContent.findOneAndUpdate(
-            { key: 'aboutText' },
-            { 
-                content: newText,
-                imageUrl: newImageUrl // Naya image URL save karo
-            },
-            { upsert: true } 
-        );
-        res.json({ success: true, message: 'About section updated!' });
+        const newArtwork = new Artwork({
+            title: req.body.title,
+            imageUrl: req.body.imageUrl
+        });
+        await newArtwork.save();
+        res.status(201).json(newArtwork); // Naya item wapas bhejo
     } catch (err) {
-        res.status(500).json({ message: 'Error updating about text' });
+        res.status(500).json({ message: 'Artwork jodne mein error' });
     }
 });
+
+// DELETE: Artwork delete karein (admin.html ke liye)
+app.delete('/api/artwork/:id', async (req, res) => {
+    // ID ko URL se extract karo
+    const { id } = req.params;
+    
+    // Password ko body se extract karo
+    const { password } = req.body;
+
+    if (password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+
+    try {
+        await Artwork.findByIdAndDelete(id);
+        res.json({ success: true, message: 'Artwork deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Artwork delete karne mein error' });
+    }
+});
+
 
 // --- Server Start ---
 const PORT = process.env.PORT || 3000;
