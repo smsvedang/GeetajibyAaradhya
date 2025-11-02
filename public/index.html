@@ -8,7 +8,6 @@
 </head>
 <body>
     
-    <!-- Header (Yeh tabs ke baahar rahega) -->
     <header class="hero-section">
         <div class="container">
             <h1>Shrimad Bhagavad Gita</h1>
@@ -17,20 +16,16 @@
         </div>
     </header>
 
-    <!-- Naya Tab Structure -->
     <div class="container">
         
-        <!-- Tab Buttons -->
         <div class="main-tabs">
             <button class="main-tab-button active" data-tab="tab-shlokas">Gita Shlokas</button>
             <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
             <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
         </div>
 
-        <!-- Tab Content Panels -->
         <div class="main-tab-panels">
 
-            <!-- Tab 1: Gita Shlokas (Default Active) -->
             <div id="tab-shlokas" class="main-tab-content active">
                 <main class="shloka-list-container">
                     <h2>Chapters and Shlokas of the Gita</h2>
@@ -40,7 +35,6 @@
                 </main>
             </div>
 
-            <!-- Tab 2: About Aaradhya -->
             <div id="tab-about" class="main-tab-content">
                 <section class="about">
                     <h2>About Aaradhya</h2>
@@ -55,26 +49,22 @@
                 </section>
             </div>
 
-            <!-- Tab 3: Artwork Gallery -->
             <div id="tab-gallery" class="main-tab-content">
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
-                    <div class="gallery-grid" id="gallery-grid-container">
-                        <p>Gallery loading...</p>
+                    <div class="gallery-marquee">
+                        <div class="gallery-track" id="gallery-track-container">
+                            </div>
                     </div>
                 </section>
             </div>
 
         </div>
-    </div> <!-- End container -->
-
-
-    <footer class="footer">
+    </div> <footer class="footer">
         <p>Contact: Your Name</p>
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
-    <!-- Saara Public JavaScript -->
     <script>
         
         // --- FUNCTION 1: Video embed banana ---
@@ -132,7 +122,7 @@
         // --- FUNCTION 4: Shlokas ko Group karke load karna ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
-            container.innerHTML = ''; // "Loading..." hatao
+            container.innerHTML = ''; 
 
             try {
                 const response = await fetch('/api/shlokas');
@@ -175,58 +165,67 @@
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery load karna ---
+        // --- FUNCTION 5: Artwork Gallery load karna (Marquee ke liye) ---
         async function loadArtworkGallery() {
-            const container = document.getElementById('gallery-grid-container');
-            container.innerHTML = ''; // "Loading..." hatao
+            const container = document.getElementById('gallery-track-container'); 
+            container.innerHTML = ''; 
             try {
                 const response = await fetch('/api/artwork');
                 const artworks = await response.json();
 
                 if (artworks.length === 0) {
-                    container.innerHTML = '<p>No artwork added yet. (Add from Admin Panel)</p>';
+                    container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet. (Add from Admin Panel)</p>';
                     return;
                 }
 
-                artworks.forEach(artwork => {
+                const itemWidth = 270; // Image (250px) + margin (20px)
+                const duration = artworks.length * 5; 
+                
+                container.style.animationDuration = `${Math.max(duration, 20)}s`;
+                container.style.width = `${artworks.length * itemWidth * 2}px`;
+                
+                const createGalleryItem = (artwork) => {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
-                    container.appendChild(item);
+                    return item;
+                };
+
+                // Originals aur Clones (loop ke liye)
+                artworks.forEach(artwork => {
+                    container.appendChild(createGalleryItem(artwork));
                 });
+                artworks.forEach(artwork => {
+                    container.appendChild(createGalleryItem(artwork));
+                });
+
             } catch (err) {
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
         
         // --- NAYA TAB SWITCHING JAVASCRIPT ---
-        // 'load' event ke bajaaye 'DOMContentLoaded' ka istemaal taaki JS pehle load ho
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.main-tab-button');
             const contents = document.querySelectorAll('.main-tab-content');
 
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    // Sabhi tabs se 'active' hatao
                     tabs.forEach(t => t.classList.remove('active'));
                     contents.forEach(c => c.classList.remove('active'));
 
-                    // Current tab par 'active' lagao
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.tab).classList.add('active');
                 });
             });
         });
 
-
         // --- PAGE LOAD ---
-        // Page load hone par sabhi content ko load karein
         window.addEventListener('load', () => {
-            loadGroupedShlokas(); // Shlokas ko group mein dikhao
+            loadGroupedShlokas(); 
             loadAboutSection(); 
-            loadArtworkGallery(); // Gallery load karo
+            loadArtworkGallery(); 
         });
     </script>
 </body>
 </html>
-
