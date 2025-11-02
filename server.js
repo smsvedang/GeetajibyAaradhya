@@ -3,25 +3,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
-const cors = require('cors'); // --- CORS ko import karein ---
-
-require('dotenv').config(); // --- .env file ke variables load karne ke liye ---
 
 const app = express();
 
 // --- Middleware ---
-app.use(cors()); // --- CORS middleware ko use karein ---
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- MongoDB Connection ---
 const dbURI = process.env.MONGO_URI; 
-if (!dbURI) {
-    console.error('MongoDB URI not found. Make sure MONGO_URI is set in your .env file.');
-    process.exit(1); // Exit if no DB connection string
-}
-
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB से जुड़ गए!'))
     .catch(err => console.error('MongoDB Connection Error:', err));
@@ -31,7 +22,7 @@ const shlokaSchema = new mongoose.Schema({
     adhyay: { type: Number, required: true },
     shloka: { type: Number, required: true },
     text: { type: String, required: false },
-    video_id: { type: String, required: true } // video_url se video_id kiya (jaisa POST route mein tha)
+    video_id: { type: String, required: true }
 });
 const Shloka = mongoose.model('Shloka', shlokaSchema);
 
@@ -66,9 +57,6 @@ app.get('/api/shlokas', async (req, res) => {
 // POST: Login
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
-    if (!process.env.ADMIN_PASSWORD) {
-        return res.status(500).json({ message: 'Admin password not set on server.'});
-    }
     if (password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true });
     } else {
@@ -82,12 +70,11 @@ app.post('/api/shlokas', async (req, res) => {
         return res.status(401).json({ message: 'Password galat hai' });
     }
     try {
-        // video_url ko video_id se badla, model se match karne ke liye
         const newShloka = new Shloka({
             adhyay: Number(req.body.adhyay),
             shloka: Number(req.body.shloka),
             text: req.body.text,
-            video_id: req.body.video_id // video_url ki jagah video_id
+            video_id: req.body.video_url
         });
         await newShloka.save();
         res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
@@ -107,7 +94,7 @@ app.get('/api/about', async (req, res) => {
             about = new SiteContent({ 
                 key: 'aboutText', 
                 content: 'Welcome! Please update this text in the admin panel.',
-                imageUrl: 'https://placehold.co/150x150/FFF8E1/BFA080?text=Image' // Placeholder image
+                imageUrl: 'placeholder.jpg'
             });
             await about.save();
         }
@@ -170,22 +157,12 @@ app.post('/api/artwork', async (req, res) => {
 // DELETE: Artwork delete karein
 app.delete('/api/artwork/:id', async (req, res) => {
     const { id } = req.params;
-    // Password ko body se check karna DELETE request mein tricky ho sakta hai
-    // Aksar, yeh auth token se hota hai, but aapke pattern ke hisaab se body use kar rahe hain
-    // Note: Bahut se HTTP clients DELETE ke saath body nahi bhejte.
-    // Behtar hoga password ko headers ya query param se bhejein, lekin abhi ke liye body se hi rakhte hain.
-    
-    // Updated: Password ko query parameter se lena
-    const { password } = req.query; 
+    const { password } = req.body;
     if (password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
-    
     try {
-        const result = await Artwork.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ message: 'Artwork not found' });
-        }
+        await Artwork.findByIdAndDelete(id);
         res.json({ success: true, message: 'Artwork deleted' });
     } catch (err) {
         res.status(500).json({ message: 'Artwork delete karne mein error' });
@@ -200,3 +177,4 @@ app.listen(PORT, () => {
 
 // Vercel ke liye zaroori
 module.exports = app;
+

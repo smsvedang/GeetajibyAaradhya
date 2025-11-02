@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaradhya Soni - Geeta Shlokas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- 1. Hero Section -->
+    <header class="hero-section">
+        <div class="container">
+            <h1>Shrimad Bhagavad Gita</h1>
+            <h2>Shloka Recitation by Aaradhya Soni</h2>
+            <p class="subtitle">A platform dedicated to Aaradhya's journey of learning the Gita. Listen and share her inspiring efforts.</p>
+        </div>
+    </header>
+
+    <!-- 2. 'About Aaradhya' Section -->
+    <section class="about">
+        <div class="container">
+            <h2>About Aaradhya</h2>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
+                </div>
+                <div class="about-text" id="about-text-content">
+                    <p>Loading details...</p> 
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Artwork Gallery Section -->
+    <section class="gallery">
+        <div class="container">
+            <h2>Aaradhya's Artwork Gallery</h2>
+            <div class="gallery-grid" id="gallery-grid-container">
+                <p>Gallery loading...</p>
+                <!-- Artwork ab JS se load hoga -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Shloka List Section (UPDATED) -->
+    <main class="shloka-list-container">
+        <div class="container">
+            <h2>Chapters and Shlokas of the Gita</h2>
+            <!-- Shlokas ab JS se group hokar yahaan aayenge -->
+            <div id="shloka-container">
+                <p>Loading shlokas...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Contact: Your Name</p>
+        <p>&copy; 2025 - All Rights Reserved.</p>
+    </footer>
+
+    <!-- Saara Public JavaScript -->
+    <script>
+        
+        // --- FUNCTION 1: Video embed banana ---
+        function createVideo(video_id) {
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'video-wrapper';
+            videoWrapper.innerHTML = `
+                <iframe 
+                    width="560" height="315" 
+                    src="https://www.youtube.com/embed/${video_id}" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>`;
+            return videoWrapper;
+        }
+
+        // --- FUNCTION 2: Shloka item banana ---
+        function createShlokaItem(shloka) {
+            const item = document.createElement('div');
+            item.className = 'shloka-item';
+            const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
+            item.innerHTML = `
+                <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+                <p class="shloka-text">${formattedText}</p>
+            `;
+            item.appendChild(createVideo(shloka.video_id));
+            return item;
+        }
+
+
+        // --- FUNCTION 3: 'About' section load karna ---
+        async function loadAboutSection() {
+            const aboutContainer = document.getElementById('about-text-content');
+            const aboutImage = document.getElementById('about-image-src');
+            try {
+                const response = await fetch('/api/about');
+                const data = await response.json();
+                
+                if (data && data.content) {
+                    aboutContainer.innerHTML = `<p>${data.content.replace(/\n/g, '<br>')}</p>`;
+                } else {
+                    aboutContainer.innerHTML = '<p>Details could not be loaded.</p>';
+                }
+                
+                if (data && data.imageUrl) {
+                    aboutImage.src = data.imageUrl;
+                }
+
+            } catch (err) {
+                aboutContainer.innerHTML = '<p>Could not load details.</p>';
+            }
+        }
+
+        // --- FUNCTION 4: Shlokas ko Group karke load karna ---
+        async function loadGroupedShlokas() {
+            const container = document.getElementById('shloka-container');
+            container.innerHTML = ''; // "Loading..." hatao
+
+            try {
+                const response = await fetch('/api/shlokas');
+                const shlokas = await response.json(); 
+
+                if (shlokas.length === 0) {
+                    container.innerHTML = '<p>No shlokas added yet.</p>';
+                    return;
+                }
+
+                // Step 1: Shlokas ko Adhyay se group karo
+                const shlokasByAdhyay = {};
+                shlokas.forEach(shloka => {
+                    if (!shlokasByAdhyay[shloka.adhyay]) {
+                        shlokasByAdhyay[shloka.adhyay] = [];
+                    }
+                    shlokasByAdhyay[shloka.adhyay].push(shloka);
+                });
+
+                // Step 2: Grouped list ko render karo
+                for (const adhyayNum in shlokasByAdhyay) {
+                    const adhyayGroup = document.createElement('details');
+                    adhyayGroup.className = 'adhyay-group';
+                    if (adhyayNum == 1) {
+                        adhyayGroup.open = true; // Pehla adhyay khula rakho
+                    }
+
+                    const adhyayTitle = document.createElement('summary');
+                    adhyayTitle.className = 'adhyay-title';
+                    adhyayTitle.textContent = `Adhyay ${adhyayNum}`;
+                    adhyayGroup.appendChild(adhyayTitle);
+
+                    shlokasByAdhyay[adhyayNum].forEach(shloka => {
+                        const shlokaElement = createShlokaItem(shloka);
+                        adhyayGroup.appendChild(shlokaElement);
+                    });
+
+                    container.appendChild(adhyayGroup);
+                }
+            } catch (err) {
+                container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
+            }
+        }
+
+        // --- FUNCTION 5: Artwork Gallery load karna ---
+        async function loadArtworkGallery() {
+            const container = document.getElementById('gallery-grid-container');
+            container.innerHTML = ''; // "Loading..." hatao
+            try {
+                const response = await fetch('/api/artwork');
+                const artworks = await response.json();
+
+                if (artworks.length === 0) {
+                    container.innerHTML = '<p>No artwork added yet. (Add from Admin Panel)</p>';
+                    return;
+                }
+
+                artworks.forEach(artwork => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                container.innerHTML = '<p>Could not load gallery.</p>';
+            }
+        }
+
+        // --- PAGE LOAD ---
+        // Page load hone par sab kuch load karein
+        window.addEventListener('load', () => {
+            loadGroupedShlokas(); // Shlokas ko group mein dikhao
+            loadAboutSection(); 
+            loadArtworkGallery(); // Gallery load karo
+        });
+    </script>
+</body>
+</html>
