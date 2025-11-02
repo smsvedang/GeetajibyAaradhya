@@ -32,22 +32,17 @@
         </div>
     </main>
     <script>
-        // यह JavaScript एडमिन पैनल को चलाएगा
+        // Yeh naya, simple JavaScript hai
         
         const loginSection = document.getElementById('login-section');
         const adminSection = document.getElementById('admin-section');
         const loginForm = document.getElementById('login-form');
         const shlokaForm = document.getElementById('shloka-form');
+        
+        // Ek global variable password store karne ke liye
+        let adminPassword = '';
 
-        // चेक करें कि क्या हमारे पास पहले से टोकन है (localStorage में)
-        const token = localStorage.getItem('adminToken');
-        if (token) {
-            // अगर टोकन है, तो सीधा एडमिन पैनल दिखाओ
-            loginSection.style.display = 'none';
-            adminSection.style.display = 'block';
-        }
-
-        // 1. लॉगिन फॉर्म सबमिट
+        // 1. Login Form Submit
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = document.getElementById('password').value;
@@ -61,9 +56,10 @@
             const data = await response.json();
             
             if (data.success) {
-                // लॉगिन सफल! टोकन को सेव करो
-                localStorage.setItem('adminToken', data.token);
-                // एडमिन पैनल दिखाओ
+                // Login safal! Password ko variable mein save karo
+                adminPassword = password;
+                
+                // Admin panel dikhao
                 loginSection.style.display = 'none';
                 adminSection.style.display = 'block';
             } else {
@@ -71,13 +67,13 @@
             }
         });
 
-        // 2. श्लोक फॉर्म सबमिट
+        // 2. Shloka Form Submit
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const currentToken = localStorage.getItem('adminToken');
-            if (!currentToken) {
-                alert('Login token missing. Please login again.');
+            // Agar password nahi hai toh
+            if (!adminPassword) {
+                alert('Aap logged in nahi hain. Page refresh karke login karen.');
                 return;
             }
             
@@ -85,13 +81,13 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${currentToken}` // टोकन को साथ भेजो
                 },
                 body: JSON.stringify({
                     adhyay: document.getElementById('adhyay').value,
                     shloka: document.getElementById('shloka').value,
                     text: document.getElementById('text').value,
-                    video_url: document.getElementById('video_url').value
+                    video_url: document.getElementById('video_url').value,
+                    password: adminPassword // Har baar password saath bhejenge
                 })
             });
             
@@ -99,7 +95,7 @@
             
             if (response.ok) {
                 alert('Shloka added successfully!');
-                shlokaForm.reset(); // फॉर्म खाली करो
+                shlokaForm.reset(); // Form khaali karo
             } else {
                 alert(data.message || 'Failed to add shloka.');
             }
