@@ -29,7 +29,8 @@ body {
 /* --- MAIN TABS (Home Page) --- */
 .main-tabs {
     display: flex;
-    justify-content: center;
+    /* YEH BADLAAV HAI: 'center' se 'flex-start' (left align) kiya gaya */
+    justify-content: flex-start; 
     border-bottom: 2px solid #FFECB3;
     margin-top: 20px;
     overflow-x: auto;
@@ -301,7 +302,6 @@ button.cancel-button {
         padding: 12px 15px; 
         font-size: 1.0em;
     }
-    /* Mobile par Adhyay title chhota karein */
     .adhyay-title {
         font-size: 1.5em;
         padding: 15px;
