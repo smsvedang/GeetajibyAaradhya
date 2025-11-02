@@ -1,4 +1,4 @@
-/* --- YEH POORA NAYA, SAAF CODE HAI --- */
+/* --- Yeh 100% Saaf (Clean) Code Hai --- */
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -50,7 +50,12 @@ app.get('/api/shlokas', async (req, res) => {
         const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
         res.json(shlokas);
     } catch (err) {
-        res.status(500).json({ message: 'Shlokas laane mein error' });
+        console.error('❌ Error fetching shlokas:', err.message);
+        res.status(500).json({
+            message: 'Shlokas laane mein error',
+            error: err.message,
+            stack: err.stack
+        });
     }
 });
 
