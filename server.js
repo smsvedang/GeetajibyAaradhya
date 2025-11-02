@@ -49,14 +49,15 @@ app.get('/api/shlokas', async (req, res) => {
     try {
         const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
         res.json(shlokas);
-    } catch (err) {
-        console.error('❌ Error fetching shlokas:', err.message);
-        res.status(500).json({
-            message: 'Shlokas laane mein error',
-            error: err.message,
-            stack: err.stack
-        });
-    }
+    } 
+   catch (err) {
+    console.error('❌ Error updating About section:', err.message, err.stack);
+    res.status(500).json({ 
+        message: 'Error updating about text', 
+        error: err.message 
+    });
+}
+
 });
 
 // POST: Login
