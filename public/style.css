@@ -26,28 +26,28 @@ body {
 .hero-section .subtitle { font-size: 1.1em; max-width: 600px; margin: 15px auto 0; line-height: 1.5; }
 
 
-/* --- MAIN TABS (Home Page) --- */
+/* --- MAIN TABS (Home Page) - UPDATED --- */
 .main-tabs {
     display: flex;
-    /* YEH BADLAAV HAI: 'center' se 'flex-start' (left align) kiya gaya */
-    justify-content: flex-start; 
+    justify-content: center; /* Center karein */
+    flex-wrap: wrap; /* YEH NAYA HAI: Zaroorat padne par agli line mein bhej dega */
     border-bottom: 2px solid #FFECB3;
     margin-top: 20px;
-    overflow-x: auto;
-    white-space: nowrap;
+    /* overflow-x: auto; HATA DIYA GAYA */
+    /* white-space: nowrap; HATA DIYA GAYA */
 }
 .main-tab-button {
-    padding: 15px 30px;
+    padding: 15px 20px; /* Padding thodi kam ki gayi */
     cursor: pointer;
     border: none;
     background-color: transparent;
-    font-size: 1.1em;
+    font-size: 1.0em; /* Font thoda chhota kiya */
     color: #5D4037;
     font-weight: 500;
     transition: all 0.2s ease;
     margin-bottom: -2px; 
     border-bottom: 3px solid transparent;
-    flex-shrink: 0; 
+    /* flex-shrink: 0; HATA DIYA GAYA (taaki shrink ho sake) */
 }
 .main-tab-button:hover {
     background-color: #FFF3E0;
@@ -64,6 +64,7 @@ body {
 .main-tab-content.active {
     display: block;
 }
+/* --- END TAB FIX --- */
 
 
 /* --- 2. About Section (Tab content) --- */
@@ -114,8 +115,8 @@ body {
 }
 .gallery-item {
     flex-shrink: 0;
-    width: 250px; 
-    height: 180px; 
+    width: 831px; 
+    height: 522px; 
     margin: 0 10px; 
     border-radius: 8px;
     overflow: hidden;
@@ -307,3 +308,4 @@ button.cancel-button {
         padding: 15px;
     }
 }
+
