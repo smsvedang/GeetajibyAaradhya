@@ -1,6 +1,6 @@
 /* --- Basic Setup --- */
 * {
-    box-sizing: border-box; /* Yeh layout aur mobile problems ko fix karta hai */
+    box-sizing: border-box; 
 }
 body {
     font-family: Arial, sans-serif;
@@ -25,12 +25,48 @@ body {
 .hero-section h2 { margin: 10px 0; font-size: 1.5em; font-weight: 300; }
 .hero-section .subtitle { font-size: 1.1em; max-width: 600px; margin: 15px auto 0; line-height: 1.5; }
 
-/* --- 2. About Section --- */
-.about {
-    background-color: #ffffff;
-    padding: 30px 0;
-    margin-top: -10px;
+
+/* --- NAYA MAIN TABS (Home Page) --- */
+.main-tabs {
+    display: flex;
+    justify-content: center;
     border-bottom: 2px solid #FFECB3;
+    margin-top: 20px;
+    /* Margin-bottom tabs panel se aayega */
+}
+.main-tab-button {
+    padding: 15px 30px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 1.1em;
+    color: #5D4037;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: -2px; /* Active border ke liye */
+    border-bottom: 3px solid transparent;
+}
+.main-tab-button:hover {
+    background-color: #FFF3E0;
+}
+.main-tab-button.active {
+    color: #D84315;
+    font-weight: bold;
+    border-bottom-color: #D84315;
+}
+.main-tab-content {
+    display: none;
+    padding-top: 30px;
+}
+.main-tab-content.active {
+    display: block;
+}
+/* --- END NAYA MAIN TABS --- */
+
+
+/* --- 2. About Section (Ab Tab ke andar) --- */
+.about {
+    /* Isse extra padding hata di gayi hai */
 }
 .about h2 {
     font-size: 2em;
@@ -38,6 +74,7 @@ body {
     border-bottom: 2px solid #FF9800;
     padding-bottom: 10px;
     margin-bottom: 20px;
+    margin-top: 0; /* Tab content ke liye zaroori */
 }
 .about-content { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 30px; }
 .about-image { flex: 1; min-width: 250px; }
@@ -45,10 +82,9 @@ body {
 .about-text { flex: 2; min-width: 300px; }
 .about-text p { font-size: 1.1em; line-height: 1.7; margin: 0 0 15px 0; white-space: pre-wrap; }
 
-/* --- 3. Artwork Gallery Section --- */
+/* --- 3. Artwork Gallery Section (Ab Tab ke andar) --- */
 .gallery {
-    background-color: #FAF8F1;
-    padding: 30px 0;
+    /* Isse extra padding hata di gayi hai */
 }
 .gallery h2 {
     font-size: 2em;
@@ -57,6 +93,7 @@ body {
     border-bottom: 2px solid #FF9800;
     padding-bottom: 10px;
     margin-bottom: 30px;
+    margin-top: 0; /* Tab content ke liye zaroori */
 }
 .gallery-grid {
     display: grid;
@@ -72,15 +109,16 @@ body {
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gallery-item:hover { transform: scale(1.03); }
 
-/* --- 4. Shloka List Section --- */
+/* --- 4. Shloka List Section (Ab Tab ke andar) --- */
 .shloka-list-container {
-    padding: 20px 0;
+    /* Isse extra padding hata di gayi hai */
 }
 .shloka-list-container h2 {
     font-size: 2em;
     text-align: center;
     color: #5D4037;
     margin-bottom: 30px;
+    margin-top: 0; /* Tab content ke liye zaroori */
 }
 
 /* Adhyay Group Style */
@@ -123,7 +161,7 @@ body {
     height: 0;
     overflow: hidden;
     border-radius: 8px;
-    max-width: 100%; /* Mobile fix */
+    max-width: 100%; 
 }
 .video-wrapper iframe {
     position: absolute;
@@ -143,7 +181,7 @@ body {
 }
 .footer p { margin: 5px 0; }
 
-/* --- Admin Panel Styles --- */
+/* --- Admin Panel Styles (No Change) --- */
 input, textarea, button {
     width: 100%;
     padding: 12px;
@@ -160,14 +198,12 @@ button {
     border: none;
     font-weight: bold;
 }
-button.delete-button { /* Delete Button Style */
+button.delete-button { 
     background-color: #D84315;
     font-size: 0.9em;
     padding: 8px;
     width: auto;
 }
-
-/* Admin Tabs CSS */
 .admin-tabs {
     display: flex;
     border-bottom: 2px solid #FF9800;
@@ -196,8 +232,6 @@ button.delete-button { /* Delete Button Style */
     font-weight: bold;
     color: #5D4037;
 }
-
-/* Artwork List Style (Admin) */
 #artwork-list {
     margin-top: 20px;
     border-top: 1px solid #eee;
@@ -222,6 +256,4 @@ button.delete-button { /* Delete Button Style */
     font-weight: bold;
     color: #5D4037;
 }
-.artwork-admin-item button {
-    margin-left: 15px;
-}   
+

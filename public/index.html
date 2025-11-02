@@ -8,7 +8,7 @@
 </head>
 <body>
     
-    <!-- 1. Hero Section -->
+    <!-- Header (Yeh tabs ke baahar rahega) -->
     <header class="hero-section">
         <div class="container">
             <h1>Shrimad Bhagavad Gita</h1>
@@ -17,42 +17,57 @@
         </div>
     </header>
 
-    <!-- 2. 'About Aaradhya' Section -->
-    <section class="about">
-        <div class="container">
-            <h2>About Aaradhya</h2>
-            <div class="about-content">
-                <div class="about-image">
-                    <img src="https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
-                </div>
-                <div class="about-text" id="about-text-content">
-                    <p>Loading details...</p> 
-                </div>
-            </div>
+    <!-- Naya Tab Structure -->
+    <div class="container">
+        
+        <!-- Tab Buttons -->
+        <div class="main-tabs">
+            <button class="main-tab-button active" data-tab="tab-shlokas">Gita Shlokas</button>
+            <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
+            <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
         </div>
-    </section>
 
-    <!-- 3. Artwork Gallery Section -->
-    <section class="gallery">
-        <div class="container">
-            <h2>Aaradhya's Artwork Gallery</h2>
-            <div class="gallery-grid" id="gallery-grid-container">
-                <p>Gallery loading...</p>
-                <!-- Artwork ab JS se load hoga -->
-            </div>
-        </div>
-    </section>
+        <!-- Tab Content Panels -->
+        <div class="main-tab-panels">
 
-    <!-- 4. Shloka List Section (UPDATED) -->
-    <main class="shloka-list-container">
-        <div class="container">
-            <h2>Chapters and Shlokas of the Gita</h2>
-            <!-- Shlokas ab JS se group hokar yahaan aayenge -->
-            <div id="shloka-container">
-                <p>Loading shlokas...</p>
+            <!-- Tab 1: Gita Shlokas (Default Active) -->
+            <div id="tab-shlokas" class="main-tab-content active">
+                <main class="shloka-list-container">
+                    <h2>Chapters and Shlokas of the Gita</h2>
+                    <div id="shloka-container">
+                        <p>Loading shlokas...</p>
+                    </div>
+                </main>
             </div>
+
+            <!-- Tab 2: About Aaradhya -->
+            <div id="tab-about" class="main-tab-content">
+                <section class="about">
+                    <h2>About Aaradhya</h2>
+                    <div class="about-content">
+                        <div class="about-image">
+                            <img src="https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
+                        </div>
+                        <div class="about-text" id="about-text-content">
+                            <p>Loading details...</p> 
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Tab 3: Artwork Gallery -->
+            <div id="tab-gallery" class="main-tab-content">
+                <section class="gallery">
+                    <h2>Aaradhya's Artwork Gallery</h2>
+                    <div class="gallery-grid" id="gallery-grid-container">
+                        <p>Gallery loading...</p>
+                    </div>
+                </section>
+            </div>
+
         </div>
-    </main>
+    </div> <!-- End container -->
+
 
     <footer class="footer">
         <p>Contact: Your Name</p>
@@ -91,7 +106,6 @@
             return item;
         }
 
-
         // --- FUNCTION 3: 'About' section load karna ---
         async function loadAboutSection() {
             const aboutContainer = document.getElementById('about-text-content');
@@ -129,7 +143,6 @@
                     return;
                 }
 
-                // Step 1: Shlokas ko Adhyay se group karo
                 const shlokasByAdhyay = {};
                 shlokas.forEach(shloka => {
                     if (!shlokasByAdhyay[shloka.adhyay]) {
@@ -138,12 +151,11 @@
                     shlokasByAdhyay[shloka.adhyay].push(shloka);
                 });
 
-                // Step 2: Grouped list ko render karo
                 for (const adhyayNum in shlokasByAdhyay) {
                     const adhyayGroup = document.createElement('details');
                     adhyayGroup.className = 'adhyay-group';
                     if (adhyayNum == 1) {
-                        adhyayGroup.open = true; // Pehla adhyay khula rakho
+                        adhyayGroup.open = true; 
                     }
 
                     const adhyayTitle = document.createElement('summary');
@@ -186,9 +198,29 @@
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
+        
+        // --- NAYA TAB SWITCHING JAVASCRIPT ---
+        // 'load' event ke bajaaye 'DOMContentLoaded' ka istemaal taaki JS pehle load ho
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.main-tab-button');
+            const contents = document.querySelectorAll('.main-tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Sabhi tabs se 'active' hatao
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    // Current tab par 'active' lagao
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        });
+
 
         // --- PAGE LOAD ---
-        // Page load hone par sab kuch load karein
+        // Page load hone par sabhi content ko load karein
         window.addEventListener('load', () => {
             loadGroupedShlokas(); // Shlokas ko group mein dikhao
             loadAboutSection(); 
@@ -197,3 +229,4 @@
     </script>
 </body>
 </html>
+
