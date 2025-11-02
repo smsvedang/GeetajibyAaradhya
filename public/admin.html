@@ -13,7 +13,6 @@
 
     <main class="container">
         
-        <!-- Login Form -->
         <div id="login-section">
             <h2>Login</h2>
             <form id="login-form">
@@ -22,30 +21,32 @@
             </form>
         </div>
 
-        <!-- Admin Dashboard -->
         <div id="admin-dashboard" style="display:none;">
 
-            <!-- Tab Buttons -->
             <div class="admin-tabs">
                 <button class="tab-button active" data-tab="tab-shloka">Manage Shlokas</button>
                 <button class="tab-button" data-tab="tab-about">Update About</button>
                 <button class="tab-button" data-tab="tab-artwork">Manage Artwork</button>
             </div>
 
-            <!-- Tab 1: Shloka Panel -->
             <div id="tab-shloka" class="tab-content active">
-                <h2>Add New Shloka</h2>
+                <h2 id="shloka-form-title">Add New Shloka</h2>
                 <form id="shloka-form">
+                    <input type="hidden" id="shloka-id" value="">
+                    
                     <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
                     <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
                     <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
                     <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
-                    <button type="submit">Add Shloka</button>
+                    <button type="submit" id="shloka-submit-button">Add Shloka</button>
+                    <button type="button" id="shloka-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
                 </form>
-                <!-- (Yahaan Shloka edit/delete list baad mein jodeinge) -->
+
+                <h2 style="margin-top: 30px;">Existing Shlokas</h2>
+                <div id="shloka-list-admin">
+                    </div>
             </div>
 
-            <!-- Tab 2: About Panel -->
             <div id="tab-about" class="tab-content">
                 <h2>Update "About Aaradhya" Section</h2>
                 <form id="about-form">
@@ -58,7 +59,6 @@
                 </form>
             </div>
 
-            <!-- Tab 3: Artwork Panel -->
             <div id="tab-artwork" class="tab-content">
                 <h2>Add New Artwork</h2>
                 <form id="artwork-form">
@@ -68,24 +68,31 @@
                 </form>
                 <h2>Existing Artwork</h2>
                 <div id="artwork-list">
-                    <!-- Artwork list JS se load hogi -->
-                </div>
+                    </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Saara Admin JavaScript -->
     <script>
         const loginSection = document.getElementById('login-section');
         const adminDashboard = document.getElementById('admin-dashboard');
         const loginForm = document.getElementById('login-form');
         
+        // Shloka Elements (UPDATED)
         const shlokaForm = document.getElementById('shloka-form');
+        const shlokaFormTitle = document.getElementById('shloka-form-title');
+        const shlokaSubmitButton = document.getElementById('shloka-submit-button');
+        const shlokaCancelButton = document.getElementById('shloka-cancel-edit');
+        const shlokaIdInput = document.getElementById('shloka-id');
+        const shlokaListContainer = document.getElementById('shloka-list-admin');
+
+        // About Elements
         const aboutForm = document.getElementById('about-form');
         const aboutTextInput = document.getElementById('about-text-input');
         const aboutImageUrlInput = document.getElementById('about-image-url');
         
+        // Artwork Elements
         const artworkForm = document.getElementById('artwork-form');
         const artworkListContainer = document.getElementById('artwork-list');
 
@@ -133,6 +140,35 @@
             } catch (err) { console.error('Failed to load artwork'); }
         }
 
+        // NAYA: Shloka list (admin) load karne ka function
+        async function loadShlokasAdmin() {
+            try {
+                const response = await fetch('/api/shlokas');
+                const shlokas = await response.json();
+                shlokaListContainer.innerHTML = ''; // List ko saaf karo
+                
+                shlokas.forEach(shloka => {
+                    const item = document.createElement('div');
+                    item.className = 'shloka-admin-item';
+                    item.innerHTML = `
+                        <p><strong>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</strong></p>
+                        <div class="admin-buttons">
+                            <button class="edit-button" data-id="${shloka._id}">Edit</button>
+                            <button class="delete-button" data-id="${shloka._id}">Delete</button>
+                        </div>
+                    `;
+                    
+                    // Poora shloka data 'edit' ke liye save karein
+                    item.querySelector('.edit-button').dataset.shloka = JSON.stringify(shloka);
+                    
+                    shlokaListContainer.appendChild(item);
+                });
+            } catch (err) {
+                console.error('Failed to load shlokas for admin');
+            }
+        }
+
+
         // --- Event Listeners ---
         
         // 1. Login
@@ -151,8 +187,11 @@
                     adminPassword = password;
                     loginSection.style.display = 'none';
                     adminDashboard.style.display = 'block';
+                    
+                    // Login ke baad sab kuch load karo
                     loadAboutContent();
                     loadArtwork();
+                    loadShlokasAdmin(); // NAYA
                 } else {
                     alert(data.message || 'Login failed!');
                 }
@@ -162,12 +201,19 @@
             }
         });
 
-        // 2. Shloka Form
+        // 2. Shloka Form (UPDATED for Edit/Add)
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
-            const response = await fetch('/api/shlokas', {
-                method: 'POST',
+
+            const shlokaId = shlokaIdInput.value;
+            const isEditMode = !!shlokaId; // Check karein ki ID hai ya nahi
+
+            const url = isEditMode ? `/api/shlokas/${shlokaId}` : '/api/shlokas';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     adhyay: document.getElementById('adhyay').value,
@@ -177,12 +223,73 @@
                     password: adminPassword 
                 })
             });
+            
             const data = await response.json();
             if (response.ok) {
-                alert('Shloka added successfully!');
-                shlokaForm.reset(); 
-            } else { alert(data.message || 'Failed to add shloka.'); }
+                alert(isEditMode ? 'Shloka updated!' : 'Shloka added!');
+                resetShlokaForm();
+                loadShlokasAdmin(); // List ko refresh karo
+            } else {
+                alert(data.message || 'Failed to save shloka.');
+            }
         });
+        
+        // NAYA: Shloka 'Cancel Edit' button
+        function resetShlokaForm() {
+            shlokaForm.reset();
+            shlokaIdInput.value = '';
+            shlokaFormTitle.textContent = 'Add New Shloka';
+            shlokaSubmitButton.textContent = 'Add Shloka';
+            shlokaCancelButton.style.display = 'none';
+        }
+        shlokaCancelButton.addEventListener('click', resetShlokaForm);
+
+        // NAYA: Shloka List (Admin) par Edit/Delete click
+        shlokaListContainer.addEventListener('click', async (e) => {
+            if (!adminPassword) return alert('Please login first.');
+            
+            const target = e.target;
+            const id = target.dataset.id;
+
+            // --- DELETE ---
+            if (target.classList.contains('delete-button')) {
+                if (!confirm('Are you sure you want to delete this shloka?')) return;
+
+                const response = await fetch(`/api/shlokas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+
+                if (response.ok) {
+                    alert('Shloka deleted!');
+                    loadShlokasAdmin(); // List ko refresh karo
+                } else {
+                    alert('Failed to delete shloka.');
+                }
+            }
+            
+            // --- EDIT ---
+            if (target.classList.contains('edit-button')) {
+                const shlokaData = JSON.parse(target.dataset.shloka);
+                
+                // Form ko data se bharo
+                shlokaIdInput.value = shlokaData._id;
+                document.getElementById('adhyay').value = shlokaData.adhyay;
+                document.getElementById('shloka').value = shlokaData.shloka;
+                document.getElementById('text').value = shlokaData.text || '';
+                document.getElementById('video_url').value = shlokaData.video_id;
+                
+                // Form ko 'Edit Mode' mein daalo
+                shlokaFormTitle.textContent = 'Edit Shloka';
+                shlokaSubmitButton.textContent = 'Update Shloka';
+                shlokaCancelButton.style.display = 'block';
+                
+                // Form par scroll karo
+                shlokaForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
 
         // 3. 'About' Form
         aboutForm.addEventListener('submit', async (e) => {

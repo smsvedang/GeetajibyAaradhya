@@ -17,7 +17,7 @@ mongoose.connect(dbURI)
     .then(() => console.log('MongoDB से जुड़ गए!'))
     .catch(err => console.error('MongoDB Connection Error:', err));
 
-// --- 1. Shloka Model (Yeh zaroori hai) ---
+// --- 1. Shloka Model ---
 const shlokaSchema = new mongoose.Schema({
     adhyay: { type: Number, required: true },
     shloka: { type: Number, required: true },
@@ -26,7 +26,7 @@ const shlokaSchema = new mongoose.Schema({
 });
 const Shloka = mongoose.model('Shloka', shlokaSchema);
 
-// --- 2. SiteContent Model ('About' ke liye) (Yeh zaroori hai) ---
+// --- 2. SiteContent Model ('About') ---
 const contentSchema = new mongoose.Schema({
     key: { type: String, unique: true, required: true },
     content: { type: String, required: true },
@@ -34,7 +34,7 @@ const contentSchema = new mongoose.Schema({
 });
 const SiteContent = mongoose.model('SiteContent', contentSchema);
 
-// --- 3. Artwork Model (Yeh pehle se tha) ---
+// --- 3. Artwork Model ---
 const artworkSchema = new mongoose.Schema({
     title: { type: String, required: true },
     imageUrl: { type: String, required: true }
@@ -83,6 +83,44 @@ app.post('/api/shlokas', async (req, res) => {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
     }
 });
+
+// NAYA: Shloka EDIT karein (PUT)
+app.put('/api/shlokas/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+    try {
+        const { id } = req.params;
+        const updatedShloka = {
+            adhyay: Number(req.body.adhyay),
+            shloka: Number(req.body.shloka),
+            text: req.body.text,
+            video_id: req.body.video_url
+        };
+        
+        await Shloka.findByIdAndUpdate(id, updatedShloka);
+        res.json({ success: true, message: 'Shloka updated!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Shloka update karne mein error', error: err.message });
+    }
+});
+
+// NAYA: Shloka DELETE karein
+app.delete('/api/shlokas/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+    try {
+        const { id } = req.params;
+        await Shloka.findByIdAndDelete(id);
+        res.json({ success: true, message: 'Shloka deleted!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Shloka delete karne mein error', error: err.message });
+    }
+});
+
 
 // --- 'ABOUT' SECTION API ---
 
@@ -177,4 +215,3 @@ app.listen(PORT, () => {
 
 // Vercel ke liye zaroori
 module.exports = app;
-
