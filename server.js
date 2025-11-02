@@ -16,7 +16,7 @@ mongoose.connect(dbURI)
     .then(() => console.log('MongoDB से जुड़ गए!'))
     .catch(err => console.error('MongoDB Connection Error:', err));
 
-// --- 1. Shloka Model ---
+// --- 1. Shloka Model (Yeh zaroori hai) ---
 const shlokaSchema = new mongoose.Schema({
     adhyay: { type: Number, required: true },
     shloka: { type: Number, required: true },
@@ -25,7 +25,7 @@ const shlokaSchema = new mongoose.Schema({
 });
 const Shloka = mongoose.model('Shloka', shlokaSchema);
 
-// --- 2. SiteContent Model ('About') ---
+// --- 2. SiteContent Model ('About' ke liye) (Yeh zaroori hai) ---
 const contentSchema = new mongoose.Schema({
     key: { type: String, unique: true, required: true },
     content: { type: String, required: true },
@@ -33,7 +33,7 @@ const contentSchema = new mongoose.Schema({
 });
 const SiteContent = mongoose.model('SiteContent', contentSchema);
 
-// --- 3. Artwork Model ---
+// --- 3. Artwork Model (Yeh pehle se tha) ---
 const artworkSchema = new mongoose.Schema({
     title: { type: String, required: true },
     imageUrl: { type: String, required: true }
@@ -83,7 +83,7 @@ app.post('/api/shlokas', async (req, res) => {
     }
 });
 
-// --- 'ABOUT' SECTION API (Yeh hissa missing tha) ---
+// --- 'ABOUT' SECTION API ---
 
 // GET: 'About' content
 app.get('/api/about', async (req, res) => {
@@ -124,7 +124,7 @@ app.post('/api/about', async (req, res) => {
     }
 });
 
-// --- ARTWORK APIS (Yeh hissa bhi zaroori hai) ---
+// --- ARTWORK APIS ---
 
 // GET: Saare artwork
 app.get('/api/artwork', async (req, res) => {
