@@ -51,6 +51,7 @@
                     <h2>About Aaradhya</h2>
                     <div class="about-content">
                         <div class="about-image">
+                            <!-- Placeholder image -->
                             <img src="httpsG://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
                         </div>
                         <div class="about-text" id="about-text-content">
@@ -60,14 +61,13 @@
                 </section>
             </div>
 
-            <!-- Tab 3: Artwork Gallery (Marquee) -->
+            <!-- Tab 3: Artwork Gallery (UPDATED TO GRID) -->
             <div id="tab-gallery" class="main-tab-content">
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
-                    <div class="gallery-marquee">
-                        <div class="gallery-track" id="gallery-track-container">
-                            <!-- Images JS se load hongi -->
-                        </div>
+                    <!-- Marquee ko Grid se replace kiya gaya -->
+                    <div class="gallery-grid" id="gallery-grid-container">
+                        <!-- Images JS se load hongi -->
                     </div>
                 </section>
             </div>
@@ -81,7 +81,7 @@
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
-    <!-- Saara Public JavaScript -->
+    <!-- Saara Public JavaScript (Poora) -->
     <script>
         
         // --- FUNCTION 1: Video embed banana ---
@@ -189,13 +189,13 @@
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery load karna ---
+        // --- FUNCTION 5: Artwork Gallery load karna (Grid ke liye) ---
         async function loadArtworkGallery() {
-            const container = document.getElementById('gallery-track-container'); 
+            const container = document.getElementById('gallery-grid-container'); 
             if (!container) return; 
             container.innerHTML = ''; 
             try {
-                // CACHE-BUSTER: Hamesha naya data laayega
+                // Hamesha naya data laayega (cache-buster)
                 const response = await fetch('/api/artwork?cache_buster=' + new Date().getTime());
                 const artworks = await response.json();
 
@@ -203,25 +203,13 @@
                     container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet. (Add from Admin Panel)</p>';
                     return;
                 }
-
-                const itemWidth = 270; 
-                const duration = artworks.length * 5; 
                 
-                container.style.animationDuration = `${Math.max(duration, 20)}s`;
-                container.style.width = `${artworks.length * itemWidth * 2}px`;
-                
-                const createGalleryItem = (artwork) => {
+                // Grid logic
+                artworks.forEach(artwork => {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
-                    return item;
-                };
-
-                artworks.forEach(artwork => {
-                    container.appendChild(createGalleryItem(artwork));
-                });
-                artworks.forEach(artwork => {
-                    container.appendChild(createGalleryItem(artwork));
+                    container.appendChild(item);
                 });
 
             } catch (err) {
