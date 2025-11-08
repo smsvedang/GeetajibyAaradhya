@@ -47,6 +47,12 @@ const Artwork = mongoose.model('Artwork', artworkSchema);
 // GET: Saare shlokas
 app.get('/api/shlokas', async (req, res) => {
     try {
+        // --- NAYA CACHE FIX ---
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        // --- END FIX ---
+
         const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
         res.json(shlokas);
     } catch (err) {
@@ -56,6 +62,7 @@ app.get('/api/shlokas', async (req, res) => {
 
 // POST: Login
 app.post('/api/login', (req, res) => {
+    // ... (No change here) ...
     const { password } = req.body;
     if (password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true });
@@ -66,6 +73,7 @@ app.post('/api/login', (req, res) => {
 
 // POST: Naya shloka jodein
 app.post('/api/shlokas', async (req, res) => {
+    // ... (No change here) ...
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
@@ -84,8 +92,9 @@ app.post('/api/shlokas', async (req, res) => {
     }
 });
 
-// NAYA: Shloka EDIT karein (PUT)
+// (Shloka PUT aur DELETE APIs)
 app.put('/api/shlokas/:id', async (req, res) => {
+    // ... (No change here) ...
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
@@ -97,7 +106,6 @@ app.put('/api/shlokas/:id', async (req, res) => {
             text: req.body.text,
             video_id: req.body.video_url
         };
-        
         await Shloka.findByIdAndUpdate(id, updatedShloka);
         res.json({ success: true, message: 'Shloka updated!' });
     } catch (err) {
@@ -106,8 +114,8 @@ app.put('/api/shlokas/:id', async (req, res) => {
     }
 });
 
-// NAYA: Shloka DELETE karein
 app.delete('/api/shlokas/:id', async (req, res) => {
+    // ... (No change here) ...
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
@@ -127,6 +135,12 @@ app.delete('/api/shlokas/:id', async (req, res) => {
 // GET: 'About' content
 app.get('/api/about', async (req, res) => {
     try {
+        // --- NAYA CACHE FIX ---
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        // --- END FIX ---
+        
         let about = await SiteContent.findOne({ key: 'aboutText' });
         if (!about) {
             about = new SiteContent({ 
@@ -144,6 +158,7 @@ app.get('/api/about', async (req, res) => {
 
 // POST: 'About' content update karein
 app.post('/api/about', async (req, res) => {
+    // ... (No change here) ...
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
@@ -168,6 +183,12 @@ app.post('/api/about', async (req, res) => {
 // GET: Saare artwork
 app.get('/api/artwork', async (req, res) => {
     try {
+        // --- NAYA CACHE FIX ---
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        // --- END FIX ---
+
         const artworks = await Artwork.find();
         res.json(artworks);
     } catch (err) {
@@ -177,6 +198,7 @@ app.get('/api/artwork', async (req, res) => {
 
 // POST: Naya artwork jodein
 app.post('/api/artwork', async (req, res) => {
+    // ... (No change here) ...
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
@@ -194,6 +216,7 @@ app.post('/api/artwork', async (req, res) => {
 
 // DELETE: Artwork delete karein
 app.delete('/api/artwork/:id', async (req, res) => {
+    // ... (No change here) ...
     const { id } = req.params;
     const { password } = req.body;
     if (password !== process.env.ADMIN_PASSWORD) {
