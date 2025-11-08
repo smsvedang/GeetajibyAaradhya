@@ -81,7 +81,7 @@ body {
 .about-text { flex: 2; min-width: 300px; }
 .about-text p { font-size: 1.1em; line-height: 1.7; margin: 0 0 15px 0; white-space: pre-wrap; }
 
-/* --- 3. Artwork Gallery Section (UPDATED TO GRID) --- */
+/* --- 3. Artwork Gallery Section (UPDATED TO CAROUSEL) --- */
 .gallery h2 {
     font-size: 2em;
     color: #D84315;
@@ -91,31 +91,70 @@ body {
     margin-bottom: 30px;
     margin-top: 0;
 }
-/* Marquee/Track/Animation styles HATA DIYE GAYE hain */
-/* YEH NAYA (ya puraana waapas laaya gaya) GRID STYLE hai */
-.gallery-grid {
-    display: grid;
-    /* Yeh 3 columns banaayega, lekin mobile par 1 ya 2 */
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px; /* Images ke beech space */
-}
-.gallery-item {
+
+/* Naya Carousel Style */
+.carousel-container {
+    position: relative;
+    max-width: 700px; /* Slider ki max width */
+    margin: auto;
+    overflow: hidden;
     border-radius: 8px;
-    overflow: hidden; /* Image ke kone (corners) goal rakhega */
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    /* Height/Width ab marquee ki tarah fixed nahi hain */
 }
-.gallery-item img {
+.carousel-item {
+    display: none; /* Sabhi slides ko chhipao */
+    animation: fadeEffect 0.5s ease-in-out;
+}
+.carousel-item.active {
+    display: block; /* Sirf active slide ko dikhao */
+}
+.carousel-item img {
     width: 100%;
-    height: 100%;
-    object-fit: cover; 
     display: block;
 }
-.gallery-item:hover {
-    transform: scale(1.03); /* Hover par zoom effect */
+/* Fade Animation */
+@keyframes fadeEffect {
+    from {opacity: 0.4}
+    to {opacity: 1}
 }
-/* --- END GALLERY FIX --- */
+
+/* Next & Previous buttons */
+.carousel-button {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -22px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    background-color: rgba(0,0,0,0.3);
+    border: none;
+}
+.carousel-button.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+.carousel-button:hover {
+    background-color: rgba(0,0,0,0.6);
+}
+
+/* Slide Counter Text */
+.slide-counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+/* --- END CAROUSEL STYLE --- */
 
 
 /* --- 4. Shloka List Section (Tab content) --- */
@@ -296,5 +335,10 @@ button.cancel-button {
     .adhyay-title {
         font-size: 1.5em;
         padding: 15px;
+    }
+    /* Carousel buttons ko mobile par chhota karein */
+    .carousel-button {
+        padding: 10px;
+        font-size: 16px;
     }
 }

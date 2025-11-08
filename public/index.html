@@ -61,14 +61,21 @@
                 </section>
             </div>
 
-            <!-- Tab 3: Artwork Gallery (UPDATED TO GRID) -->
+            <!-- Tab 3: Artwork Gallery (UPDATED TO CAROUSEL) -->
             <div id="tab-gallery" class="main-tab-content">
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
-                    <!-- Marquee ko Grid se replace kiya gaya -->
-                    <div class="gallery-grid" id="gallery-grid-container">
+                    
+                    <!-- Naya Carousel Structure -->
+                    <div class="carousel-container" id="gallery-carousel-container">
                         <!-- Images JS se load hongi -->
+                        <!-- Buttons -->
+                        <button classd="carousel-button prev" id="carousel-prev">&#10094;</button>
+                        <button class="carousel-button next" id="carousel-next">&#10095;</button>
+                        <!-- Slide Number -->
+                        <div class="slide-counter" id="slide-counter-text"></div>
                     </div>
+
                 </section>
             </div>
 
@@ -81,10 +88,10 @@
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
-    <!-- Saara Public JavaScript (Poora) -->
+    <!-- Saara Public JavaScript (UPDATED) -->
     <script>
         
-        // --- FUNCTION 1: Video embed banana ---
+        // --- FUNCTION 1, 2, 3, 4 (No Change) ---
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
@@ -100,7 +107,6 @@
             return videoWrapper;
         }
 
-        // --- FUNCTION 2: Shloka item banana ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
@@ -113,12 +119,10 @@
             return item;
         }
 
-        // --- FUNCTION 3: 'About' section load karna ---
         async function loadAboutSection() {
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
             try {
-                // CACHE-BUSTER: Hamesha naya data laayega
                 const response = await fetch('/api/about?cache_buster=' + new Date().getTime());
                 const data = await response.json();
                 
@@ -133,19 +137,16 @@
                 } else {
                     aboutImage.src = 'https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya'; // Fallback
                 }
-
             } catch (err) {
                 aboutContainer.innerHTML = '<p>Could not load details.</p>';
             }
         }
 
-        // --- FUNCTION 4: Shlokas ko Group karke load karna ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
 
             try {
-                // CACHE-BUSTER: Hamesha naya data laayega
                 const response = await fetch('/api/shlokas?cache_buster=' + new Date().getTime());
                 const shlokas = await response.json(); 
 
@@ -168,7 +169,7 @@
 					
 					const numAdhyay = parseInt(adhyayNum, 10);
 					if (numAdhyay <= 3) {
-						adhyayGroup.open = true; // Pehle 3 adhyay khule rakho
+						adhyayGroup.open = true; 
 					}
 
                     const adhyayTitle = document.createElement('summary');
@@ -189,34 +190,82 @@
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery load karna (Grid ke liye) ---
+        // --- FUNCTION 5: Artwork Gallery load karna (UPDATED FOR CAROUSEL) ---
         async function loadArtworkGallery() {
-            const container = document.getElementById('gallery-grid-container'); 
+            const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
-            container.innerHTML = ''; 
+            
             try {
-                // Hamesha naya data laayega (cache-buster)
                 const response = await fetch('/api/artwork?cache_buster=' + new Date().getTime());
                 const artworks = await response.json();
 
                 if (artworks.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet. (Add from Admin Panel)</p>';
+                    container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet.</p>';
                     return;
                 }
                 
-                // Grid logic
-                artworks.forEach(artwork => {
+                // Naya Carousel Logic
+                artworks.forEach((artwork, index) => {
                     const item = document.createElement('div');
-                    item.className = 'gallery-item';
+                    item.className = 'carousel-item';
+                    // Pehli image ko 'active' (visible) banao
+                    if (index === 0) item.classList.add('active'); 
                     item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
                     container.appendChild(item);
                 });
+                
+                // Naya Function call: Carousel ke button set karo
+                setupCarouselListeners(artworks.length);
 
             } catch (err) {
                 console.error("Error loading artwork:", err);
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
+
+        // --- NAYA FUNCTION 6: Carousel button logic ---
+        function setupCarouselListeners(totalSlides) {
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
+            const prevButton = document.getElementById('carousel-prev');
+            const nextButton = document.getElementById('carousel-next');
+            const counterText = document.getElementById('slide-counter-text');
+
+            function showSlide(index) {
+                // Bounds check karo (aakhiri slide se aage/peeche jaana)
+                if (index >= totalSlides) {
+                    currentSlide = 0; // Waapas pehli slide par
+                } else if (index < 0) {
+                    currentSlide = totalSlides - 1; // Aakhiri slide par
+                } else {
+                    currentSlide = index;
+                }
+
+                // Sabhi slides ko chhipao
+                slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+                
+                // Sirf current slide ko dikhao
+                slides[currentSlide].classList.add('active');
+                
+                // Counter update karo
+                counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            }
+
+            // Pehli slide dikhao
+            showSlide(0);
+
+            // Button clicks
+            prevButton.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+            });
+
+            nextButton.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+            });
+        }
+        
         
         // --- TAB SWITCHING JAVASCRIPT ---
         document.addEventListener('DOMContentLoaded', () => {
