@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FK7635GLTR"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-FK7635GLTR');
-</script>
-    <meta name="google-site-verification" content="Jd6EdOgNm9R9JwI8jRmuPd8hM4vk7ipxcsPtey0oSWc" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaradhya Soni - The SMA Warrior</title>
+    
+    <!-- Meta Tags -->
+    <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
     <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 1 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
+    <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 1, LearnGeeta, Artwork Gallery, Gita Recitation">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
+    <!-- Header -->
     <header class="hero-section">
         <div class="container">
             <h1>Shrimad Bhagavad Gita</h1>
@@ -27,16 +22,20 @@
         </div>
     </header>
 
+    <!-- Tab Structure -->
     <div class="container">
         
+        <!-- Tab Buttons -->
         <div class="main-tabs">
-            <button class="main-tab-button" data-tab="tab-shlokas">Home</button>
-            <button class="main-tab-button active" data-tab="tab-about">About Aaradhya</button>
+            <button class="main-tab-button active" data-tab="tab-shlokas">Home (Shlokas)</button>
+            <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
             <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
         </div>
 
+        <!-- Tab Content Panels -->
         <div class="main-tab-panels">
 
+            <!-- Tab 1: Gita Shlokas (Home) -->
             <div id="tab-shlokas" class="main-tab-content active">
                 <main class="shloka-list-container">
                     <h2>Chapters and Shlokas of the Gita</h2>
@@ -46,12 +45,13 @@
                 </main>
             </div>
 
+            <!-- Tab 2: About Aaradhya -->
             <div id="tab-about" class="main-tab-content">
                 <section class="about">
                     <h2>About Aaradhya</h2>
                     <div class="about-content">
                         <div class="about-image">
-                            <img src="https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
+                            <img src="httpsG://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
                         </div>
                         <div class="about-text" id="about-text-content">
                             <p>Loading details...</p> 
@@ -60,24 +60,28 @@
                 </section>
             </div>
 
+            <!-- Tab 3: Artwork Gallery (Marquee) -->
             <div id="tab-gallery" class="main-tab-content">
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
                     <div class="gallery-marquee">
                         <div class="gallery-track" id="gallery-track-container">
-                            </div>
+                            <!-- Images JS se load hongi -->
+                        </div>
                     </div>
                 </section>
             </div>
 
         </div>
-    </div> <footer class="footer">
-        <p>Contact: Aaradhya Soni</p>
-        <p>Email: sonivedang7@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 Vedang Soni</p>
+    </div> <!-- End container -->
+
+
+    <footer class="footer">
+        <p>Contact: Your Name</p>
+        <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
+    <!-- Saara Public JavaScript -->
     <script>
         
         // --- FUNCTION 1: Video embed banana ---
@@ -114,7 +118,8 @@
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
             try {
-                const response = await fetch('/api/about');
+                // CACHE-BUSTER: Hamesha naya data laayega
+                const response = await fetch('/api/about?cache_buster=' + new Date().getTime());
                 const data = await response.json();
                 
                 if (data && data.content) {
@@ -123,8 +128,10 @@
                     aboutContainer.innerHTML = '<p>Details could not be loaded.</p>';
                 }
                 
-                if (data && data.imageUrl) {
+                if (data && data.imageUrl && data.imageUrl !== 'placeholder.jpg') {
                     aboutImage.src = data.imageUrl;
+                } else {
+                    aboutImage.src = 'https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya'; // Fallback
                 }
 
             } catch (err) {
@@ -138,7 +145,8 @@
             container.innerHTML = ''; 
 
             try {
-                const response = await fetch('/api/shlokas');
+                // CACHE-BUSTER: Hamesha naya data laayega
+                const response = await fetch('/api/shlokas?cache_buster=' + new Date().getTime());
                 const shlokas = await response.json(); 
 
                 if (shlokas.length === 0) {
@@ -156,10 +164,12 @@
 
                 for (const adhyayNum in shlokasByAdhyay) {
                     const adhyayGroup = document.createElement('details');
-                    adhyayGroup.className = 'adhyay-group';
-                    if (adhyayNum == 1) {
-                        adhyayGroup.open = true; 
-                    }
+					adhyayGroup.className = 'adhyay-group';
+					
+					const numAdhyay = parseInt(adhyayNum, 10);
+					if (numAdhyay <= 3) {
+						adhyayGroup.open = true; // Pehle 3 adhyay khule rakho
+					}
 
                     const adhyayTitle = document.createElement('summary');
                     adhyayTitle.className = 'adhyay-title';
@@ -174,16 +184,19 @@
                     container.appendChild(adhyayGroup);
                 }
             } catch (err) {
+                console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery load karna (Marquee ke liye) ---
+        // --- FUNCTION 5: Artwork Gallery load karna ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-track-container'); 
+            if (!container) return; 
             container.innerHTML = ''; 
             try {
-                const response = await fetch('/api/artwork');
+                // CACHE-BUSTER: Hamesha naya data laayega
+                const response = await fetch('/api/artwork?cache_buster=' + new Date().getTime());
                 const artworks = await response.json();
 
                 if (artworks.length === 0) {
@@ -191,7 +204,7 @@
                     return;
                 }
 
-                const itemWidth = 270; // Image (250px) + margin (20px)
+                const itemWidth = 270; 
                 const duration = artworks.length * 5; 
                 
                 container.style.animationDuration = `${Math.max(duration, 20)}s`;
@@ -204,7 +217,6 @@
                     return item;
                 };
 
-                // Originals aur Clones (loop ke liye)
                 artworks.forEach(artwork => {
                     container.appendChild(createGalleryItem(artwork));
                 });
@@ -213,6 +225,7 @@
                 });
 
             } catch (err) {
+                console.error("Error loading artwork:", err);
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
@@ -231,10 +244,8 @@
                     document.getElementById(tab.dataset.tab).classList.add('active');
                 });
             });
-        });
 
-        // --- PAGE LOAD ---
-        window.addEventListener('load', () => {
+            // Page load par sabhi data load karein
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery(); 
