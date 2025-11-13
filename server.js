@@ -132,7 +132,6 @@ app.get('/api/shloka/find', async (req, res) => {
             return res.status(400).json({ message: 'Adhyay and Shloka parameters are required' });
         }
 
-        // [NAYA FIX] Cache control headers yahaan add karein
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
@@ -143,13 +142,17 @@ app.get('/api/shloka/find', async (req, res) => {
         });
 
         if (!foundShloka) {
-            return res.status(404).json({ message: 'Shloka not found' });
+            // Agar database mein nahi mila, toh 404 bhejega
+            return res.status(404).json({ message: 'Shloka not found in database' });
         }
+        
         res.json(foundShloka);
+
     } catch (err) {
-        // [FIX] Error ko Vercel logs mein print karo (Pichhle step se)
+        // [NAYA FIX] Error ko Vercel logs mein print karo
         console.error("ERROR FETCHING SHLOKA:", err); 
-        res.status(500).json({ message: 'Shloka laane mein error' });
+        
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 

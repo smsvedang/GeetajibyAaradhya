@@ -86,13 +86,15 @@
             }
 
             try {
-                // [NAYA FIX] Cache buster add kiya gaya
                 const cacheBuster = `&cache_buster=${new Date().getTime()}`;
                 const response = await fetch(`/api/shloka/find?adhyay=${adhyay}&shloka=${shlokaNum}${cacheBuster}`);
                 
                 if (!response.ok) {
-                    throw new Error('Shloka not found');
+                    // Response se server ka error message padhne ki koshish karo
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Shloka not found');
                 }
+                
                 const shloka = await response.json();
                 
                 container.innerHTML = ''; 
@@ -101,7 +103,8 @@
 
             } catch (err) {
                 console.error(err);
-                container.innerHTML = `<p>Error: Could not load shloka. ${err.message}</p>`;
+                // [NAYA FIX] Ab yeh server ka asli error message dikhayega
+                container.innerHTML = `<p>Error: ${err.message}</p>`;
             }
         });
         
