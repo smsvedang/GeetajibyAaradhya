@@ -76,7 +76,6 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('single-shloka-container');
             
-            // 1. URL se Adhyay aur Shloka number nikalo
             const params = new URLSearchParams(window.location.search);
             const adhyay = params.get('adhyay');
             const shlokaNum = params.get('shloka');
@@ -86,16 +85,17 @@
                 return;
             }
 
-            // 2. Naye API route se data fetch karo
             try {
-                const response = await fetch(`/api/shloka/find?adhyay=${adhyay}&shloka=${shlokaNum}`);
+                // [NAYA FIX] Cache buster add kiya gaya
+                const cacheBuster = `&cache_buster=${new Date().getTime()}`;
+                const response = await fetch(`/api/shloka/find?adhyay=${adhyay}&shloka=${shlokaNum}${cacheBuster}`);
+                
                 if (!response.ok) {
                     throw new Error('Shloka not found');
                 }
                 const shloka = await response.json();
                 
-                // 3. Page par render karo
-                container.innerHTML = ''; // Loading text hatao
+                container.innerHTML = ''; 
                 const shlokaCard = createSingleShlokaCard(shloka);
                 container.appendChild(shlokaCard);
 
@@ -105,7 +105,7 @@
             }
         });
         
-        // 3. Like/Share button logic (No Change)
+        // Like/Share button logic (No Change)
         document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {
