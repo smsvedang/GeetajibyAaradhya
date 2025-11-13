@@ -123,6 +123,33 @@ app.post('/api/shlokas/like/:id', async (req, res) => {
     }
 });
 
+// NAYA: Ek shloka Adhyay aur Shloka number se fetch karein
+app.get('/api/shloka/find', async (req, res) => {
+    try {
+        const { adhyay, shloka } = req.query;
+
+        if (!adhyay || !shloka) {
+            return res.status(400).json({ message: 'Adhyay and Shloka parameters are required' });
+        }
+
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        const foundShloka = await Shloka.findOne({ 
+            adhyay: Number(adhyay), 
+            shloka: Number(shloka) 
+        });
+
+        if (!foundShloka) {
+            return res.status(404).json({ message: 'Shloka not found' });
+        }
+        res.json(foundShloka);
+    } catch (err) {
+        res.status(500).json({ message: 'Shloka laane mein error' });
+    }
+});
+
 // (Shloka POST, PUT, DELETE APIs... aapka code yahaan... no change)
 app.post('/api/shlokas', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {

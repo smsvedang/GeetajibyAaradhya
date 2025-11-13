@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aaradhya Soni - Gita Shloka</title>
     <link rel="stylesheet" href="style.css">
-</head>
+    </head>
 <body>
     
     <nav class="top-navbar">
@@ -13,11 +13,9 @@
             <div class="logo">
                 <a href="index.html" style="text-decoration: none; color: #D84315;">Warrior Aaradhya</a>
             </div>
-            
             <div class="shloka-nav-links">
                 <a href="index.html" class="home-button">Home</a>
             </div>
-
         </div>
     </nav>
 
@@ -74,29 +72,40 @@
             return item;
         }
 
+        // Page load hone par shlok fetch karo (UPDATED)
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('single-shloka-container');
+            
+            // 1. URL se Adhyay aur Shloka number nikalo
             const params = new URLSearchParams(window.location.search);
-            const shlokaId = params.get('id');
-            if (!shlokaId) {
-                container.innerHTML = "<p>Error: No shloka ID provided.</p>";
+            const adhyay = params.get('adhyay');
+            const shlokaNum = params.get('shloka');
+
+            if (!adhyay || !shlokaNum) {
+                container.innerHTML = "<p>Error: Link is incomplete.</p>";
                 return;
             }
+
+            // 2. Naye API route se data fetch karo
             try {
-                const response = await fetch(`/api/shloka/${shlokaId}`);
+                const response = await fetch(`/api/shloka/find?adhyay=${adhyay}&shloka=${shlokaNum}`);
                 if (!response.ok) {
                     throw new Error('Shloka not found');
                 }
                 const shloka = await response.json();
-                container.innerHTML = ''; 
+                
+                // 3. Page par render karo
+                container.innerHTML = ''; // Loading text hatao
                 const shlokaCard = createSingleShlokaCard(shloka);
                 container.appendChild(shlokaCard);
+
             } catch (err) {
                 console.error(err);
                 container.innerHTML = `<p>Error: Could not load shloka. ${err.message}</p>`;
             }
         });
         
+        // 3. Like/Share button logic (No Change)
         document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {

@@ -119,20 +119,19 @@
             return videoWrapper;
         }
         
-       // --- FUNCTION 2: Create Shloka Item (UPDATED for new share link) ---
+       // --- FUNCTION 2: Create Shloka Item (UPDATED for short share link) ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item-card';
             
-            // ID ab bhi scrolling ke liye istemal hogi
             const shlokaId = `shloka-${shloka.adhyay}-${shloka.shloka}`;
             item.id = shlokaId;
             
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             
-            // NAYA: Share link ab 'shloka.html?id=...' use karega
-            const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
+            // NAYA: Share link ab 'adhyay' aur 'shloka' number use karega
+            const shareUrl = `${window.location.origin}/shloka.html?adhyay=${shloka.adhyay}&shloka=${shloka.shloka}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
 
