@@ -27,6 +27,8 @@
                 <button class="tab-button active" data-tab="tab-shloka">Manage Shlokas</button>
                 <button class="tab-button" data-tab="tab-about">Update About</button>
                 <button class="tab-button" data-tab="tab-artwork">Manage Artwork</button>
+                <button class="tab-button" data-tab="tab-blog">Manage Blog</button>
+                <button class="tab-button" data-tab="tab-testimonials">Manage Testimonials</button>
             </div>
 
             <div id="tab-shloka" class="tab-content active">
@@ -71,15 +73,50 @@
                     </div>
             </div>
 
+            <div id="tab-blog" class="tab-content">
+                <h2 id="blog-form-title">Add New Blog Post</h2>
+                <form id="blog-form">
+                    <input type="hidden" id="blog-id" value="">
+                    
+                    <input type="text" id="blog-title" placeholder="Blog Post Title" required>
+                    <textarea id="blog-content" placeholder="Blog content..." rows="10" required></textarea>
+                    
+                    <button type="submit" id="blog-submit-button">Add Post</button>
+                    <button type="button" id="blog-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
+                </form>
+
+                <h2 style="margin-top: 30px;">Existing Blog Posts</h2>
+                <div id="blog-list-admin">
+                    </div>
+            </div>
+
+            <div id="tab-testimonials" class="tab-content">
+                <h2 id="testimonial-form-title">Add New Testimonial</h2>
+                <form id="testimonial-form">
+                    <input type="hidden" id="testimonial-id" value="">
+                    
+                    <input type="text" id="testimonial-author" placeholder="Author (e.g., Smt. Sharma)" required>
+                    <textarea id="testimonial-quote" placeholder="Testimonial quote..." rows="5" required></textarea>
+                    
+                    <button type="submit" id="testimonial-submit-button">Add Testimonial</button>
+                    <button type="button" id="testimonial-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
+                </form>
+
+                <h2 style="margin-top: 30px;">Existing Testimonials</h2>
+                <div id="testimonial-list-admin">
+                    </div>
+            </div>
+
         </div>
     </main>
 
     <script>
+        // --- Element Selectors ---
         const loginSection = document.getElementById('login-section');
         const adminDashboard = document.getElementById('admin-dashboard');
         const loginForm = document.getElementById('login-form');
         
-        // Shloka Elements (UPDATED)
+        // Shloka Elements
         const shlokaForm = document.getElementById('shloka-form');
         const shlokaFormTitle = document.getElementById('shloka-form-title');
         const shlokaSubmitButton = document.getElementById('shloka-submit-button');
@@ -95,6 +132,22 @@
         // Artwork Elements
         const artworkForm = document.getElementById('artwork-form');
         const artworkListContainer = document.getElementById('artwork-list');
+
+        // NAYA: Blog Elements
+        const blogForm = document.getElementById('blog-form');
+        const blogFormTitle = document.getElementById('blog-form-title');
+        const blogSubmitButton = document.getElementById('blog-submit-button');
+        const blogCancelButton = document.getElementById('blog-cancel-edit');
+        const blogIdInput = document.getElementById('blog-id');
+        const blogListContainer = document.getElementById('blog-list-admin');
+
+        // NAYA: Testimonial Elements
+        const testimonialForm = document.getElementById('testimonial-form');
+        const testimonialFormTitle = document.getElementById('testimonial-form-title');
+        const testimonialSubmitButton = document.getElementById('testimonial-submit-button');
+        const testimonialCancelButton = document.getElementById('testimonial-cancel-edit');
+        const testimonialIdInput = document.getElementById('testimonial-id');
+        const testimonialListContainer = document.getElementById('testimonial-list-admin');
 
         let adminPassword = '';
 
@@ -129,7 +182,7 @@
                 artworkListContainer.innerHTML = ''; 
                 artworks.forEach(artwork => {
                     const item = document.createElement('div');
-                    item.className = 'artwork-admin-item';
+                    item.className = 'artwork-admin-item'; // Class badal sakte hain
                     item.innerHTML = `
                         <img src="${artwork.imageUrl}" alt="${artwork.title}">
                         <p>${artwork.title}</p>
@@ -140,13 +193,11 @@
             } catch (err) { console.error('Failed to load artwork'); }
         }
 
-        // NAYA: Shloka list (admin) load karne ka function
         async function loadShlokasAdmin() {
             try {
                 const response = await fetch('/api/shlokas');
                 const shlokas = await response.json();
-                shlokaListContainer.innerHTML = ''; // List ko saaf karo
-                
+                shlokaListContainer.innerHTML = ''; 
                 shlokas.forEach(shloka => {
                     const item = document.createElement('div');
                     item.className = 'shloka-admin-item';
@@ -157,15 +208,55 @@
                             <button class="delete-button" data-id="${shloka._id}">Delete</button>
                         </div>
                     `;
-                    
-                    // Poora shloka data 'edit' ke liye save karein
                     item.querySelector('.edit-button').dataset.shloka = JSON.stringify(shloka);
-                    
                     shlokaListContainer.appendChild(item);
                 });
-            } catch (err) {
-                console.error('Failed to load shlokas for admin');
-            }
+            } catch (err) { console.error('Failed to load shlokas for admin'); }
+        }
+
+        // NAYA: Blog list load karne ka function
+        async function loadBlogPosts() {
+            try {
+                const response = await fetch('/api/blog');
+                const posts = await response.json();
+                blogListContainer.innerHTML = ''; 
+                posts.forEach(post => {
+                    const item = document.createElement('div');
+                    item.className = 'shloka-admin-item'; // Same style istemal karega
+                    item.innerHTML = `
+                        <p><strong>${post.title}</strong></p>
+                        <div class="admin-buttons">
+                            <button class="edit-button" data-id="${post._id}">Edit</button>
+                            <button class="delete-button" data-id="${post._id}">Delete</button>
+                        </div>
+                    `;
+                    item.querySelector('.edit-button').dataset.post = JSON.stringify(post);
+                    blogListContainer.appendChild(item);
+                });
+            } catch (err) { console.error('Failed to load blog posts'); }
+        }
+
+        // NAYA: Testimonial list load karne ka function
+        async function loadTestimonials() {
+            try {
+                const response = await fetch('/api/testimonials');
+                const testimonials = await response.json();
+                testimonialListContainer.innerHTML = '';
+                testimonials.forEach(testimonial => {
+                    const item = document.createElement('div');
+                    item.className = 'shloka-admin-item'; // Same style istemal karega
+                    item.innerHTML = `
+                        <p><strong>${testimonial.author}</strong></p>
+                        <p>${testimonial.quote.substring(0, 50)}...</p>
+                        <div class="admin-buttons">
+                            <button class="edit-button" data-id="${testimonial._id}">Edit</button>
+                            <button class="delete-button" data-id="${testimonial._id}">Delete</button>
+                        </div>
+                    `;
+                    item.querySelector('.edit-button').dataset.testimonial = JSON.stringify(testimonial);
+                    testimonialListContainer.appendChild(item);
+                });
+            } catch (err) { console.error('Failed to load testimonials'); }
         }
 
 
@@ -191,7 +282,9 @@
                     // Login ke baad sab kuch load karo
                     loadAboutContent();
                     loadArtwork();
-                    loadShlokasAdmin(); // NAYA
+                    loadShlokasAdmin();
+                    loadBlogPosts(); // NAYA
+                    loadTestimonials(); // NAYA
                 } else {
                     alert(data.message || 'Login failed!');
                 }
@@ -201,13 +294,13 @@
             }
         });
 
-        // 2. Shloka Form (UPDATED for Edit/Add)
+        // 2. Shloka Form (Add/Edit)
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
 
             const shlokaId = shlokaIdInput.value;
-            const isEditMode = !!shlokaId; // Check karein ki ID hai ya nahi
+            const isEditMode = !!shlokaId;
 
             const url = isEditMode ? `/api/shlokas/${shlokaId}` : '/api/shlokas';
             const method = isEditMode ? 'PUT' : 'POST';
@@ -228,13 +321,76 @@
             if (response.ok) {
                 alert(isEditMode ? 'Shloka updated!' : 'Shloka added!');
                 resetShlokaForm();
-                loadShlokasAdmin(); // List ko refresh karo
+                loadShlokasAdmin();
             } else {
                 alert(data.message || 'Failed to save shloka.');
             }
         });
         
-        // NAYA: Shloka 'Cancel Edit' button
+        // NAYA: Blog Form (Add/Edit)
+        blogForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminPassword) return alert('Please login first.');
+
+            const blogId = blogIdInput.value;
+            const isEditMode = !!blogId;
+
+            const url = isEditMode ? `/api/blog/${blogId}` : '/api/blog';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: document.getElementById('blog-title').value,
+                    content: document.getElementById('blog-content').value,
+                    password: adminPassword 
+                })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                alert(isEditMode ? 'Post updated!' : 'Post added!');
+                resetBlogForm();
+                loadBlogPosts();
+            } else {
+                alert(data.message || 'Failed to save post.');
+            }
+        });
+
+        // NAYA: Testimonial Form (Add/Edit)
+        testimonialForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!adminPassword) return alert('Please login first.');
+
+            const testimonialId = testimonialIdInput.value;
+            const isEditMode = !!testimonialId;
+
+            const url = isEditMode ? `/api/testimonials/${testimonialId}` : '/api/testimonials';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    author: document.getElementById('testimonial-author').value,
+                    quote: document.getElementById('testimonial-quote').value,
+                    password: adminPassword 
+                })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                alert(isEditMode ? 'Testimonial updated!' : 'Testimonial added!');
+                resetTestimonialForm();
+                loadTestimonials();
+            } else {
+                alert(data.message || 'Failed to save testimonial.');
+            }
+        });
+
+        // --- Reset Form Functions ---
+
         function resetShlokaForm() {
             shlokaForm.reset();
             shlokaIdInput.value = '';
@@ -244,8 +400,69 @@
         }
         shlokaCancelButton.addEventListener('click', resetShlokaForm);
 
-        // NAYA: Shloka List (Admin) par Edit/Delete click
+        // NAYA: Blog 'Cancel Edit' button
+        function resetBlogForm() {
+            blogForm.reset();
+            blogIdInput.value = '';
+            blogFormTitle.textContent = 'Add New Blog Post';
+            blogSubmitButton.textContent = 'Add Post';
+            blogCancelButton.style.display = 'none';
+        }
+        blogCancelButton.addEventListener('click', resetBlogForm);
+
+        // NAYA: Testimonial 'Cancel Edit' button
+        function resetTestimonialForm() {
+            testimonialForm.reset();
+            testimonialIdInput.value = '';
+            testimonialFormTitle.textContent = 'Add New Testimonial';
+            testimonialSubmitButton.textContent = 'Add Testimonial';
+            testimonialCancelButton.style.display = 'none';
+        }
+        testimonialCancelButton.addEventListener('click', resetTestimonialForm);
+
+
+        // --- List Click Listeners (Delete/Edit) ---
+
+        // Shloka List (Edit/Delete)
         shlokaListContainer.addEventListener('click', async (e) => {
+            if (!adminPassword) return alert('Please login first.');
+            const target = e.target;
+            const id = target.dataset.id;
+
+            // --- DELETE ---
+            if (target.classList.contains('delete-button')) {
+                if (!confirm('Are you sure you want to delete this shloka?')) return;
+                const response = await fetch(`/api/shlokas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+                if (response.ok) {
+                    alert('Shloka deleted!');
+                    loadShlokasAdmin();
+                } else { alert('Failed to delete shloka.'); }
+            }
+            
+            // --- EDIT ---
+            if (target.classList.contains('edit-button')) {
+                const shlokaData = JSON.parse(target.dataset.shloka);
+                
+                shlokaIdInput.value = shlokaData._id;
+                document.getElementById('adhyay').value = shlokaData.adhyay;
+                document.getElementById('shloka').value = shlokaData.shloka;
+                document.getElementById('text').value = shlokaData.text || '';
+                document.getElementById('video_url').value = shlokaData.video_id; // Dhyan dein, ye 'video_id' ho sakta hai
+                
+                shlokaFormTitle.textContent = 'Edit Shloka';
+                shlokaSubmitButton.textContent = 'Update Shloka';
+                shlokaCancelButton.style.display = 'block';
+                
+                shlokaForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // NAYA: Blog List (Admin) par Edit/Delete click
+        blogListContainer.addEventListener('click', async (e) => {
             if (!adminPassword) return alert('Please login first.');
             
             const target = e.target;
@@ -253,45 +470,75 @@
 
             // --- DELETE ---
             if (target.classList.contains('delete-button')) {
-                if (!confirm('Are you sure you want to delete this shloka?')) return;
-
-                const response = await fetch(`/api/shlokas/${id}`, {
+                if (!confirm('Are you sure you want to delete this post?')) return;
+                const response = await fetch(`/api/blog/${id}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: adminPassword })
                 });
-
                 if (response.ok) {
-                    alert('Shloka deleted!');
-                    loadShlokasAdmin(); // List ko refresh karo
-                } else {
-                    alert('Failed to delete shloka.');
-                }
+                    alert('Post deleted!');
+                    loadBlogPosts();
+                } else { alert('Failed to delete post.'); }
             }
             
             // --- EDIT ---
             if (target.classList.contains('edit-button')) {
-                const shlokaData = JSON.parse(target.dataset.shloka);
+                const postData = JSON.parse(target.dataset.post);
                 
-                // Form ko data se bharo
-                shlokaIdInput.value = shlokaData._id;
-                document.getElementById('adhyay').value = shlokaData.adhyay;
-                document.getElementById('shloka').value = shlokaData.shloka;
-                document.getElementById('text').value = shlokaData.text || '';
-                document.getElementById('video_url').value = shlokaData.video_id;
+                blogIdInput.value = postData._id;
+                document.getElementById('blog-title').value = postData.title;
+                document.getElementById('blog-content').value = postData.content;
                 
-                // Form ko 'Edit Mode' mein daalo
-                shlokaFormTitle.textContent = 'Edit Shloka';
-                shlokaSubmitButton.textContent = 'Update Shloka';
-                shlokaCancelButton.style.display = 'block';
+                blogFormTitle.textContent = 'Edit Blog Post';
+                blogSubmitButton.textContent = 'Update Post';
+                blogCancelButton.style.display = 'block';
                 
-                // Form par scroll karo
-                shlokaForm.scrollIntoView({ behavior: 'smooth' });
+                blogForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // NAYA: Testimonial List (Admin) par Edit/Delete click
+        testimonialListContainer.addEventListener('click', async (e) => {
+            if (!adminPassword) return alert('Please login first.');
+            
+            const target = e.target;
+            const id = target.dataset.id;
+
+            // --- DELETE ---
+            if (target.classList.contains('delete-button')) {
+                if (!confirm('Are you sure you want to delete this testimonial?')) return;
+                const response = await fetch(`/api/testimonials/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+                if (response.ok) {
+                    alert('Testimonial deleted!');
+                    loadTestimonials();
+                } else { alert('Failed to delete testimonial.'); }
+            }
+            
+            // --- EDIT ---
+            if (target.classList.contains('edit-button')) {
+                const testimonialData = JSON.parse(target.dataset.testimonial);
+                
+                testimonialIdInput.value = testimonialData._id;
+                document.getElementById('testimonial-author').value = testimonialData.author;
+                document.getElementById('testimonial-quote').value = testimonialData.quote;
+                
+                testimonialFormTitle.textContent = 'Edit Testimonial';
+                testimonialSubmitButton.textContent = 'Update Testimonial';
+                testimonialCancelButton.style.display = 'block';
+                
+                testimonialForm.scrollIntoView({ behavior: 'smooth' });
             }
         });
 
 
-        // 3. 'About' Form
+        // --- Other Form Handlers ---
+
+        // 'About' Form
         aboutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
@@ -309,7 +556,7 @@
             else { alert(data.message || 'Failed to save.'); }
         });
 
-        // 4. Artwork Form Submit
+        // Artwork Form Submit
         artworkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
@@ -329,7 +576,7 @@
             } else { alert('Failed to add artwork.'); }
         });
 
-        // 5. Artwork Delete Button Click
+        // Artwork Delete Button Click
         artworkListContainer.addEventListener('click', async (e) => {
             if (!e.target.classList.contains('delete-button')) return;
             if (!adminPassword) return alert('Please login first.');
