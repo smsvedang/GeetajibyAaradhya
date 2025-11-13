@@ -14,28 +14,32 @@ body {
     padding: 20px;
 }
 
-/* --- 1. Hero (Welcome) Section --- */
+/* --- 1. Hero (Welcome) Section [UPDATED] --- */
 .hero-section {
     background-color: #FF9800;
     color: white;
-    padding: 40px 20px;
+    padding-top: 40px; /* Top padding rakhein */
+    padding-bottom: 0; /* Bottom padding 0, kyunki menubar ab iska hissa hai */
     text-align: center;
+}
+.hero-content {
+    padding-bottom: 30px; /* Content aur menubar ke beech gap */
 }
 .hero-section h1 { margin: 0; font-size: 2.8em; }
 .hero-section h2 { margin: 10px 0; font-size: 1.5em; font-weight: 300; }
 .hero-section .subtitle { font-size: 1.1em; max-width: 600px; margin: 15px auto 0; line-height: 1.5; }
 
 
-/* --- MAIN TABS (Home Page) --- */
-.main-tabs {
+/* --- MAIN MENUBAR (New Style for Tabs) [UPDATED] --- */
+.main-menubar {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center; /* Menubar ko center karein */
     flex-wrap: wrap; 
-    border-bottom: 2px solid #FFECB3;
-    margin-top: 20px;
+    background-color: #FFF3E0; /* Menubar ka background color */
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Oopar halka shadow */
 }
 .main-tab-button {
-    padding: 15px 10px; 
+    padding: 15px 20px; /* Thoda zyada padding */
     cursor: pointer;
     border: none;
     background-color: transparent;
@@ -43,19 +47,19 @@ body {
     color: #5D4037;
     font-weight: 500;
     transition: all 0.2s ease;
-    margin-bottom: -2px; 
-    border-bottom: 3px solid transparent;
-    flex: 1;
-    text-align: center;
+    border-bottom: 4px solid transparent; /* Niche ka border */
+    flex-grow: 1; /* Taaki mobile par fail jaayein */
     min-width: 120px; 
+    text-align: center;
 }
 .main-tab-button:hover {
-    background-color: #FFF3E0;
+    background-color: #FFECB3; /* Hover par halka rang */
 }
 .main-tab-button.active {
     color: #D84315;
     font-weight: bold;
-    border-bottom-color: #D84315;
+    border-bottom-color: #D84315; /* Active tab ka border */
+    background-color: #FFFFFF; /* Active tab ko safed dikhayein */
 }
 .main-tab-content {
     display: none;
@@ -91,34 +95,18 @@ body {
     margin-bottom: 30px;
     margin-top: 0;
 }
-
-/* Naya Carousel Style */
 .carousel-container {
     position: relative;
-    max-width: 700px; /* Slider ki max width */
+    max-width: 700px; 
     margin: auto;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.carousel-item {
-    display: none; /* Sabhi slides ko chhipao */
-    animation: fadeEffect 0.5s ease-in-out;
-}
-.carousel-item.active {
-    display: block; /* Sirf active slide ko dikhao */
-}
-.carousel-item img {
-    width: 100%;
-    display: block;
-}
-/* Fade Animation */
-@keyframes fadeEffect {
-    from {opacity: 0.4}
-    to {opacity: 1}
-}
-
-/* Next & Previous buttons */
+.carousel-item { display: none; animation: fadeEffect 0.5s ease-in-out; }
+.carousel-item.active { display: block; }
+.carousel-item img { width: 100%; display: block; }
+@keyframes fadeEffect { from {opacity: 0.4} to {opacity: 1} }
 .carousel-button {
     cursor: pointer;
     position: absolute;
@@ -135,15 +123,8 @@ body {
     background-color: rgba(0,0,0,0.3);
     border: none;
 }
-.carousel-button.next {
-    right: 0;
-    border-radius: 3px 0 0 3px;
-}
-.carousel-button:hover {
-    background-color: rgba(0,0,0,0.6);
-}
-
-/* Slide Counter Text */
+.carousel-button.next { right: 0; border-radius: 3px 0 0 3px; }
+.carousel-button:hover { background-color: rgba(0,0,0,0.6); }
 .slide-counter {
     position: absolute;
     top: 10px;
@@ -154,8 +135,6 @@ body {
     border-radius: 5px;
     font-size: 14px;
 }
-/* --- END CAROUSEL STYLE --- */
-
 
 /* --- 4. Shloka List Section (Tab content) --- */
 .shloka-list-container h2 {
@@ -187,6 +166,7 @@ body {
 .shloka-item {
     padding: 20px;
     border-top: 1px solid #FFECB3;
+    transition: background-color 0.5s ease; /* [NAYA] Highlight ke liye */
 }
 .shloka-item h3 { margin: 0 0 10px 0; color: #D84315; }
 .shloka-text { font-style: italic; color: #6D4C41; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
@@ -206,6 +186,47 @@ body {
     height: 100%;
 }
 
+/* [NAYA] Shloka Action Buttons (Like/Share) */
+.shloka-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    border-top: 1px solid #FFECB3;
+    padding-top: 15px;
+}
+.shloka-action-button {
+    flex: 1; /* Dono button barabar fail jaayein */
+    background-color: #f4f4f4;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+.shloka-action-button:hover {
+    background-color: #e9e9e9;
+}
+.shloka-action-button .like-count {
+    font-weight: bold;
+    margin-left: 5px;
+}
+.shloka-action-button:disabled { /* Liked button */
+    background-color: #FFEBEE; /* Light red */
+    color: #D84315;
+    border-color: #FFCDD2;
+    cursor: not-allowed;
+}
+
+/* [NAYA] Shloka Highlight */
+.shloka-item.highlight {
+    background-color: #FFF9C4; /* Light yellow highlight */
+    border: 1px solid #FFEB3B;
+}
+
 /* --- Footer --- */
 .footer {
     text-align: center;
@@ -217,6 +238,7 @@ body {
 .footer p { margin: 5px 0; }
 
 /* --- Admin Panel Styles --- */
+/* (Aapka puraana code... zyadatar no change) */
 input, textarea, button {
     width: 100%;
     padding: 12px;
@@ -243,6 +265,7 @@ button.delete-button {
     display: flex;
     border-bottom: 2px solid #FF9800;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* [NAYA] */
 }
 .tab-button {
     padding: 10px 20px;
@@ -252,6 +275,7 @@ button.delete-button {
     font-size: 1em;
     border-radius: 5px 5px 0 0;
     margin-right: 5px;
+    margin-bottom: 5px; /* [NAYA] */
 }
 .tab-button.active {
     background-color: #FF9800;
@@ -266,10 +290,7 @@ button.delete-button {
     font-weight: bold;
     color: #5D4037;
 }
-#artwork-list {
-    margin-top: 20px;
-    border-top: 1px solid #eee;
-}
+#artwork-list { margin-top: 20px; border-top: 1px solid #eee; }
 .artwork-admin-item {
     display: flex;
     align-items: center;
@@ -284,12 +305,7 @@ button.delete-button {
     border-radius: 5px;
     margin-right: 15px;
 }
-.artwork-admin-item p {
-    flex-grow: 1;
-    margin: 0;
-    font-weight: bold;
-    color: #5D4037;
-}
+.artwork-admin-item p { flex-grow: 1; margin: 0; font-weight: bold; color: #5D4037; }
 .shloka-admin-item {
     display: flex;
     align-items: center;
@@ -299,12 +315,15 @@ button.delete-button {
     background: #FAFAFA;
     border-radius: 5px;
     margin-bottom: 5px;
+    flex-wrap: wrap; /* [NAYA] */
 }
 .shloka-admin-item p {
     flex-grow: 1;
     margin: 0;
     font-weight: bold;
     color: #5D4037;
+    margin-bottom: 5px; /* [NAYA] */
+    width: 100%; /* [NAYA] */
 }
 .admin-buttons {
     display: flex;
@@ -322,24 +341,12 @@ button.cancel-button {
 
 /* --- MOBILE HEADING FIX --- */
 @media (max-width: 600px) {
-    .hero-section h1 {
-        font-size: 2.0em; 
-    }
-    .hero-section h2 {
-        font-size: 1.2em; 
-    }
-    .main-tab-button {
-        padding: 12px 5px;
-        font-size: 0.9em;
-    }
-    .adhyay-title {
-        font-size: 1.5em;
-        padding: 15px;
-    }
-    .carousel-button {
-        padding: 10px;
-        font-size: 16px;
-    }
+    .hero-section h1 { font-size: 2.0em; }
+    .hero-section h2 { font-size: 1.2em; }
+    .main-tab-button { padding: 12px 5px; font-size: 0.9em; } /* [UPDATED] */
+    .adhyay-title { font-size: 1.5em; padding: 15px; }
+    .carousel-button { padding: 10px; font-size: 16px; }
+    .shloka-actions { flex-direction: column; } /* [NAYA] Like/Share ko stack karein */
 }
 
 /* --- Blog Styling --- */
@@ -347,13 +354,12 @@ button.cancel-button {
 .testimonials-container h2 {
     text-align: center;
     font-size: 2em;
-    color: #D84315; /* Changed from BFA080 */
+    color: #D84315; 
     margin-bottom: 25px;
     margin-top: 0;
     border-bottom: 2px solid #FF9800;
     padding-bottom: 10px;
 }
-
 .blog-post-item {
     background-color: #fff;
     border: 1px solid #eee;
@@ -362,37 +368,18 @@ button.cancel-button {
     margin-bottom: 20px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-
-.blog-post-item h3 {
-    font-size: 1.6em;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 5px;
-}
-
-.blog-post-item .blog-date {
-    font-size: 0.9em;
-    color: #777;
-    margin-bottom: 15px;
-    font-style: italic;
-}
-
-.blog-post-item .blog-content {
-    font-size: 1em;
-    line-height: 1.7;
-    color: #555;
-    white-space: pre-wrap; /* Added for line breaks */
-}
+.blog-post-item h3 { font-size: 1.6em; color: #333; margin-top: 0; margin-bottom: 5px; }
+.blog-post-item .blog-date { font-size: 0.9em; color: #777; margin-bottom: 15px; font-style: italic; }
+.blog-post-item .blog-content { font-size: 1em; line-height: 1.7; color: #555; white-space: pre-wrap; }
 
 /* --- Testimonial Styling --- */
 .testimonial-item {
-    background-color: #FFFDF9; /* Lighter cream */
-    border-left: 5px solid #BFA080; /* Accent color */
+    background-color: #FFFDF9; 
+    border-left: 5px solid #BFA080; 
     padding: 20px 25px;
     margin-bottom: 20px;
     border-radius: 0 8px 8px 0;
 }
-
 .testimonial-item blockquote {
     font-size: 1.1em;
     font-style: italic;
@@ -401,9 +388,8 @@ button.cancel-button {
     margin: 0 0 10px 0;
     padding: 0;
     position: relative;
-    white-space: pre-wrap; /* Added for line breaks */
+    white-space: pre-wrap; 
 }
-
 .testimonial-item cite {
     font-size: 1em;
     font-weight: bold;
@@ -414,10 +400,7 @@ button.cancel-button {
 }
 
 /* --- Public "Add Yours" Button --- */
-.add-testimonial-toggle {
-    text-align: center;
-    margin-bottom: 20px;
-}
+.add-testimonial-toggle { text-align: center; margin-bottom: 20px; }
 #add-yours-button {
     background-color: #BFA080;
     color: white;
@@ -429,9 +412,7 @@ button.cancel-button {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-#add-yours-button:hover {
-    background-color: #a98b6f;
-}
+#add-yours-button:hover { background-color: #a98b6f; }
 
 /* --- Public Submission Form --- */
 .testimonial-submission-form {
@@ -442,18 +423,8 @@ button.cancel-button {
     border: 1px solid #eee;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
-.testimonial-submission-form h3 {
-    margin-top: 0;
-    font-size: 1.6em;
-    color: #333;
-    text-align: center;
-}
-.testimonial-submission-form p {
-    text-align: center;
-    font-size: 0.95em;
-    color: #666;
-    margin-bottom: 20px;
-}
+.testimonial-submission-form h3 { margin-top: 0; font-size: 1.6em; color: #333; text-align: center; }
+.testimonial-submission-form p { text-align: center; font-size: 0.95em; color: #666; margin-bottom: 20px; }
 .testimonial-submission-form input[type="text"],
 .testimonial-submission-form textarea {
     width: 100%;
@@ -463,7 +434,7 @@ button.cancel-button {
     border-radius: 5px;
     font-size: 1em;
     font-family: inherit;
-    box-sizing: border-box; /* Important */
+    box-sizing: border-box; 
 }
 .testimonial-submission-form button[type="submit"] {
     width: 100%;
@@ -477,16 +448,10 @@ button.cancel-button {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-.testimonial-submission-form button[type="submit"]:hover {
-    background-color: #a98b6f;
-}
+.testimonial-submission-form button[type="submit"]:hover { background-color: #a98b6f; }
 
 /* Section Divider */
-hr.section-divider {
-    border: 0;
-    border-top: 1px solid #eee;
-    margin: 30px 0;
-}
+hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 
 /* --- Admin Panel "Approve" Button --- */
 .admin-buttons .approve-button {
@@ -496,6 +461,4 @@ hr.section-divider {
     padding: 8px;
     width: auto;
 }
-.admin-buttons .approve-button:hover {
-    background-color: #45a049;
-}
+.admin-buttons .approve-button:hover { background-color: #45a049; }
