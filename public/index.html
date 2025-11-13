@@ -36,11 +36,19 @@
         </div>
         
         <nav class="main-menubar">
-            <button class="main-tab-button active" data-tab="tab-shlokas">Home (Shlokas)</button>
-            <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
-            <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
-            <button class="main-tab-button" data-tab="tab-blog">Blog</button>
-            <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
+            <button class="menu-toggle" id="menu-toggle-button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="menu-links" id="menu-links-container">
+                <button class="main-tab-button active" data-tab="tab-shlokas">Home (Shlokas)</button>
+                <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
+                <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
+                <button class="main-tab-button" data-tab="tab-blog">Blog</button>
+                <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
+            </div>
         </nav>
     </header>
 
@@ -126,7 +134,6 @@
         
         // --- FUNCTION 1: Create Video ---
         function createVideo(video_id) {
-            // (Aapka puraana code... no change)
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
             videoWrapper.innerHTML = `
@@ -141,19 +148,20 @@
             return videoWrapper;
         }
         
-        // --- FUNCTION 2: Create Shloka Item (Poora badal gaya hai) ---
+        // --- FUNCTION 2: Create Shloka Item (UPDATED with share data) ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
             
-            // NAYA: Har shlok ke liye ek unique ID (Share link ke liye)
             const shlokaId = `shloka-${shloka.adhyay}-${shloka.shloka}`;
             item.id = shlokaId;
             
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
-            
-            // Check karein ki user ne pehle like kiya hai ya nahi
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
+            
+            // Share data
+            const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
 
             item.innerHTML = `
                 <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
@@ -162,7 +170,6 @@
             
             item.appendChild(createVideo(shloka.video_id));
 
-            // NAYA: Action Buttons (Like & Share)
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'shloka-actions';
             
@@ -170,7 +177,10 @@
                 <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
                     ❤️ <span class="like-count">${shloka.likes || 0}</span>
                 </button>
-                <button class="shloka-action-button share-button" data-hash="#${shlokaId}">
+                <button class="shloka-action-button share-button" 
+                        data-hash="#${shlokaId}" 
+                        data-title="${shareTitle}" 
+                        data-text="${shareText}">
                     🔗 Share
                 </button>
             `;
@@ -181,7 +191,6 @@
         
         // --- FUNCTION 3: Load About Section ---
         async function loadAboutSection() {
-            // (Aapka puraana code... no change)
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
             try {
@@ -202,7 +211,7 @@
             }
         }
         
-        // --- FUNCTION 4: Load Shlokas (UPDATED) ---
+        // --- FUNCTION 4: Load Shlokas ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
@@ -220,12 +229,15 @@
                     }
                     shlokasByAdhyay[shloka.adhyay].push(shloka);
                 });
-
                 for (const adhyayNum in shlokasByAdhyay) {
                     const adhyayGroup = document.createElement('details');
                     adhyayGroup.className = 'adhyay-group';
-                    // NAYA: Adhyay ke liye ID (Share link ke liye)
                     adhyayGroup.id = `adhyay-${adhyayNum}`;
+                    
+                    // Pehla Adhyay default mein khula rakhein
+                    if (parseInt(adhyayNum, 10) === 1) {
+                         adhyayGroup.open = true; 
+                    }
                     
                     const adhyayTitle = document.createElement('summary');
                     adhyayTitle.className = 'adhyay-title';
@@ -238,48 +250,172 @@
                     });
                     container.appendChild(adhyayGroup);
                 }
-                
-                // NAYA: Shloka load hone ke baad, deep link check karo
                 handleDeepLink();
-                
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
             }
         }
 
-        // --- FUNCTION 5 & 6: Artwork Gallery & Carousel ---
-        async function loadArtworkGallery() { /* (Aapka puraana code... no change) */ }
-        function setupCarouselListeners(totalSlides) { /* (Aapka puraana code... no change) */ }
-        // (Inn functions ko copy-paste kar lein)
-        
-        // --- FUNCTION 7 & 8: Blog & Testimonials ---
-        async function loadBlogPosts() { /* (Aapka puraana code... no change) */ }
-        async function loadTestimonials() { /* (Aapka puraana code... no change) */ }
-        // (Inn functions ko copy-paste kar lein)
+        // --- FUNCTION 5: Load Artwork Gallery (CODE IS BACK) ---
+        async function loadArtworkGallery() {
+            const container = document.getElementById('gallery-carousel-container'); 
+            if (!container) return; 
+            try {
+                const response = await fetch('/api/artwork?cache_buster=' + new Date().getTime());
+                const artworks = await response.json();
+                if (artworks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet.</p>';
+                    return;
+                }
+                
+                // Clear any loading text before adding items
+                container.innerHTML = ''; 
+                
+                artworks.forEach((artwork, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'carousel-item';
+                    if (index === 0) item.classList.add('active'); 
+                    item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
+                    container.appendChild(item);
+                });
+                
+                // Add buttons back in
+                container.innerHTML += `
+                    <button class="carousel-button prev" id="carousel-prev">&#10094;</button>
+                    <button class="carousel-button next" id="carousel-next">&#10095;</button>
+                    <div class="slide-counter" id="slide-counter-text"></div>
+                `;
+                
+                setupCarouselListeners(artworks.length);
+            } catch (err) {
+                console.error("Error loading artwork:", err);
+                container.innerHTML = '<p>Could not load gallery.</p>';
+            }
+        }
 
+        // --- FUNCTION 6: Carousel logic (CODE IS BACK) ---
+        function setupCarouselListeners(totalSlides) {
+            let currentSlide = 0;
+            // Re-select elements AFTER they are added
+            const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
+            const prevButton = document.getElementById('carousel-prev');
+            const nextButton = document.getElementById('carousel-next');
+            const counterText = document.getElementById('slide-counter-text');
+
+            if (!prevButton || !nextButton || !counterText) return; // Guard clause
+
+            function showSlide(index) {
+                if (index >= totalSlides) {
+                    currentSlide = 0;
+                } else if (index < 0) {
+                    currentSlide = totalSlides - 1;
+                } else {
+                    currentSlide = index;
+                }
+                slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+                slides[currentSlide].classList.add('active');
+                counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            }
+            showSlide(0);
+            prevButton.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+            });
+            nextButton.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+            });
+        }
         
-        // NAYA: FUNCTION 9: Deep Link Handler
+        // --- FUNCTION 7: Load Blog posts (CODE IS BACK) ---
+        async function loadBlogPosts() {
+            const container = document.getElementById('blog-posts-container');
+            container.innerHTML = '';
+            try {
+                const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
+                const posts = await response.json();
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<p>No blog posts added yet.</p>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const item = document.createElement('article');
+                    item.className = 'blog-post-item';
+                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                    });
+                    
+                    item.innerHTML = `
+                        <h3>${post.title}</h3>
+                        <p class="blog-date">${postDate}</p>
+                        <div class="blog-content">
+                            ${post.content.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Error loading blog posts:", err);
+                container.innerHTML = '<p>Could not load blog posts.</p>';
+            }
+        }
+        
+        // --- FUNCTION 8: Load Approved Testimonials (CODE IS BACK) ---
+        async function loadTestimonials() {
+            const container = document.getElementById('testimonials-list-container');
+            container.innerHTML = '';
+            try {
+                const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
+                const testimonials = await response.json();
+                
+                if (testimonials.length === 0) {
+                    container.innerHTML = '<p>No testimonials added yet.</p>';
+                    return;
+                }
+
+                testimonials.forEach(testimonial => {
+                    const item = document.createElement('div');
+                    item.className = 'testimonial-item';
+                    item.innerHTML = `
+                        <blockquote>${testimonial.quote.replace(/\n/g, '<br>')}</blockquote>
+                        <cite>- ${testimonial.author}</cite>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Error loading testimonials:", err);
+                container.innerHTML = '<p>Could not load testimonials.</p>';
+            }
+        }
+        
+        // --- FUNCTION 9: Deep Link Handler ---
         function handleDeepLink() {
             const hash = window.location.hash;
             if (hash) {
                 try {
-                    const targetElement = document.getElementById(hash.substring(1)); // Remove #
+                    const targetElement = document.getElementById(hash.substring(1));
                     if (targetElement) {
-                        // Parent <details> (adhyay) ko dhoondo
                         const parentDetails = targetElement.closest('details.adhyay-group');
                         if (parentDetails) {
-                            parentDetails.open = true; // Adhyay ko kholo
+                            parentDetails.open = true;
                         }
                         
-                        // Element par scroll karo
-                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Tab ko bhi switch karo (Home tab par)
+                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+                        document.querySelector('.main-tab-button[data-tab="tab-shlokas"]').classList.add('active');
+                        document.getElementById('tab-shlokas').classList.add('active');
                         
-                        // Highlight karo
-                        targetElement.classList.add('highlight');
-                        setTimeout(() => {
-                            targetElement.classList.remove('highlight');
-                        }, 2500); // 2.5 second baad highlight hata do
+                        setTimeout(() => { // Thoda delay taaki scroll kaam kare
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            targetElement.classList.add('highlight');
+                            setTimeout(() => {
+                                targetElement.classList.remove('highlight');
+                            }, 2500);
+                        }, 100);
                     }
                 } catch (e) {
                     console.error("Error handling deep link:", e);
@@ -290,27 +426,41 @@
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.main-tab-button');
-            const contents = document.querySelectorAll('.main-tab-content');
+            const tabButtons = document.querySelectorAll('.main-tab-button');
+            const tabContents = document.querySelectorAll('.main-tab-content');
+            const menuToggle = document.getElementById('menu-toggle-button');
+            const menuLinks = document.getElementById('menu-links-container');
 
-            tabs.forEach(tab => {
+            // --- NAYA: Hamburger Menu Toggle ---
+            menuToggle.addEventListener('click', () => {
+                menuLinks.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            // --- Tab Switching Logic ---
+            tabButtons.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    contents.forEach(c => c.classList.remove('active'));
+                    tabButtons.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.tab).classList.add('active');
+                    
+                    // NAYA: Mobile par menu ko band karo
+                    if (window.innerWidth <= 768) {
+                        menuLinks.classList.remove('active');
+                        menuToggle.classList.remove('active');
+                    }
                 });
             });
 
             // Page load par sabhi data load karein
             loadGroupedShlokas(); 
             loadAboutSection(); 
-            loadArtworkGallery(); // (Yahaan Galti thi, ise call karein)
+            loadArtworkGallery();
             loadBlogPosts();
             loadTestimonials(); 
 
             // --- Public Testimonial Form Handler ---
-            // (Aapka puraana code... no change)
             const addButton = document.getElementById('add-yours-button');
             const formContainer = document.getElementById('public-testimonial-form-container');
             const publicForm = document.getElementById('public-testimonial-form');
@@ -337,22 +487,38 @@
                 } catch (err) { alert('Error connecting to server.'); }
             });
 
-            // NAYA: Shloka Action Buttons (Like & Share) ke liye Event Listener
+            // --- Shloka Action Buttons (Like & Share) Event Listener ---
             const shlokaContainer = document.getElementById('shloka-container');
             shlokaContainer.addEventListener('click', async (e) => {
                 
-                // --- Share Button Click ---
+                // --- Share Button Click (UPDATED) ---
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
                     const hash = shareButton.dataset.hash;
-                    // protocol://domain/path + #hash
-                    const urlToCopy = window.location.origin + window.location.pathname + hash;
-                    try {
-                        await navigator.clipboard.writeText(urlToCopy);
-                        alert('Shloka link copied to clipboard!');
-                    } catch (err) {
-                        console.error('Failed to copy: ', err);
-                        alert('Failed to copy link.');
+                    const urlToShare = window.location.origin + window.location.pathname + hash;
+                    const title = shareButton.dataset.title;
+                    const text = shareButton.dataset.text;
+                    
+                    // NAYA: Web Share API ka istemal
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: title,
+                                text: text,
+                                url: urlToShare
+                            });
+                        } catch (err) {
+                            console.error('Share failed:', err);
+                        }
+                    } else {
+                        // Fallback: Agar Web Share API nahi hai (jaise desktop par)
+                        try {
+                            await navigator.clipboard.writeText(urlToShare);
+                            alert('Shloka link copied to clipboard!');
+                        } catch (err) {
+                            console.error('Failed to copy: ', err);
+                            alert('Failed to copy link.');
+                        }
                     }
                 }
                 
@@ -360,30 +526,21 @@
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
                     const shlokaDbId = likeButton.dataset.id;
-                    
-                    // Check local storage taaki user dobaara like na kar sake
                     if (localStorage.getItem('liked_' + shlokaDbId)) {
-                        alert('You have already liked this shloka.');
-                        return;
+                        return; // Pehle hi liked hai
                     }
-
-                    // Like button ko disable karo
                     likeButton.disabled = true;
-
                     try {
                         const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, {
                             method: 'POST'
                         });
                         const data = await response.json();
-                        
                         if (data.success) {
-                            // Count update karo
                             const countSpan = likeButton.querySelector('.like-count');
                             countSpan.textContent = data.likes;
-                            // Local storage mein save karo
                             localStorage.setItem('liked_' + shlokaDbId, 'true');
                         } else {
-                            likeButton.disabled = false; // Agar fail hua toh waapas enable karo
+                            likeButton.disabled = false;
                         }
                     } catch (err) {
                         console.error('Failed to like:', err);
