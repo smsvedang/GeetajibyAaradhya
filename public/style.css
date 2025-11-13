@@ -272,3 +272,26 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     max-width: 700px; /* Card ko center mein rakhein */
     margin: 40px auto; /* Upar/neeche margin */
 }
+/* --- NAYA: Shloka Page Home Button --- */
+.shloka-nav-links .home-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #FFF3E0;
+    color: #D84315;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid #FFECB3;
+    transition: background-color 0.2s ease;
+}
+.shloka-nav-links .home-button:hover {
+    background-color: #FFECB3;
+}
+
+/* Mobile par button chhota karein */
+@media (max-width: 768px) {
+    .shloka-nav-links .home-button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+}

@@ -13,7 +13,12 @@
             <div class="logo">
                 <a href="index.html" style="text-decoration: none; color: #D84315;">Warrior Aaradhya</a>
             </div>
+            
+            <div class="shloka-nav-links">
+                <a href="index.html" class="home-button">Home</a>
             </div>
+
+        </div>
     </nav>
 
     <div class="container">
@@ -38,19 +43,14 @@
             return videoWrapper;
         }
 
-        // Single shlok card banane ka function (index.html se thoda alag)
         function createSingleShlokaCard(shloka) {
             const item = document.createElement('div');
-            item.className = 'shloka-item-card'; // Wahi card style
-            
+            item.className = 'shloka-item-card'; 
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
-            
-            // Share data
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            const shareUrl = window.location.href; // Yahi page ka URL
-
+            const shareUrl = window.location.href; 
             item.innerHTML = `
                 <div class="card-video-container">
                     ${createVideo(shloka.video_id).innerHTML}
@@ -74,39 +74,29 @@
             return item;
         }
 
-        // Page load hone par shlok fetch karo
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('single-shloka-container');
-            
-            // 1. URL se ID nikalo (e.g., ?id=12345)
             const params = new URLSearchParams(window.location.search);
             const shlokaId = params.get('id');
-
             if (!shlokaId) {
                 container.innerHTML = "<p>Error: No shloka ID provided.</p>";
                 return;
             }
-
-            // 2. Naye API route se data fetch karo
             try {
                 const response = await fetch(`/api/shloka/${shlokaId}`);
                 if (!response.ok) {
                     throw new Error('Shloka not found');
                 }
                 const shloka = await response.json();
-                
-                // 3. Page par render karo
-                container.innerHTML = ''; // Loading text hatao
+                container.innerHTML = ''; 
                 const shlokaCard = createSingleShlokaCard(shloka);
                 container.appendChild(shlokaCard);
-
             } catch (err) {
                 console.error(err);
                 container.innerHTML = `<p>Error: Could not load shloka. ${err.message}</p>`;
             }
         });
         
-        // 3. Like/Share button logic (index.html se copy)
         document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {
@@ -121,7 +111,6 @@
                     catch (err) { alert('Failed to copy link.'); }
                 }
             }
-            
             const likeButton = e.target.closest('.like-button');
             if (likeButton) {
                 const shlokaDbId = likeButton.dataset.id;
