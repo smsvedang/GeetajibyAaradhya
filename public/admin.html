@@ -87,7 +87,7 @@
                     <button type="button" id="shloka-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
                 </form>
                 <h2 style="margin-top: 30px;">Existing Shlokas</h2>
-                <div class="admin-item-list" id="shloka-list-admin"></div>
+                <div id="shloka-list-admin"></div>
             </div>
 
             <div id="tab-blog" class="content-page">
@@ -206,14 +206,17 @@
                 artworks.forEach(artwork => {
                     const item = document.createElement('div');
                     item.className = 'artwork-admin-item';
+                    
+                    // [FIX] Button ko .admin-buttons mein wrap kar diya
                     item.innerHTML = `
                         <img src="${artwork.imageUrl}" alt="${artwork.title}">
                         <p>${artwork.title}</p>
-                        <button class="delete-button" data-id="${artwork._id}">Delete</button>
+                        <div class="admin-buttons">
+                            <button class="delete-button" data-id="${artwork._id}">Delete</button>
+                        </div>
                     `;
                     artworkListContainer.appendChild(item);
                 });
-                // NAYA: Dashboard update
                 document.getElementById('stat-artwork').textContent = artworks.length;
             } catch (err) { console.error('Failed to load artwork'); }
         }
@@ -221,22 +224,43 @@
         async function loadShlokasAdmin() {
             try {
                 const response = await fetch('/api/shlokas');
-                const shlokas = await response.json();
-                shlokaListContainer.innerHTML = ''; 
+                const shlokas = await response.json(); // Server se sorted aate hain
+                shlokaListContainer.innerHTML = ''; // List ko saaf karo
+
+                let currentAdhyay = 0;
+                let shlokaGroup; // Har adhyay ke liye naya inner list
+
                 shlokas.forEach(shloka => {
+                    // [NAYA] Check karo ki naya adhyay hai ya nahi
+                    if (shloka.adhyay !== currentAdhyay) {
+                        currentAdhyay = shloka.adhyay;
+                        
+                        // Adhyay ka header banao
+                        const adhyayHeader = document.createElement('h3');
+                        adhyayHeader.className = 'adhyay-admin-header';
+                        adhyayHeader.textContent = `Adhyay ${currentAdhyay}`;
+                        shlokaListContainer.appendChild(adhyayHeader);
+                        
+                        // Us adhyay ke shloks ke liye ek naya container
+                        shlokaGroup = document.createElement('div');
+                        shlokaGroup.className = 'admin-item-list-inner';
+                        shlokaListContainer.appendChild(shlokaGroup);
+                    }
+
+                    // Shlok item banao
                     const item = document.createElement('div');
                     item.className = 'shloka-admin-item';
                     item.innerHTML = `
-                        <p><strong>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</strong></p>
+                        <p><strong>Shloka ${shloka.shloka}</strong> (Likes: ${shloka.likes || 0})</p>
                         <div class="admin-buttons">
                             <button class="edit-button" data-id="${shloka._id}">Edit</button>
                             <button class="delete-button" data-id="${shloka._id}">Delete</button>
                         </div>
                     `;
                     item.querySelector('.edit-button').dataset.shloka = JSON.stringify(shloka);
-                    shlokaListContainer.appendChild(item);
+                    shlokaGroup.appendChild(item); // Item ko uske adhyay ke group mein daalo
                 });
-                // NAYA: Dashboard update
+                
                 document.getElementById('stat-shlokas').textContent = shlokas.length;
             } catch (err) { console.error('Failed to load shlokas for admin'); }
         }
