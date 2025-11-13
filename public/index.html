@@ -182,7 +182,7 @@
             }
         }
         
-        // --- FUNCTION 4: Load Shlokas (UPDATED FOR GRID) ---
+        // --- FUNCTION 4: Load Shlokas (UPDATED FOR FOLDING GRID) ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
@@ -203,33 +203,47 @@
                     shlokasByAdhyay[shloka.adhyay].push(shloka);
                 });
                 
-                // NAYA: Grid layout render karein
+                // NAYA: Ab details/summary tags ke andar grid render karein
                 for (const adhyayNum in shlokasByAdhyay) {
-                    // Adhyay Title
-                    const adhyayTitle = document.createElement('h2');
+                    
+                    // 1. Poore group ke liye <details> tag
+                    const adhyayGroup = document.createElement('details');
+                    adhyayGroup.className = 'adhyay-group';
+                    adhyayGroup.id = `adhyay-${adhyayNum}`;
+                    
+                    // Adhyay 1 ko default khula rakhein
+                    if (parseInt(adhyayNum, 10) === 1) {
+                         adhyayGroup.open = true; 
+                    }
+
+                    // 2. Title ke liye <summary> tag
+                    const adhyayTitle = document.createElement('summary');
                     adhyayTitle.className = 'adhyay-title';
                     adhyayTitle.textContent = `Adhyay ${adhyayNum}`;
-                    adhyayTitle.id = `adhyay-${adhyayNum}`;
-                    container.appendChild(adhyayTitle);
                     
-                    // Har Adhyay ke liye ek Grid
+                    // 3. Sabhi cards ke liye Grid container
                     const shlokaGrid = document.createElement('div');
                     shlokaGrid.className = 'shloka-grid';
                     
                     shlokasByAdhyay[adhyayNum].forEach(shloka => {
-                        const shlokaElement = createShlokaItem(shloka);
-                        shlokaGrid.appendChild(shlokaElement); // Card ko grid mein daalein
+                        const shlokaElement = createShlokaItem(shloka); // createShlokaItem abhi bhi card banata hai
+                        shlokaGrid.appendChild(shlokaElement);
                     });
                     
-                    container.appendChild(shlokaGrid); // Grid ko container mein daalein
+                    // Title aur Grid ko <details> tag ke andar daalein
+                    adhyayGroup.appendChild(adhyayTitle);
+                    adhyayGroup.appendChild(shlokaGrid);
+                    
+                    // Poore group ko main container mein daalein
+                    container.appendChild(adhyayGroup);
                 }
-                handleDeepLink();
+                handleDeepLink(); // Deep link ab bhi kaam karega
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
             }
         }
-
+        
         // --- FUNCTION 5: Load Artwork Gallery ---
         async function loadArtworkGallery() {
             // (Aapka puraana code... no change)
