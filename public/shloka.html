@@ -72,25 +72,26 @@
             return item;
         }
 
-        // Page load hone par shlok fetch karo (UPDATED)
+        // Page load hone par shlok fetch karo (UPDATED - Reverted to ID)
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('single-shloka-container');
             
+            // 1. URL se ID nikalo (e.g., ?id=12345)
             const params = new URLSearchParams(window.location.search);
-            const adhyay = params.get('adhyay');
-            const shlokaNum = params.get('shloka');
+            const shlokaId = params.get('id'); // 'id' se fetch karein
 
-            if (!adhyay || !shlokaNum) {
-                container.innerHTML = "<p>Error: Link is incomplete.</p>";
+            if (!shlokaId) {
+                container.innerHTML = "<p>Error: No shloka ID provided.</p>";
                 return;
             }
 
+            // 2. Puraane API route se data fetch karo
             try {
-                const cacheBuster = `&cache_buster=${new Date().getTime()}`;
-                const response = await fetch(`/api/shloka/find?adhyay=${adhyay}&shloka=${shlokaNum}${cacheBuster}`);
+                // [FIX] Cache buster add kiya gaya
+                const cacheBuster = `?cache_buster=${new Date().getTime()}`;
+                const response = await fetch(`/api/shloka/${shlokaId}${cacheBuster}`);
                 
                 if (!response.ok) {
-                    // Response se server ka error message padhne ki koshish karo
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Shloka not found');
                 }
@@ -103,12 +104,11 @@
 
             } catch (err) {
                 console.error(err);
-                // [NAYA FIX] Ab yeh server ka asli error message dikhayega
                 container.innerHTML = `<p>Error: ${err.message}</p>`;
             }
         });
         
-        // Like/Share button logic (No Change)
+        // 3. Like/Share button logic (No Change)
         document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {
