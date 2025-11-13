@@ -267,3 +267,8 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     }
     .shloka-actions { flex-direction: column; } 
 }
+/* --- NAYA: Single Shloka Page Style --- */
+#single-shloka-container {
+    max-width: 700px; /* Card ko center mein rakhein */
+    margin: 40px auto; /* Upar/neeche margin */
+}

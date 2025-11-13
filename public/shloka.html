@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaradhya Soni - Gita Shloka</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <nav class="top-navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="index.html" style="text-decoration: none; color: #D84315;">Warrior Aaradhya</a>
+            </div>
+            </div>
+    </nav>
+
+    <div class="container">
+        <main id="single-shloka-container">
+            <p>Loading shloka...</p>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>Contact: Aaradhya Soni</p>
+        <p>Email: warrioraaradhya111@gmail.com</p>
+        <p>Whatsapp: +91 9243714402</p>
+        <p>&copy; 2025 - All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // --- Copy/Paste from index.html ---
+        function createVideo(video_id) {
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'video-wrapper';
+            videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${video_id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            return videoWrapper;
+        }
+
+        // Single shlok card banane ka function (index.html se thoda alag)
+        function createSingleShlokaCard(shloka) {
+            const item = document.createElement('div');
+            item.className = 'shloka-item-card'; // Wahi card style
+            
+            const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
+            const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
+            
+            // Share data
+            const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            const shareUrl = window.location.href; // Yahi page ka URL
+
+            item.innerHTML = `
+                <div class="card-video-container">
+                    ${createVideo(shloka.video_id).innerHTML}
+                </div>
+                <div class="card-content">
+                    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+                    <p class="shloka-text">${formattedText}</p>
+                    <div class="shloka-actions">
+                        <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
+                            ❤️ <span class="like-count">${shloka.likes || 0}</span>
+                        </button>
+                        <button class="shloka-action-button share-button" 
+                                data-url="${shareUrl}" 
+                                data-title="${shareTitle}" 
+                                data-text="${shareText}">
+                            🔗 Share
+                        </button>
+                    </div>
+                </div>
+            `;
+            return item;
+        }
+
+        // Page load hone par shlok fetch karo
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('single-shloka-container');
+            
+            // 1. URL se ID nikalo (e.g., ?id=12345)
+            const params = new URLSearchParams(window.location.search);
+            const shlokaId = params.get('id');
+
+            if (!shlokaId) {
+                container.innerHTML = "<p>Error: No shloka ID provided.</p>";
+                return;
+            }
+
+            // 2. Naye API route se data fetch karo
+            try {
+                const response = await fetch(`/api/shloka/${shlokaId}`);
+                if (!response.ok) {
+                    throw new Error('Shloka not found');
+                }
+                const shloka = await response.json();
+                
+                // 3. Page par render karo
+                container.innerHTML = ''; // Loading text hatao
+                const shlokaCard = createSingleShlokaCard(shloka);
+                container.appendChild(shlokaCard);
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p>Error: Could not load shloka. ${err.message}</p>`;
+            }
+        });
+        
+        // 3. Like/Share button logic (index.html se copy)
+        document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
+            const shareButton = e.target.closest('.share-button');
+            if (shareButton) {
+                const urlToShare = shareButton.dataset.url;
+                const title = shareButton.dataset.title;
+                const text = shareButton.dataset.text;
+                if (navigator.share) {
+                    try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
+                    catch (err) { console.error('Share failed:', err); }
+                } else {
+                    try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
+                    catch (err) { alert('Failed to copy link.'); }
+                }
+            }
+            
+            const likeButton = e.target.closest('.like-button');
+            if (likeButton) {
+                const shlokaDbId = likeButton.dataset.id;
+                if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
+                likeButton.disabled = true;
+                try {
+                    const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, { method: 'POST' });
+                    const data = await response.json();
+                    if (data.success) {
+                        const countSpan = likeButton.querySelector('.like-count');
+                        countSpan.textContent = data.likes;
+                        localStorage.setItem('liked_' + shlokaDbId, 'true');
+                    } else { likeButton.disabled = false; }
+                } catch (err) { likeButton.disabled = false; }
+            }
+        });
+    </script>
+</body>
+</html>
