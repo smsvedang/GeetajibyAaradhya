@@ -342,3 +342,68 @@ button.cancel-button {
         font-size: 16px;
     }
 }
+/* --- NAYA: Blog Styling --- */
+.blog-container h2, 
+.testimonials-container h2 {
+    text-align: center;
+    font-size: 2em;
+    color: #BFA080;
+    margin-bottom: 25px;
+}
+
+.blog-post-item {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.blog-post-item h3 {
+    font-size: 1.6em;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.blog-post-item .blog-date {
+    font-size: 0.9em;
+    color: #777;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.blog-post-item .blog-content {
+    font-size: 1em;
+    line-height: 1.7;
+    color: #555;
+}
+
+/* --- NAYA: Testimonial Styling --- */
+.testimonial-item {
+    background-color: #FFF8E1; /* Light cream */
+    border-left: 5px solid #BFA080; /* Accent color */
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+}
+
+.testimonial-item blockquote {
+    font-size: 1.1em;
+    font-style: italic;
+    color: #444;
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+    padding: 0;
+    position: relative;
+}
+
+.testimonial-item cite {
+    font-size: 1em;
+    font-weight: bold;
+    color: #BFA080;
+    display: block;
+    text-align: right;
+    font-style: normal;
+}

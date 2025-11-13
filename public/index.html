@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -13,14 +12,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Meta Tags -->
     <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
     <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
     <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 2, LearnGeeta, Artwork Gallery, Gita Recitation">
-     <!-- NAYA: Google ko Site Name 'Suggest' karne ke liye Structured Data -->
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+      "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Aaradhya Soni - The SMA Warrior",
       "alternateName": "Warrior Aaradhya",
@@ -31,7 +28,6 @@
 </head>
 <body>
     
-    <!-- Header -->
     <header class="hero-section">
         <div class="container">
             <h1>Shrimad Bhagavad Gita</h1>
@@ -40,20 +36,18 @@
         </div>
     </header>
 
-    <!-- Tab Structure -->
     <div class="container">
         
-        <!-- Tab Buttons -->
         <div class="main-tabs">
             <button class="main-tab-button active" data-tab="tab-shlokas">Home (Shlokas)</button>
             <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
             <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
+            <button class="main-tab-button" data-tab="tab-blog">Blog</button>
+            <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
         </div>
 
-        <!-- Tab Content Panels -->
         <div class="main-tab-panels">
 
-            <!-- Tab 1: Gita Shlokas (Home) -->
             <div id="tab-shlokas" class="main-tab-content active">
                 <main class="shloka-list-container">
                     <h2>Chapters and Shlokas of the Gita</h2>
@@ -63,13 +57,11 @@
                 </main>
             </div>
 
-            <!-- Tab 2: About Aaradhya -->
             <div id="tab-about" class="main-tab-content">
                 <section class="about">
                     <h2>About Aaradhya</h2>
                     <div class="about-content">
                         <div class="about-image">
-                            <!-- Placeholder image -->
                             <img src="httpsG://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
                         </div>
                         <div class="about-text" id="about-text-content">
@@ -79,36 +71,44 @@
                 </section>
             </div>
 
-            <!-- Tab 3: Artwork Gallery (UPDATED TO CAROUSEL) -->
             <div id="tab-gallery" class="main-tab-content">
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
                     
-                    <!-- Naya Carousel Structure -->
                     <div class="carousel-container" id="gallery-carousel-container">
-                        <!-- Images JS se load hongi -->
-                        <!-- Buttons -->
                         <button classd="carousel-button prev" id="carousel-prev">&#10094;</button>
                         <button class="carousel-button next" id="carousel-next">&#10095;</button>
-                        <!-- Slide Number -->
                         <div class="slide-counter" id="slide-counter-text"></div>
                     </div>
+                </section>
+            </div>
+            
+            <div id="tab-blog" class="main-tab-content">
+                <section class="blog-container">
+                    <h2>Blog</h2>
+                    <div id="blog-posts-container">
+                        <p>Loading blog posts...</p>
+                    </div>
+                </section>
+            </div>
 
+            <div id="tab-testimonials" class="main-tab-content">
+                <section class="testimonials-container">
+                    <h2>Testimonials</h2>
+                    <div id="testimonials-list-container">
+                        <p>Loading testimonials...</p>
+                    </div>
                 </section>
             </div>
 
         </div>
-    </div> <!-- End container -->
-
-
-    <footer class="footer">
+    </div> <footer class="footer">
         <p>Contact: Aaradhya Soni</p>
         <p>Email: warrioraaradhya111@gmail.com</p>
         <p>Whatsapp: +91 9243714402</p>
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
-    <!-- Saara Public JavaScript (UPDATED) -->
     <script>
         
         // --- FUNCTION 1, 2, 3, 4 (No Change) ---
@@ -126,7 +126,6 @@
                 </iframe>`;
             return videoWrapper;
         }
-
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
@@ -138,7 +137,6 @@
             item.appendChild(createVideo(shloka.video_id));
             return item;
         }
-
         async function loadAboutSection() {
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
@@ -161,20 +159,16 @@
                 aboutContainer.innerHTML = '<p>Could not load details.</p>';
             }
         }
-
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
-
             try {
                 const response = await fetch('/api/shlokas?cache_buster=' + new Date().getTime());
                 const shlokas = await response.json(); 
-
                 if (shlokas.length === 0) {
                     container.innerHTML = '<p>No shlokas added yet.</p>';
                     return;
                 }
-
                 const shlokasByAdhyay = {};
                 shlokas.forEach(shloka => {
                     if (!shlokasByAdhyay[shloka.adhyay]) {
@@ -182,26 +176,22 @@
                     }
                     shlokasByAdhyay[shloka.adhyay].push(shloka);
                 });
-
                 for (const adhyayNum in shlokasByAdhyay) {
                     const adhyayGroup = document.createElement('details');
-					adhyayGroup.className = 'adhyay-group';
-					
-					const numAdhyay = parseInt(adhyayNum, 10);
-					if (numAdhyay <= 3) {
-						adhyayGroup.open = true; 
-					}
-
+                    adhyayGroup.className = 'adhyay-group';
+                    
+                    const numAdhyay = parseInt(adhyayNum, 10);
+                    if (numAdhyay <= 3) {
+                        adhyayGroup.open = true; 
+                    }
                     const adhyayTitle = document.createElement('summary');
                     adhyayTitle.className = 'adhyay-title';
                     adhyayTitle.textContent = `Adhyay ${adhyayNum}`;
                     adhyayGroup.appendChild(adhyayTitle);
-
                     shlokasByAdhyay[adhyayNum].forEach(shloka => {
                         const shlokaElement = createShlokaItem(shloka);
                         adhyayGroup.appendChild(shlokaElement);
                     });
-
                     container.appendChild(adhyayGroup);
                 }
             } catch (err) {
@@ -210,80 +200,122 @@
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery load karna (UPDATED FOR CAROUSEL) ---
+        // --- FUNCTION 5: Artwork Gallery (No Change) ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
-            
             try {
                 const response = await fetch('/api/artwork?cache_buster=' + new Date().getTime());
                 const artworks = await response.json();
-
                 if (artworks.length === 0) {
                     container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet.</p>';
                     return;
                 }
-                
-                // Naya Carousel Logic
                 artworks.forEach((artwork, index) => {
                     const item = document.createElement('div');
                     item.className = 'carousel-item';
-                    // Pehli image ko 'active' (visible) banao
                     if (index === 0) item.classList.add('active'); 
                     item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
                     container.appendChild(item);
                 });
-                
-                // Naya Function call: Carousel ke button set karo
                 setupCarouselListeners(artworks.length);
-
             } catch (err) {
                 console.error("Error loading artwork:", err);
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
 
-        // --- NAYA FUNCTION 6: Carousel button logic ---
+        // --- FUNCTION 6: Carousel logic (No Change) ---
         function setupCarouselListeners(totalSlides) {
             let currentSlide = 0;
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const counterText = document.getElementById('slide-counter-text');
-
             function showSlide(index) {
-                // Bounds check karo (aakhiri slide se aage/peeche jaana)
                 if (index >= totalSlides) {
-                    currentSlide = 0; // Waapas pehli slide par
+                    currentSlide = 0;
                 } else if (index < 0) {
-                    currentSlide = totalSlides - 1; // Aakhiri slide par
+                    currentSlide = totalSlides - 1;
                 } else {
                     currentSlide = index;
                 }
-
-                // Sabhi slides ko chhipao
                 slides.forEach(slide => {
                     slide.classList.remove('active');
                 });
-                
-                // Sirf current slide ko dikhao
                 slides[currentSlide].classList.add('active');
-                
-                // Counter update karo
                 counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
             }
-
-            // Pehli slide dikhao
             showSlide(0);
-
-            // Button clicks
             prevButton.addEventListener('click', () => {
                 showSlide(currentSlide - 1);
             });
-
             nextButton.addEventListener('click', () => {
                 showSlide(currentSlide + 1);
             });
+        }
+        
+        // --- NAYA FUNCTION 7: Blog posts load karna ---
+        async function loadBlogPosts() {
+            const container = document.getElementById('blog-posts-container');
+            container.innerHTML = '';
+            try {
+                const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
+                const posts = await response.json();
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<p>No blog posts added yet.</p>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const item = document.createElement('article');
+                    item.className = 'blog-post-item';
+                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                    });
+                    
+                    item.innerHTML = `
+                        <h3>${post.title}</h3>
+                        <p class="blog-date">${postDate}</p>
+                        <div class="blog-content">
+                            ${post.content.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Error loading blog posts:", err);
+                container.innerHTML = '<p>Could not load blog posts.</p>';
+            }
+        }
+        
+        // --- NAYA FUNCTION 8: Testimonials load karna ---
+        async function loadTestimonials() {
+            const container = document.getElementById('testimonials-list-container');
+            container.innerHTML = '';
+            try {
+                const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
+                const testimonials = await response.json();
+                
+                if (testimonials.length === 0) {
+                    container.innerHTML = '<p>No testimonials added yet.</p>';
+                    return;
+                }
+
+                testimonials.forEach(testimonial => {
+                    const item = document.createElement('div');
+                    item.className = 'testimonial-item';
+                    item.innerHTML = `
+                        <blockquote>${testimonial.quote.replace(/\n/g, '<br>')}</blockquote>
+                        <cite>- ${testimonial.author}</cite>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) {
+                console.error("Error loading testimonials:", err);
+                container.innerHTML = '<p>Could not load testimonials.</p>';
+            }
         }
         
         
@@ -306,6 +338,8 @@
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery(); 
+            loadBlogPosts(); // NAYA
+            loadTestimonials(); // NAYA
         });
     </script>
 </body>
