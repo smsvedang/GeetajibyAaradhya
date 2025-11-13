@@ -147,6 +147,8 @@ app.get('/api/shloka/find', async (req, res) => {
         }
         res.json(foundShloka);
     } catch (err) {
+        // [FIX] Error ko Vercel logs mein print karo (Pichhle step se)
+        console.error("ERROR FETCHING SHLOKA:", err); 
         res.status(500).json({ message: 'Shloka laane mein error' });
     }
 });
