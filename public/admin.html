@@ -4,94 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-style.css"> 
 </head>
 <body>
-    <header class="header" style="background-color: #5D4037; text-align: center; color: white; padding: 20px;">
-        <h1>Admin Panel</h1>
-    </header>
 
-    <main class="container">
-        
-        <div id="login-section">
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+    <div id="login-section">
+        <form id="login-form">
+            <h2>Admin Login</h2>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
 
-        <div id="admin-dashboard" style="display:none;">
+    <div id="admin-dashboard" class="admin-wrapper" style="display:none;">
 
-            <div class="admin-tabs">
-                <button class="tab-button active" data-tab="tab-shloka">Manage Shlokas</button>
-                <button class="tab-button" data-tab="tab-about">Update About</button>
-                <button class="tab-button" data-tab="tab-artwork">Manage Artwork</button>
-                <button class="tab-button" data-tab="tab-blog">Manage Blog</button>
-                <button class="tab-button" data-tab="tab-testimonials">Manage Testimonials</button>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                Admin Panel
             </div>
+            <nav class="sidebar-nav">
+                <button class="sidebar-button active" data-tab="tab-dashboard">Dashboard</button>
+                <button class="sidebar-button" data-tab="tab-testimonials">Testimonials</button>
+                <button class="sidebar-button" data-tab="tab-shloka">Manage Shlokas</button>
+                <button class="sidebar-button" data-tab="tab-blog">Manage Blog</button>
+                <button class="sidebar-button" data-tab="tab-artwork">Manage Artwork</button>
+                <button class="sidebar-button" data-tab="tab-about">Site Settings (About)</button>
+            </nav>
+        </aside>
 
-            <div id="tab-shloka" class="tab-content active">
-                <h2 id="shloka-form-title">Add New Shloka</h2>
-                <form id="shloka-form">
-                    <input type="hidden" id="shloka-id" value="">
-                    
-                    <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
-                    <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
-                    <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
-                    <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
-                    <button type="submit" id="shloka-submit-button">Add Shloka</button>
-                    <button type="button" id="shloka-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
-                </form>
+        <main class="main-content">
 
-                <h2 style="margin-top: 30px;">Existing Shlokas</h2>
-                <div id="shloka-list-admin">
+            <div id="tab-dashboard" class="content-page active">
+                <h1 class="page-header">Dashboard</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card pending">
+                        <h3>Pending Testimonials</h3>
+                        <span class="stat-number" id="stat-pending">0</span>
                     </div>
-            </div>
-
-            <div id="tab-about" class="tab-content">
-                <h2>Update "About Aaradhya" Section</h2>
-                <form id="about-form">
-                    <label for="about-image-url">About Photo URL:</label>
-                    <input type="text" id="about-image-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)">
-                    
-                    <label for="about-text-input">About Text:</label>
-                    <textarea id="about-text-input" rows="10" placeholder="Enter text for the 'About' section..."></textarea>
-                    <button type="submit">Save About Text</button>
-                </form>
-            </div>
-
-            <div id="tab-artwork" class="tab-content">
-                <h2>Add New Artwork</h2>
-                <form id="artwork-form">
-                    <input type="text" id="artwork-title" placeholder="Drawing Title (e.g., Ganesh Ji)" required>
-                    <input type="text" id="artwork-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)" required>
-                    <button type="submit">Add Artwork</button>
-                </form>
-                <h2>Existing Artwork</h2>
-                <div id="artwork-list">
+                    <div class="stat-card">
+                        <h3>Total Shlokas</h3>
+                        <span class="stat-number" id="stat-shlokas">0</span>
                     </div>
-            </div>
-
-            <div id="tab-blog" class="tab-content">
-                <h2 id="blog-form-title">Add New Blog Post</h2>
-                <form id="blog-form">
-                    <input type="hidden" id="blog-id" value="">
-                    
-                    <input type="text" id="blog-title" placeholder="Blog Post Title" required>
-                    <textarea id="blog-content" placeholder="Blog content..." rows="10" required></textarea>
-                    
-                    <button type="submit" id="blog-submit-button">Add Post</button>
-                    <button type="button" id="blog-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
-                </form>
-
-                <h2 style="margin-top: 30px;">Existing Blog Posts</h2>
-                <div id="blog-list-admin">
+                    <div class="stat-card">
+                        <h3>Blog Posts</h3>
+                        <span class="stat-number" id="stat-blog">0</span>
                     </div>
+                    <div class="stat-card">
+                        <h3>Artworks</h3>
+                        <span class="stat-number" id="stat-artwork">0</span>
+                    </div>
+                </div>
             </div>
 
-            <div id="tab-testimonials" class="tab-content">
-                
+            <div id="tab-testimonials" class="content-page">
+                <h1 class="page-header">Manage Testimonials</h1>
                 <h2 id="testimonial-form-title">Add New Testimonial (Manually)</h2>
                 <form id="testimonial-form">
                     <input type="hidden" id="testimonial-id" value="">
@@ -100,18 +66,70 @@
                     <button type="submit" id="testimonial-submit-button">Add Testimonial</button>
                     <button type="button" id="testimonial-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
                 </form>
-
-                <h2 style="margin-top: 30px; color: #ff9800;">Pending Requests</h2>
-                <div id="testimonial-list-pending">
-                    </div>
                 
-                <h2 style="margin-top: 30px; color: #4CAF50;">Approved Testimonials</h2>
-                <div id="testimonial-list-approved">
-                    </div>
+                <h2 style="color: var(--primary-color);">Pending Requests</h2>
+                <div class="admin-item-list" id="testimonial-list-pending"></div>
+                
+                <h2 style="margin-top: 30px; color: var(--green);">Approved Testimonials</h2>
+                <div class="admin-item-list" id="testimonial-list-approved"></div>
             </div>
 
-        </div>
-    </main>
+            <div id="tab-shloka" class="content-page">
+                <h1 class="page-header">Manage Shlokas</h1>
+                <h2 id="shloka-form-title">Add New Shloka</h2>
+                <form id="shloka-form">
+                    <input type="hidden" id="shloka-id" value="">
+                    <input type="text" id="adhyay" placeholder="Adhyay (e.g., 1)" required>
+                    <input type="text" id="shloka" placeholder="Shloka (e.g., 2)" required>
+                    <textarea id="text" placeholder="Shloka Text..." rows="4"></textarea>
+                    <input type="text" id="video_url" placeholder="YouTube Video ID (Just the ID)" required>
+                    <button type="submit" id="shloka-submit-button">Add Shloka</button>
+                    <button type="button" id="shloka-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
+                </form>
+                <h2 style="margin-top: 30px;">Existing Shlokas</h2>
+                <div class="admin-item-list" id="shloka-list-admin"></div>
+            </div>
+
+            <div id="tab-blog" class="content-page">
+                <h1 class="page-header">Manage Blog</h1>
+                <h2 id="blog-form-title">Add New Blog Post</h2>
+                <form id="blog-form">
+                    <input type="hidden" id="blog-id" value="">
+                    <input type="text" id="blog-title" placeholder="Blog Post Title" required>
+                    <textarea id="blog-content" placeholder="Blog content..." rows="10" required></textarea>
+                    <button type="submit" id="blog-submit-button">Add Post</button>
+                    <button type="button" id="blog-cancel-edit" class="cancel-button" style="display: none;">Cancel Edit</button>
+                </form>
+                <h2 style="margin-top: 30px;">Existing Blog Posts</h2>
+                <div class="admin-item-list" id="blog-list-admin"></div>
+            </div>
+
+            <div id="tab-artwork" class="content-page">
+                <h1 class="page-header">Manage Artwork</h1>
+                <h2>Add New Artwork</h2>
+                <form id="artwork-form">
+                    <input type="text" id="artwork-title" placeholder="Drawing Title (e.g., Ganesh Ji)" required>
+                    <input type="text" id="artwork-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)" required>
+                    <button type="submit">Add Artwork</button>
+                </form>
+                <h2 style="margin-top: 30px;">Existing Artwork</h2>
+                <div class="admin-item-list" id="artwork-list"></div>
+            </div>
+            
+            <div id="tab-about" class="content-page">
+                <h1 class="page-header">Site Settings (About Page)</h1>
+                <form id="about-form">
+                    <h2>Update "About Aaradhya" Section</h2>
+                    <label for="about-image-url">About Photo URL:</label>
+                    <input type="text" id="about-image-url" placeholder="Paste image URL here (e.g., https://i.imgur.com/....jpg)">
+                    <label for="about-text-input">About Text:</label>
+                    <textarea id="about-text-input" rows="10" placeholder="Enter text for the 'About' section..."></textarea>
+                    <button type="submit">Save About Text</button>
+                </form>
+            </div>
+
+        </main>
+    </div>
 
     <script>
         // --- Element Selectors ---
@@ -119,7 +137,7 @@
         const adminDashboard = document.getElementById('admin-dashboard');
         const loginForm = document.getElementById('login-form');
         
-        // Shloka Elements
+        // Shloka
         const shlokaForm = document.getElementById('shloka-form');
         const shlokaFormTitle = document.getElementById('shloka-form-title');
         const shlokaSubmitButton = document.getElementById('shloka-submit-button');
@@ -127,16 +145,16 @@
         const shlokaIdInput = document.getElementById('shloka-id');
         const shlokaListContainer = document.getElementById('shloka-list-admin');
 
-        // About Elements
+        // About
         const aboutForm = document.getElementById('about-form');
         const aboutTextInput = document.getElementById('about-text-input');
         const aboutImageUrlInput = document.getElementById('about-image-url');
         
-        // Artwork Elements
+        // Artwork
         const artworkForm = document.getElementById('artwork-form');
         const artworkListContainer = document.getElementById('artwork-list');
 
-        // Blog Elements
+        // Blog
         const blogForm = document.getElementById('blog-form');
         const blogFormTitle = document.getElementById('blog-form-title');
         const blogSubmitButton = document.getElementById('blog-submit-button');
@@ -144,7 +162,7 @@
         const blogIdInput = document.getElementById('blog-id');
         const blogListContainer = document.getElementById('blog-list-admin');
 
-        // Testimonial Elements (Updated)
+        // Testimonial
         const testimonialForm = document.getElementById('testimonial-form');
         const testimonialFormTitle = document.getElementById('testimonial-form-title');
         const testimonialSubmitButton = document.getElementById('testimonial-submit-button');
@@ -155,19 +173,20 @@
 
         let adminPassword = '';
 
-        // --- Tab Switching Code ---
-        const tabs = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
+        // --- NAYA: Tab Switching Code (Sidebar ke liye) ---
+        const sidebarButtons = document.querySelectorAll('.sidebar-button');
+        const contentPages = document.querySelectorAll('.content-page');
+        sidebarButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                sidebarButtons.forEach(btn => btn.classList.remove('active'));
+                contentPages.forEach(c => c.classList.remove('active'));
+                
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
             });
         });
 
-        // --- Data Loading Functions ---
+        // --- Data Loading Functions (UPDATED) ---
         async function loadAboutContent() {
             try {
                 const response = await fetch('/api/about');
@@ -194,6 +213,8 @@
                     `;
                     artworkListContainer.appendChild(item);
                 });
+                // NAYA: Dashboard update
+                document.getElementById('stat-artwork').textContent = artworks.length;
             } catch (err) { console.error('Failed to load artwork'); }
         }
 
@@ -215,9 +236,11 @@
                     item.querySelector('.edit-button').dataset.shloka = JSON.stringify(shloka);
                     shlokaListContainer.appendChild(item);
                 });
+                // NAYA: Dashboard update
+                document.getElementById('stat-shlokas').textContent = shlokas.length;
             } catch (err) { console.error('Failed to load shlokas for admin'); }
         }
-
+        
         async function loadBlogPosts() {
             try {
                 const response = await fetch('/api/blog');
@@ -225,7 +248,7 @@
                 blogListContainer.innerHTML = ''; 
                 posts.forEach(post => {
                     const item = document.createElement('div');
-                    item.className = 'shloka-admin-item';
+                    item.className = 'shloka-admin-item'; // Reuse style
                     item.innerHTML = `
                         <p><strong>${post.title}</strong></p>
                         <div class="admin-buttons">
@@ -236,6 +259,8 @@
                     item.querySelector('.edit-button').dataset.post = JSON.stringify(post);
                     blogListContainer.appendChild(item);
                 });
+                // NAYA: Dashboard update
+                document.getElementById('stat-blog').textContent = posts.length;
             } catch (err) { console.error('Failed to load blog posts'); }
         }
 
@@ -243,11 +268,10 @@
             try {
                 const response = await fetch('/api/testimonials/all'); 
                 const testimonials = await response.json();
-                
                 testimonialListPending.innerHTML = '';
                 testimonialListApproved.innerHTML = '';
-
                 let pendingCount = 0;
+
                 testimonials.forEach(testimonial => {
                     const item = document.createElement('div');
                     item.className = 'shloka-admin-item';
@@ -256,7 +280,6 @@
                         pendingCount++;
                         item.innerHTML = `
                             <p><strong>${testimonial.author}</strong></p>
-                            <p style="font-style: italic;">"${testimonial.quote.substring(0, 100)}..."</p>
                             <div class="admin-buttons">
                                 <button class="approve-button" data-id="${testimonial._id}">Approve</button>
                                 <button class="delete-button" data-id="${testimonial._id}">Delete</button>
@@ -266,7 +289,6 @@
                     } else {
                         item.innerHTML = `
                             <p><strong>${testimonial.author}</strong></p>
-                            <p>"${testimonial.quote.substring(0, 50)}..."</p>
                             <div class="admin-buttons">
                                 <button class="edit-button" data-id="${testimonial._id}">Edit</button>
                                 <button class="delete-button" data-id="${testimonial._id}">Delete</button>
@@ -278,15 +300,12 @@
                 });
                 
                 if (pendingCount === 0) {
-                     testimonialListPending.innerHTML = '<p>No pending requests.</p>';
+                     testimonialListPending.innerHTML = '<p style="padding: 15px;">No pending requests.</p>';
                 }
-
-            } catch (err) {
-                console.error('Failed to load testimonials');
-                testimonialListPending.innerHTML = '<p>Error loading testimonials.</p>';
-            }
+                // NAYA: Dashboard update
+                document.getElementById('stat-pending').textContent = pendingCount;
+            } catch (err) { console.error('Failed to load testimonials'); }
         }
-
 
         // --- Event Listeners ---
         
@@ -299,40 +318,33 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: password })
             });
-            
             try {
                 const data = await response.json();
                 if (data.success) {
                     adminPassword = password;
                     loginSection.style.display = 'none';
-                    adminDashboard.style.display = 'block';
+                    adminDashboard.style.display = 'flex'; // NAYA: flex
                     
                     // Login ke baad sab kuch load karo
                     loadAboutContent();
                     loadArtwork();
                     loadShlokasAdmin();
                     loadBlogPosts();
-                    loadTestimonials();
+                    loadTestimonials(); // Yeh function ab dashboard bhi update kar dega
                 } else {
                     alert(data.message || 'Login failed!');
                 }
-            } catch (err) {
-                console.error("Login Error:", err);
-                alert('Login failed. Check console.');
-            }
+            } catch (err) { alert('Login failed. Check console.'); }
         });
 
         // 2. Shloka Form (Add/Edit)
         shlokaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
-
             const shlokaId = shlokaIdInput.value;
             const isEditMode = !!shlokaId;
-
             const url = isEditMode ? `/api/shlokas/${shlokaId}` : '/api/shlokas';
             const method = isEditMode ? 'PUT' : 'POST';
-
             const response = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
@@ -344,12 +356,11 @@
                     password: adminPassword 
                 })
             });
-            
             const data = await response.json();
             if (response.ok) {
                 alert(isEditMode ? 'Shloka updated!' : 'Shloka added!');
                 resetShlokaForm();
-                loadShlokasAdmin();
+                loadShlokasAdmin(); // List aur dashboard refresh
             } else {
                 alert(data.message || 'Failed to save shloka.');
             }
@@ -359,13 +370,10 @@
         blogForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
-
             const blogId = blogIdInput.value;
             const isEditMode = !!blogId;
-
             const url = isEditMode ? `/api/blog/${blogId}` : '/api/blog';
             const method = isEditMode ? 'PUT' : 'POST';
-
             const response = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
@@ -375,12 +383,11 @@
                     password: adminPassword 
                 })
             });
-            
             const data = await response.json();
             if (response.ok) {
                 alert(isEditMode ? 'Post updated!' : 'Post added!');
                 resetBlogForm();
-                loadBlogPosts();
+                loadBlogPosts(); // List aur dashboard refresh
             } else {
                 alert(data.message || 'Failed to save post.');
             }
@@ -390,13 +397,10 @@
         testimonialForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!adminPassword) return alert('Please login first.');
-
             const testimonialId = testimonialIdInput.value;
             const isEditMode = !!testimonialId;
-
             const url = isEditMode ? `/api/testimonials/${testimonialId}` : '/api/testimonials/admin';
             const method = isEditMode ? 'PUT' : 'POST';
-
             const response = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
@@ -406,12 +410,11 @@
                     password: adminPassword 
                 })
             });
-            
             const data = await response.json();
             if (response.ok) {
                 alert(isEditMode ? 'Testimonial updated!' : 'Testimonial added and approved!');
                 resetTestimonialForm();
-                loadTestimonials();
+                loadTestimonials(); // List aur dashboard refresh
             } else {
                 alert(data.message || 'Failed to save testimonial.');
             }
@@ -426,7 +429,6 @@
             shlokaCancelButton.style.display = 'none';
         }
         shlokaCancelButton.addEventListener('click', resetShlokaForm);
-
         function resetBlogForm() {
             blogForm.reset();
             blogIdInput.value = '';
@@ -435,7 +437,6 @@
             blogCancelButton.style.display = 'none';
         }
         blogCancelButton.addEventListener('click', resetBlogForm);
-
         function resetTestimonialForm() {
             testimonialForm.reset();
             testimonialIdInput.value = '';
@@ -447,26 +448,21 @@
 
 
         // --- List Click Listeners (Delete/Edit) ---
-
         // Shloka List (Edit/Delete)
         shlokaListContainer.addEventListener('click', async (e) => {
             if (!adminPassword) return alert('Please login first.');
             const target = e.target;
             const id = target.dataset.id;
-
             if (target.classList.contains('delete-button')) {
-                if (!confirm('Are you sure you want to delete this shloka?')) return;
+                if (!confirm('Are you sure?')) return;
                 const response = await fetch(`/api/shlokas/${id}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: adminPassword })
                 });
-                if (response.ok) {
-                    alert('Shloka deleted!');
-                    loadShlokasAdmin();
-                } else { alert('Failed to delete shloka.'); }
+                if (response.ok) { loadShlokasAdmin(); } 
+                else { alert('Failed to delete.'); }
             }
-            
             if (target.classList.contains('edit-button')) {
                 const shlokaData = JSON.parse(target.dataset.shloka);
                 shlokaIdInput.value = shlokaData._id;
@@ -476,7 +472,7 @@
                 document.getElementById('video_url').value = shlokaData.video_id; 
                 shlokaFormTitle.textContent = 'Edit Shloka';
                 shlokaSubmitButton.textContent = 'Update Shloka';
-                shlokaCancelButton.style.display = 'block';
+                shlokaCancelButton.style.display = 'inline-block';
                 shlokaForm.scrollIntoView({ behavior: 'smooth' });
             }
         });
@@ -487,16 +483,14 @@
             const target = e.target;
             const id = target.dataset.id;
             if (target.classList.contains('delete-button')) {
-                if (!confirm('Are you sure you want to delete this post?')) return;
+                if (!confirm('Are you sure?')) return;
                 const response = await fetch(`/api/blog/${id}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: adminPassword })
                 });
-                if (response.ok) {
-                    alert('Post deleted!');
-                    loadBlogPosts();
-                } else { alert('Failed to delete post.'); }
+                if (response.ok) { loadBlogPosts(); } 
+                else { alert('Failed to delete.'); }
             }
             if (target.classList.contains('edit-button')) {
                 const postData = JSON.parse(target.dataset.post);
@@ -505,7 +499,7 @@
                 document.getElementById('blog-content').value = postData.content;
                 blogFormTitle.textContent = 'Edit Blog Post';
                 blogSubmitButton.textContent = 'Update Post';
-                blogCancelButton.style.display = 'block';
+                blogCancelButton.style.display = 'inline-block';
                 blogForm.scrollIntoView({ behavior: 'smooth' });
             }
         });
@@ -514,63 +508,40 @@
         [testimonialListPending, testimonialListApproved].forEach(container => {
             container.addEventListener('click', async (e) => {
                 if (!adminPassword) return alert('Please login first.');
-                
                 const target = e.target;
                 const id = target.dataset.id;
-
-                // --- APPROVE ---
                 if (target.classList.contains('approve-button')) {
-                    if (!confirm('Are you sure you want to approve this testimonial?')) return;
-                    
+                    if (!confirm('Are you sure?')) return;
                     const response = await fetch(`/api/testimonials/approve/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password: adminPassword })
                     });
-                    
-                    if (response.ok) {
-                        alert('Testimonial approved!');
-                        loadTestimonials(); // List refresh
-                    } else {
-                        alert('Failed to approve.');
-                    }
+                    if (response.ok) { loadTestimonials(); } 
+                    else { alert('Failed to approve.'); }
                 }
-
-                // --- DELETE ---
                 if (target.classList.contains('delete-button')) {
-                    if (!confirm('Are you sure you want to delete this testimonial?')) return;
-                    
+                    if (!confirm('Are you sure?')) return;
                     const response = await fetch(`/api/testimonials/${id}`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password: adminPassword })
                     });
-                    
-                    if (response.ok) {
-                        alert('Testimonial deleted!');
-                        loadTestimonials(); // List refresh
-                    } else {
-                        alert('Failed to delete.');
-                    }
+                    if (response.ok) { loadTestimonials(); } 
+                    else { alert('Failed to delete.'); }
                 }
-                
-                // --- EDIT ---
                 if (target.classList.contains('edit-button')) {
                     const testimonialData = JSON.parse(target.dataset.testimonial);
-                    
                     testimonialIdInput.value = testimonialData._id;
                     document.getElementById('testimonial-author').value = testimonialData.author;
                     document.getElementById('testimonial-quote').value = testimonialData.quote;
-                    
                     testimonialFormTitle.textContent = 'Edit Testimonial';
                     testimonialSubmitButton.textContent = 'Update Testimonial';
-                    testimonialCancelButton.style.display = 'block';
-                    
+                    testimonialCancelButton.style.display = 'inline-block';
                     testimonialForm.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });
-
 
         // --- Other Form Handlers ---
         aboutForm.addEventListener('submit', async (e) => {
@@ -585,9 +556,8 @@
                     password: adminPassword 
                 })
             });
-            const data = await response.json();
-            if (response.ok) { alert('About section saved successfully!'); } 
-            else { alert(data.message || 'Failed to save.'); }
+            if (response.ok) { alert('About section saved!'); } 
+            else { alert('Failed to save.'); }
         });
 
         artworkForm.addEventListener('submit', async (e) => {
@@ -613,17 +583,14 @@
             if (!e.target.classList.contains('delete-button')) return;
             if (!adminPassword) return alert('Please login first.');
             const id = e.target.dataset.id;
-            if (!confirm('Are you sure you want to delete this artwork?')) return;
-
+            if (!confirm('Are you sure?')) return;
             const response = await fetch(`/api/artwork/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: adminPassword })
             });
-            if (response.ok) {
-                alert('Artwork deleted!');
-                loadArtwork(); 
-            } else { alert('Failed to delete artwork.'); }
+            if (response.ok) { loadArtwork(); } 
+            else { alert('Failed to delete artwork.'); }
         });
     </script>
 </body>
