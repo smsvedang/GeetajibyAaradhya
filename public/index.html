@@ -347,26 +347,34 @@
             }
         }
         
-        // --- FUNCTION 9: Deep Link Handler (UPDATED) ---
+        // --- FUNCTION 9: Deep Link Handler (UPDATED FIX) ---
         function handleDeepLink() {
             const hash = window.location.hash;
             if (hash) {
                 try {
-                    const targetElement = document.getElementById(hash.substring(1));
+                    const targetElement = document.getElementById(hash.substring(1)); // e.g., 'shloka-1-2'
                     if (targetElement) {
+                        
+                        // [NAYA FIX] Is shlok ke parent <details> (adhyay) ko dhoondo
+                        const parentDetails = targetElement.closest('details.adhyay-group');
+                        if (parentDetails) {
+                            // Usko zabardasti kholo!
+                            parentDetails.open = true; 
+                        }
+                        
                         // Tab ko switch karo (Home tab par)
                         document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
                         document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
                         document.querySelector('.main-tab-button[data-tab="tab-shlokas"]').classList.add('active');
                         document.getElementById('tab-shlokas').classList.add('active');
                         
-                        setTimeout(() => {
+                        setTimeout(() => { // Thoda delay taaki <details> open ho sake
                             targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             targetElement.classList.add('highlight');
                             setTimeout(() => {
                                 targetElement.classList.remove('highlight');
-                            }, 2500);
-                        }, 100);
+                            }, 2500); // 2.5 second baad highlight hata do
+                        }, 100); 
                     }
                 } catch (e) { console.error("Error handling deep link:", e); }
             }
