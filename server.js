@@ -123,7 +123,7 @@ app.post('/api/shlokas/like/:id', async (req, res) => {
     }
 });
 
-// NAYA: Ek shloka Adhyay aur Shloka number se fetch karein
+// NAYA: Ek shloka Adhyay aur Shloka number se fetch karein (FIXED)
 app.get('/api/shloka/find', async (req, res) => {
     try {
         const { adhyay, shloka } = req.query;
@@ -132,6 +132,7 @@ app.get('/api/shloka/find', async (req, res) => {
             return res.status(400).json({ message: 'Adhyay and Shloka parameters are required' });
         }
 
+        // [NAYA FIX] Cache control headers yahaan add karein
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
