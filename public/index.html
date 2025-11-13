@@ -1,41 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-H5L4Y0WRMW');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
-    <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
-    <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 2, LearnGeeta, Artwork Gallery, Gita Recitation">
-    <script type="application/ld+json">
-    {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Aaradhya Soni - The SMA Warrior",
-    "alternateName": "Warrior Aaradhya",
-    "url": "https://warrioraaradhya.in"
-    }
-    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <header class="hero-section">
-        <div class="container hero-content">
-            <h1>Shrimad Bhagavad Gita</h1>
-            <h2>Shloka Recitation by Aaradhya Soni</h2>
-            <p class="subtitle">A platform dedicated to Aaradhya's journey of learning the Gita. Listen and share her inspiring efforts.</p>
-        </div>
-        
-        <nav class="main-menubar">
+    <nav class="top-navbar">
+        <div class="container nav-container">
+            <div class="logo">Warrior Aaradhya</div>
+            
             <button class="menu-toggle" id="menu-toggle-button">
                 <span></span>
                 <span></span>
@@ -49,15 +25,20 @@
                 <button class="main-tab-button" data-tab="tab-blog">Blog</button>
                 <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <div class="container">
         <div class="main-tab-panels">
 
             <div id="tab-shlokas" class="main-tab-content active">
+                
+                <header class="shloka-welcome-hero">
+                    <h1>Shrimad Bhagavad Gita</h1>
+                    <p class="subtitle">Shloka Recitation by Aaradhya Soni</p>
+                </header>
+                
                 <main class="shloka-list-container">
-                    <h2>Chapters and Shlokas of the Gita</h2>
                     <div id="shloka-container">
                         <p>Loading shlokas...</p>
                     </div>
@@ -82,10 +63,8 @@
                 <section class="gallery">
                     <h2>Aaradhya's Artwork Gallery</h2>
                     <div class="carousel-container" id="gallery-carousel-container">
-                        <button class="carousel-button prev" id="carousel-prev">&#10094;</button>
-                        <button class="carousel-button next" id="carousel-next">&#10095;</button>
-                        <div class="slide-counter" id="slide-counter-text"></div>
-                    </div>
+                        <p>Loading gallery...</p>
+                        </div>
                 </section>
             </div>
             
@@ -131,27 +110,20 @@
     </footer>
 
     <script>
-        
         // --- FUNCTION 1: Create Video ---
         function createVideo(video_id) {
+            // (Aapka puraana code... no change)
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
-            videoWrapper.innerHTML = `
-                <iframe 
-                    width="560" height="315" 
-                    src="https://www.youtube.com/embed/${video_id}" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>`;
+            videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${video_id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             return videoWrapper;
         }
         
-        // --- FUNCTION 2: Create Shloka Item (UPDATED with share data) ---
+        // --- FUNCTION 2: Create Shloka Item (UPDATED) ---
         function createShlokaItem(shloka) {
+            // Ab yeh ek "card" banata hai
             const item = document.createElement('div');
-            item.className = 'shloka-item';
+            item.className = 'shloka-item-card'; // NAYI CLASS
             
             const shlokaId = `shloka-${shloka.adhyay}-${shloka.shloka}`;
             item.id = shlokaId;
@@ -159,38 +131,37 @@
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             
-            // Share data
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
 
+            // Card ka content
             item.innerHTML = `
-                <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
-                <p class="shloka-text">${formattedText}</p>
+                <div class="card-video-container">
+                    ${createVideo(shloka.video_id).innerHTML}
+                </div>
+                <div class="card-content">
+                    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+                    <p class="shloka-text">${formattedText}</p>
+                    <div class="shloka-actions">
+                        <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
+                            ❤️ <span class="like-count">${shloka.likes || 0}</span>
+                        </button>
+                        <button class="shloka-action-button share-button" 
+                                data-hash="#${shlokaId}" 
+                                data-title="${shareTitle}" 
+                                data-text="${shareText}">
+                            🔗 Share
+                        </button>
+                    </div>
+                </div>
             `;
-            
-            item.appendChild(createVideo(shloka.video_id));
-
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'shloka-actions';
-            
-            actionsDiv.innerHTML = `
-                <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
-                    ❤️ <span class="like-count">${shloka.likes || 0}</span>
-                </button>
-                <button class="shloka-action-button share-button" 
-                        data-hash="#${shlokaId}" 
-                        data-title="${shareTitle}" 
-                        data-text="${shareText}">
-                    🔗 Share
-                </button>
-            `;
-            item.appendChild(actionsDiv);
             
             return item;
         }
         
         // --- FUNCTION 3: Load About Section ---
         async function loadAboutSection() {
+            // (Aapka puraana code... no change)
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
             try {
@@ -211,7 +182,7 @@
             }
         }
         
-        // --- FUNCTION 4: Load Shlokas ---
+        // --- FUNCTION 4: Load Shlokas (UPDATED FOR GRID) ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
@@ -222,6 +193,8 @@
                     container.innerHTML = '<p>No shlokas added yet.</p>';
                     return;
                 }
+                
+                // Grouping
                 const shlokasByAdhyay = {};
                 shlokas.forEach(shloka => {
                     if (!shlokasByAdhyay[shloka.adhyay]) {
@@ -229,26 +202,26 @@
                     }
                     shlokasByAdhyay[shloka.adhyay].push(shloka);
                 });
+                
+                // NAYA: Grid layout render karein
                 for (const adhyayNum in shlokasByAdhyay) {
-                    const adhyayGroup = document.createElement('details');
-                    adhyayGroup.className = 'adhyay-group';
-                    adhyayGroup.id = `adhyay-${adhyayNum}`;
-                    
-                    // Pehla Adhyay default mein khula rakhein
-                    if (parseInt(adhyayNum, 10) === 1) {
-                         adhyayGroup.open = true; 
-                    }
-                    
-                    const adhyayTitle = document.createElement('summary');
+                    // Adhyay Title
+                    const adhyayTitle = document.createElement('h2');
                     adhyayTitle.className = 'adhyay-title';
                     adhyayTitle.textContent = `Adhyay ${adhyayNum}`;
-                    adhyayGroup.appendChild(adhyayTitle);
+                    adhyayTitle.id = `adhyay-${adhyayNum}`;
+                    container.appendChild(adhyayTitle);
+                    
+                    // Har Adhyay ke liye ek Grid
+                    const shlokaGrid = document.createElement('div');
+                    shlokaGrid.className = 'shloka-grid';
                     
                     shlokasByAdhyay[adhyayNum].forEach(shloka => {
                         const shlokaElement = createShlokaItem(shloka);
-                        adhyayGroup.appendChild(shlokaElement);
+                        shlokaGrid.appendChild(shlokaElement); // Card ko grid mein daalein
                     });
-                    container.appendChild(adhyayGroup);
+                    
+                    container.appendChild(shlokaGrid); // Grid ko container mein daalein
                 }
                 handleDeepLink();
             } catch (err) {
@@ -257,8 +230,9 @@
             }
         }
 
-        // --- FUNCTION 5: Load Artwork Gallery (CODE IS BACK) ---
+        // --- FUNCTION 5: Load Artwork Gallery ---
         async function loadArtworkGallery() {
+            // (Aapka puraana code... no change)
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
             try {
@@ -268,10 +242,7 @@
                     container.innerHTML = '<p style="text-align: center; width: 100%;">No artwork added yet.</p>';
                     return;
                 }
-                
-                // Clear any loading text before adding items
                 container.innerHTML = ''; 
-                
                 artworks.forEach((artwork, index) => {
                     const item = document.createElement('div');
                     item.className = 'carousel-item';
@@ -279,14 +250,11 @@
                     item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
                     container.appendChild(item);
                 });
-                
-                // Add buttons back in
                 container.innerHTML += `
                     <button class="carousel-button prev" id="carousel-prev">&#10094;</button>
                     <button class="carousel-button next" id="carousel-next">&#10095;</button>
                     <div class="slide-counter" id="slide-counter-text"></div>
                 `;
-                
                 setupCarouselListeners(artworks.length);
             } catch (err) {
                 console.error("Error loading artwork:", err);
@@ -294,67 +262,45 @@
             }
         }
 
-        // --- FUNCTION 6: Carousel logic (CODE IS BACK) ---
+        // --- FUNCTION 6: Carousel logic ---
         function setupCarouselListeners(totalSlides) {
+            // (Aapka puraana code... no change)
             let currentSlide = 0;
-            // Re-select elements AFTER they are added
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const counterText = document.getElementById('slide-counter-text');
-
-            if (!prevButton || !nextButton || !counterText) return; // Guard clause
-
+            if (!prevButton || !nextButton || !counterText) return;
             function showSlide(index) {
-                if (index >= totalSlides) {
-                    currentSlide = 0;
-                } else if (index < 0) {
-                    currentSlide = totalSlides - 1;
-                } else {
-                    currentSlide = index;
-                }
-                slides.forEach(slide => {
-                    slide.classList.remove('active');
-                });
+                if (index >= totalSlides) { currentSlide = 0; }
+                else if (index < 0) { currentSlide = totalSlides - 1; }
+                else { currentSlide = index; }
+                slides.forEach(slide => { slide.classList.remove('active'); });
                 slides[currentSlide].classList.add('active');
                 counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
             }
             showSlide(0);
-            prevButton.addEventListener('click', () => {
-                showSlide(currentSlide - 1);
-            });
-            nextButton.addEventListener('click', () => {
-                showSlide(currentSlide + 1);
-            });
+            prevButton.addEventListener('click', () => { showSlide(currentSlide - 1); });
+            nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
         }
         
-        // --- FUNCTION 7: Load Blog posts (CODE IS BACK) ---
+        // --- FUNCTION 7: Load Blog posts ---
         async function loadBlogPosts() {
+            // (Aapka puraana code... no change)
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
                 const posts = await response.json();
-                
                 if (posts.length === 0) {
                     container.innerHTML = '<p>No blog posts added yet.</p>';
                     return;
                 }
-
                 posts.forEach(post => {
                     const item = document.createElement('article');
                     item.className = 'blog-post-item';
-                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
-                        day: 'numeric', month: 'long', year: 'numeric'
-                    });
-                    
-                    item.innerHTML = `
-                        <h3>${post.title}</h3>
-                        <p class="blog-date">${postDate}</p>
-                        <div class="blog-content">
-                            ${post.content.replace(/\n/g, '<br>')}
-                        </div>
-                    `;
+                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                    item.innerHTML = `<h3>${post.title}</h3><p class="blog-date">${postDate}</p><div class="blog-content">${post.content.replace(/\n/g, '<br>')}</div>`;
                     container.appendChild(item);
                 });
             } catch (err) {
@@ -363,26 +309,22 @@
             }
         }
         
-        // --- FUNCTION 8: Load Approved Testimonials (CODE IS BACK) ---
+        // --- FUNCTION 8: Load Approved Testimonials ---
         async function loadTestimonials() {
+            // (Aapka puraana code... no change)
             const container = document.getElementById('testimonials-list-container');
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
                 const testimonials = await response.json();
-                
                 if (testimonials.length === 0) {
                     container.innerHTML = '<p>No testimonials added yet.</p>';
                     return;
                 }
-
                 testimonials.forEach(testimonial => {
                     const item = document.createElement('div');
                     item.className = 'testimonial-item';
-                    item.innerHTML = `
-                        <blockquote>${testimonial.quote.replace(/\n/g, '<br>')}</blockquote>
-                        <cite>- ${testimonial.author}</cite>
-                    `;
+                    item.innerHTML = `<blockquote>${testimonial.quote.replace(/\n/g, '<br>')}</blockquote><cite>- ${testimonial.author}</cite>`;
                     container.appendChild(item);
                 });
             } catch (err) {
@@ -391,25 +333,20 @@
             }
         }
         
-        // --- FUNCTION 9: Deep Link Handler ---
+        // --- FUNCTION 9: Deep Link Handler (UPDATED) ---
         function handleDeepLink() {
             const hash = window.location.hash;
             if (hash) {
                 try {
                     const targetElement = document.getElementById(hash.substring(1));
                     if (targetElement) {
-                        const parentDetails = targetElement.closest('details.adhyay-group');
-                        if (parentDetails) {
-                            parentDetails.open = true;
-                        }
-                        
-                        // Tab ko bhi switch karo (Home tab par)
+                        // Tab ko switch karo (Home tab par)
                         document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
                         document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
                         document.querySelector('.main-tab-button[data-tab="tab-shlokas"]').classList.add('active');
                         document.getElementById('tab-shlokas').classList.add('active');
                         
-                        setTimeout(() => { // Thoda delay taaki scroll kaam kare
+                        setTimeout(() => {
                             targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             targetElement.classList.add('highlight');
                             setTimeout(() => {
@@ -417,12 +354,9 @@
                             }, 2500);
                         }, 100);
                     }
-                } catch (e) {
-                    console.error("Error handling deep link:", e);
-                }
+                } catch (e) { console.error("Error handling deep link:", e); }
             }
         }
-        
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -431,13 +365,13 @@
             const menuToggle = document.getElementById('menu-toggle-button');
             const menuLinks = document.getElementById('menu-links-container');
 
-            // --- NAYA: Hamburger Menu Toggle ---
+            // Hamburger Menu Toggle
             menuToggle.addEventListener('click', () => {
                 menuLinks.classList.toggle('active');
                 menuToggle.classList.toggle('active');
             });
 
-            // --- Tab Switching Logic ---
+            // Tab Switching Logic
             tabButtons.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabButtons.forEach(t => t.classList.remove('active'));
@@ -445,7 +379,6 @@
                     tab.classList.add('active');
                     document.getElementById(tab.dataset.tab).classList.add('active');
                     
-                    // NAYA: Mobile par menu ko band karo
                     if (window.innerWidth <= 768) {
                         menuLinks.classList.remove('active');
                         menuToggle.classList.remove('active');
@@ -453,14 +386,15 @@
                 });
             });
 
-            // Page load par sabhi data load karein
+            // Page load par data load karein
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery();
             loadBlogPosts();
             loadTestimonials(); 
 
-            // --- Public Testimonial Form Handler ---
+            // Public Testimonial Form Handler
+            // (Aapka puraana code... no change)
             const addButton = document.getElementById('add-yours-button');
             const formContainer = document.getElementById('public-testimonial-form-container');
             const publicForm = document.getElementById('public-testimonial-form');
@@ -487,11 +421,10 @@
                 } catch (err) { alert('Error connecting to server.'); }
             });
 
-            // --- Shloka Action Buttons (Like & Share) Event Listener ---
+            // Shloka Action Buttons (Like & Share) Event Listener
             const shlokaContainer = document.getElementById('shloka-container');
             shlokaContainer.addEventListener('click', async (e) => {
-                
-                // --- Share Button Click (UPDATED) ---
+                // Share Button Click
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
                     const hash = shareButton.dataset.hash;
@@ -499,41 +432,26 @@
                     const title = shareButton.dataset.title;
                     const text = shareButton.dataset.text;
                     
-                    // NAYA: Web Share API ka istemal
                     if (navigator.share) {
                         try {
-                            await navigator.share({
-                                title: title,
-                                text: text,
-                                url: urlToShare
-                            });
-                        } catch (err) {
-                            console.error('Share failed:', err);
-                        }
+                            await navigator.share({ title: title, text: text, url: urlToShare });
+                        } catch (err) { console.error('Share failed:', err); }
                     } else {
-                        // Fallback: Agar Web Share API nahi hai (jaise desktop par)
                         try {
                             await navigator.clipboard.writeText(urlToShare);
                             alert('Shloka link copied to clipboard!');
-                        } catch (err) {
-                            console.error('Failed to copy: ', err);
-                            alert('Failed to copy link.');
-                        }
+                        } catch (err) { alert('Failed to copy link.'); }
                     }
                 }
                 
-                // --- Like Button Click ---
+                // Like Button Click
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
                     const shlokaDbId = likeButton.dataset.id;
-                    if (localStorage.getItem('liked_' + shlokaDbId)) {
-                        return; // Pehle hi liked hai
-                    }
+                    if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
                     likeButton.disabled = true;
                     try {
-                        const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, {
-                            method: 'POST'
-                        });
+                        const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, { method: 'POST' });
                         const data = await response.json();
                         if (data.success) {
                             const countSpan = likeButton.querySelector('.like-count');

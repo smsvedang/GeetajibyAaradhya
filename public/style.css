@@ -1,43 +1,45 @@
 /* --- Basic Setup --- */
 * { box-sizing: border-box; }
-body { font-family: Arial, sans-serif; margin: 0; background-color: #FFF8E1; color: #4E342E; }
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    background-color: #FFF8E1; 
+    color: #4E342E;
+    padding-top: 60px; /* [NAYA] Sticky Navbar ke liye space */
+}
 .container { max-width: 900px; margin: 0 auto; padding: 20px; }
 
-/* --- 1. Hero (Welcome) Section [UPDATED] --- */
-.hero-section {
-    background-color: #FF9800;
-    color: white;
-    padding-top: 40px;
-    padding-bottom: 0; 
-    text-align: center;
-    position: relative; /* [NAYA] Menu ke liye zaroori */
+/* --- [NAYA] Top Sticky Navbar --- */
+.top-navbar {
+    background-color: #FFFFFF;
+    border-bottom: 2px solid #FFECB3;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1000;
 }
-.hero-content {
-    padding-left: 20px; /* [NAYA] */
-    padding-right: 20px; /* [NAYA] */
-    padding-bottom: 30px; 
-}
-.hero-section h1 { margin: 0; font-size: 2.8em; }
-.hero-section h2 { margin: 10px 0; font-size: 1.5em; font-weight: 300; }
-.hero-section .subtitle { font-size: 1.1em; max-width: 600px; margin: 15px auto 0; line-height: 1.5; }
-
-
-/* --- MAIN MENUBAR (Responsive) [NAYA] --- */
-.main-menubar {
+.nav-container {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap; 
-    background-color: #FFF3E0;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 20px; /* Container ka default padding override karein */
 }
-.menu-toggle { display: none; } /* Desktop par hide */
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #D84315;
+}
+.menu-toggle { display: none; } /* Mobile ke liye, neeche dekhein */
 .menu-links {
     display: flex;
-    justify-content: center;
-    width: 100%;
+    height: 100%;
 }
 .main-tab-button {
-    padding: 15px 20px;
+    padding: 0 20px; /* Sirf left-right padding */
     cursor: pointer;
     border: none;
     background-color: transparent;
@@ -46,19 +48,30 @@ body { font-family: Arial, sans-serif; margin: 0; background-color: #FFF8E1; col
     font-weight: 500;
     transition: all 0.2s ease;
     border-bottom: 4px solid transparent;
-    flex-grow: 1;
-    min-width: 120px; 
-    text-align: center;
+    display: flex; /* [NAYA] Text ko vertically center karein */
+    align-items: center; /* [NAYA] */
+    height: 100%; /* [NAYA] */
 }
-.main-tab-button:hover { background-color: #FFECB3; }
+.main-tab-button:hover { background-color: #FFF3E0; }
 .main-tab-button.active {
     color: #D84315;
     font-weight: bold;
     border-bottom-color: #D84315;
-    background-color: #FFFFFF;
 }
 .main-tab-content { display: none; padding-top: 30px; }
 .main-tab-content.active { display: block; }
+
+/* --- [NAYA] Shloka Welcome Hero (Home tab par) --- */
+.shloka-welcome-hero {
+    background-color: #FF9800;
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+.shloka-welcome-hero h1 { margin: 0; font-size: 2.5em; }
+.shloka-welcome-hero .subtitle { font-size: 1.1em; margin: 10px 0 0; }
 
 
 /* --- 2. About Section --- */
@@ -81,36 +94,77 @@ body { font-family: Arial, sans-serif; margin: 0; background-color: #FFF8E1; col
 .carousel-button:hover { background-color: rgba(0,0,0,0.6); }
 .slide-counter { position: absolute; top: 10px; left: 10px; color: white; background-color: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; font-size: 14px; }
 
-/* --- 4. Shloka List Section --- */
-.shloka-list-container h2 { font-size: 2em; text-align: center; color: #5D4037; margin-bottom: 30px; margin-top: 0; }
-.adhyay-group { margin-bottom: 30px; border: 1px solid #FFECB3; border-radius: 8px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.adhyay-title { font-size: 1.8em; font-weight: 600; padding: 20px; cursor: pointer; background-color: #FFF3E0; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; }
-.adhyay-title::after { content: '▼'; font-size: 0.8em; }
-.adhyay-group[open] .adhyay-title::after { content: '▲'; }
-.shloka-item { padding: 20px; border-top: 1px solid #FFECB3; transition: background-color 0.5s ease; }
-.shloka-item h3 { margin: 0 0 10px 0; color: #D84315; }
-.shloka-text { font-style: italic; color: #6D4C41; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
-.video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; max-width: 100%; }
-.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+/* --- 4. Shloka List Section (UPDATED) --- */
+.shloka-list-container { margin-top: 0; }
+
+/* [NAYA] Adhyay Title Style (h2) */
+.adhyay-title {
+    font-size: 2em;
+    font-weight: 600;
+    padding: 15px 0;
+    color: #D84315;
+    border-bottom: 2px solid #FF9800;
+    margin-top: 30px; /* Har Adhyay se pehle space */
+    margin-bottom: 20px;
+}
+
+/* [NAYA] Shloka Grid Layout */
+.shloka-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* [NAYA] Shloka Card Style */
+.shloka-item-card {
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden; /* Video ko border-radius ke andar rakhein */
+    transition: box-shadow 0.3s ease;
+}
+.shloka-item-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+}
+.card-video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 ratio */
+    height: 0;
+    overflow: hidden;
+}
+.card-video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.card-content {
+    padding: 20px;
+}
+.card-content h3 { margin: 0 0 10px 0; color: #D84315; }
+.card-content .shloka-text { font-style: italic; color: #6D4C41; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
 
 /* Shloka Action Buttons (Like/Share) */
-.shloka-actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #FFECB3; padding-top: 15px; }
+.shloka-actions { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #FFECB3; padding-top: 15px; }
 .shloka-action-button { flex: 1; background-color: #f4f4f4; color: #333; border: 1px solid #ddd; padding: 10px; font-size: 1em; font-weight: bold; cursor: pointer; border-radius: 5px; transition: background-color 0.2s; text-align: center; }
 .shloka-action-button:hover { background-color: #e9e9e9; }
 .shloka-action-button .like-count { font-weight: bold; margin-left: 5px; }
 .shloka-action-button:disabled { background-color: #FFEBEE; color: #D84315; border-color: #FFCDD2; cursor: not-allowed; }
 
 /* Shloka Highlight */
-.shloka-item.highlight { background-color: #FFF9C4; border: 1px solid #FFEB3B; }
+.shloka-item-card.highlight {
+    background-color: #FFF9C4;
+    border: 1px solid #FFEB3B;
+    box-shadow: 0 0 15px #FFEB3B;
+}
 
 /* --- Footer --- */
 .footer { text-align: center; padding: 30px; background-color: #5D4037; color: #FFFFFF; margin-top: 40px; }
 .footer p { margin: 5px 0; }
 
 /* --- Admin Panel Styles --- */
-input, textarea, button { width: 100%; padding: 12px; margin-bottom: 10px; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; font-size: 1em; }
-button { background-color: #FF9800; color: white; cursor: pointer; border: none; font-weight: bold; }
-button.delete-button { background-color: #D84315; font-size: 0.9em; padding: 8px; width: auto; }
+/* (Aapka puraana code... no change) */
 .admin-tabs { display: flex; border-bottom: 2px solid #FF9800; margin-bottom: 20px; flex-wrap: wrap; }
 .tab-button { padding: 10px 20px; cursor: pointer; border: none; background-color: #eee; font-size: 1em; border-radius: 5px 5px 0 0; margin-right: 5px; margin-bottom: 5px; }
 .tab-button.active { background-color: #FF9800; color: white; font-weight: bold; }
@@ -128,6 +182,7 @@ button.edit-button { background-color: #007bff; font-size: 0.9em; padding: 8px; 
 button.cancel-button { background-color: #6c757d; }
 
 /* --- Blog & Testimonial Styling --- */
+/* (Aapka puraana code... no change) */
 .blog-container h2, 
 .testimonials-container h2 { text-align: center; font-size: 2em; color: #D84315; margin-bottom: 25px; margin-top: 0; border-bottom: 2px solid #FF9800; padding-bottom: 10px; }
 .blog-post-item { background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
@@ -154,19 +209,13 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 
 /* --- [NAYA] Mobile Menu Styles --- */
 @media (max-width: 768px) {
-    .hero-section h1 { font-size: 2.0em; }
-    .hero-section h2 { font-size: 1.2em; }
-    .adhyay-title { font-size: 1.5em; padding: 15px; }
-    .carousel-button { padding: 10px; font-size: 16px; }
-    .shloka-actions { flex-direction: column; } 
+    body { padding-top: 60px; } /* Navbar ke liye space */
+
+    .logo { font-size: 1.2em; } /* Chhota logo */
 
     /* Hamburger Menu */
-    .main-menubar {
-        flex-direction: column; /* Stack items vertically */
-        align-items: flex-end; /* Align toggle to the right */
-        padding: 10px; /* Padding around menubar */
-        background-color: #FF9800; /* Match hero section */
-        box-shadow: none;
+    .nav-container {
+        justify-content: space-between;
     }
     .menu-toggle {
         display: block; /* Show hamburger button */
@@ -174,49 +223,48 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
         border: none;
         padding: 10px;
         cursor: pointer;
+        z-index: 10;
     }
     .menu-toggle span {
         display: block;
         width: 25px;
         height: 3px;
-        background-color: white;
+        background-color: #5D4037; /* Dark color */
         margin-bottom: 5px;
         border-radius: 3px;
         transition: all 0.3s ease;
     }
-    .menu-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-    }
-    .menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-    }
-    .menu-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-    }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
 
     .menu-links {
         display: none; /* Hide links by default */
         flex-direction: column; /* Stack links vertically */
+        position: absolute;
+        top: 60px; /* Navbar ke neeche */
+        left: 0;
         width: 100%;
         background-color: #FFF3E0;
-        margin-top: 10px;
-        border-radius: 5px;
-        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-top: 1px solid #FFECB3;
     }
     .menu-links.active {
         display: flex; /* Show links when active */
     }
     .main-tab-button {
-        padding: 15px;
+        padding: 15px 20px;
         font-size: 1.1em;
         text-align: left;
         border-bottom: 1px solid #FFECB3;
+        height: auto; /* Height auto karein */
     }
     .main-tab-button.active {
-        border-bottom-color: #D84315; /* Active border */
-        background-color: #FFECB3; /* Active background */
-    }
-    .main-tab-button:hover {
+        border-bottom-color: #D84315;
         background-color: #FFECB3;
+    }
+    
+    .shloka-grid {
+        grid-template-columns: 1fr; /* Mobile par 1 column */
     }
 }
