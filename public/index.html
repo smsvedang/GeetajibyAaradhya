@@ -95,9 +95,28 @@
             <div id="tab-testimonials" class="main-tab-content">
                 <section class="testimonials-container">
                     <h2>Testimonials</h2>
+
+                    <div class="add-testimonial-toggle">
+                        <button id="add-yours-button">Add Your Testimonial</button>
+                    </div>
+
+                    <div class="testimonial-submission-form" id="public-testimonial-form-container" style="display:none;">
+                        <h3>Share your thoughts!</h3>
+                        <p>Your testimonial will be visible after admin approval.</p>
+                        <form id="public-testimonial-form">
+                            <input type="text" id="public-author-name" placeholder="Your Name" required>
+                            <textarea id="public-author-quote" rows="4" placeholder="Your Message" required></textarea>
+                            <button type="submit" id="public-submit-button">Submit for Review</button>
+                            <button type="button" id="public-cancel-button" class="cancel-button">Cancel</button>
+                        </form>
+                        <p id="testimonial-thanks" style="display:none; text-align:center; color: green; font-weight: bold;">Thank you! Your testimonial has been submitted.</p>
+                    </div>
+
+                    <hr class="section-divider">
+
                     <div id="testimonials-list-container">
                         <p>Loading testimonials...</p>
-                    </div>
+                        </div>
                 </section>
             </div>
 
@@ -111,7 +130,7 @@
 
     <script>
         
-        // --- FUNCTION 1, 2, 3, 4 (No Change) ---
+        // --- FUNCTION 1: Create Video ---
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
@@ -126,6 +145,8 @@
                 </iframe>`;
             return videoWrapper;
         }
+        
+        // --- FUNCTION 2: Create Shloka Item ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item';
@@ -137,6 +158,8 @@
             item.appendChild(createVideo(shloka.video_id));
             return item;
         }
+        
+        // --- FUNCTION 3: Load About Section ---
         async function loadAboutSection() {
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
@@ -159,6 +182,8 @@
                 aboutContainer.innerHTML = '<p>Could not load details.</p>';
             }
         }
+        
+        // --- FUNCTION 4: Load Shlokas ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
@@ -200,7 +225,7 @@
             }
         }
 
-        // --- FUNCTION 5: Artwork Gallery (No Change) ---
+        // --- FUNCTION 5: Load Artwork Gallery ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
@@ -225,7 +250,7 @@
             }
         }
 
-        // --- FUNCTION 6: Carousel logic (No Change) ---
+        // --- FUNCTION 6: Carousel logic ---
         function setupCarouselListeners(totalSlides) {
             let currentSlide = 0;
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
@@ -255,7 +280,7 @@
             });
         }
         
-        // --- NAYA FUNCTION 7: Blog posts load karna ---
+        // --- FUNCTION 7: Load Blog posts ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
@@ -290,7 +315,7 @@
             }
         }
         
-        // --- NAYA FUNCTION 8: Testimonials load karna ---
+        // --- FUNCTION 8: Load Approved Testimonials ---
         async function loadTestimonials() {
             const container = document.getElementById('testimonials-list-container');
             container.innerHTML = '';
@@ -319,7 +344,7 @@
         }
         
         
-        // --- TAB SWITCHING JAVASCRIPT ---
+        // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.main-tab-button');
             const contents = document.querySelectorAll('.main-tab-content');
@@ -338,8 +363,58 @@
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery(); 
-            loadBlogPosts(); // NAYA
-            loadTestimonials(); // NAYA
+            loadBlogPosts();
+            loadTestimonials(); 
+
+            // --- Public Testimonial Form Handler ---
+            const addButton = document.getElementById('add-yours-button');
+            const formContainer = document.getElementById('public-testimonial-form-container');
+            const publicForm = document.getElementById('public-testimonial-form');
+            const cancelButton = document.getElementById('public-cancel-button');
+            const thanksMessage = document.getElementById('testimonial-thanks');
+
+            addButton.addEventListener('click', () => {
+                formContainer.style.display = 'block';
+                addButton.style.display = 'none';
+                thanksMessage.style.display = 'none';
+            });
+            
+            cancelButton.addEventListener('click', () => {
+                formContainer.style.display = 'none';
+                addButton.style.display = 'block';
+                publicForm.reset();
+            });
+
+            publicForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const author = document.getElementById('public-author-name').value;
+                const quote = document.getElementById('public-author-quote').value;
+                
+                if (!author || !quote) {
+                    alert('Please fill in both fields.');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/testimonials', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ author, quote })
+                    });
+                    
+                    if (response.ok) {
+                        publicForm.reset();
+                        formContainer.style.display = 'none';
+                        thanksMessage.style.display = 'block';
+                        // addButton.style.display = 'block'; // Button ko waapas laa sakte hain
+                    } else {
+                        alert('Error submitting. Please try again.');
+                    }
+                } catch (err) {
+                    alert('Error connecting to server.');
+                }
+            });
         });
     </script>
 </body>

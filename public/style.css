@@ -216,7 +216,7 @@ body {
 }
 .footer p { margin: 5px 0; }
 
-/* --- Admin Panel Styles (No Change) --- */
+/* --- Admin Panel Styles --- */
 input, textarea, button {
     width: 100%;
     padding: 12px;
@@ -336,19 +336,22 @@ button.cancel-button {
         font-size: 1.5em;
         padding: 15px;
     }
-    /* Carousel buttons ko mobile par chhota karein */
     .carousel-button {
         padding: 10px;
         font-size: 16px;
     }
 }
-/* --- NAYA: Blog Styling --- */
+
+/* --- Blog Styling --- */
 .blog-container h2, 
 .testimonials-container h2 {
     text-align: center;
     font-size: 2em;
-    color: #BFA080;
+    color: #D84315; /* Changed from BFA080 */
     margin-bottom: 25px;
+    margin-top: 0;
+    border-bottom: 2px solid #FF9800;
+    padding-bottom: 10px;
 }
 
 .blog-post-item {
@@ -378,11 +381,12 @@ button.cancel-button {
     font-size: 1em;
     line-height: 1.7;
     color: #555;
+    white-space: pre-wrap; /* Added for line breaks */
 }
 
-/* --- NAYA: Testimonial Styling --- */
+/* --- Testimonial Styling --- */
 .testimonial-item {
-    background-color: #FFF8E1; /* Light cream */
+    background-color: #FFFDF9; /* Lighter cream */
     border-left: 5px solid #BFA080; /* Accent color */
     padding: 20px 25px;
     margin-bottom: 20px;
@@ -397,6 +401,7 @@ button.cancel-button {
     margin: 0 0 10px 0;
     padding: 0;
     position: relative;
+    white-space: pre-wrap; /* Added for line breaks */
 }
 
 .testimonial-item cite {
@@ -406,4 +411,91 @@ button.cancel-button {
     display: block;
     text-align: right;
     font-style: normal;
+}
+
+/* --- Public "Add Yours" Button --- */
+.add-testimonial-toggle {
+    text-align: center;
+    margin-bottom: 20px;
+}
+#add-yours-button {
+    background-color: #BFA080;
+    color: white;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#add-yours-button:hover {
+    background-color: #a98b6f;
+}
+
+/* --- Public Submission Form --- */
+.testimonial-submission-form {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.testimonial-submission-form h3 {
+    margin-top: 0;
+    font-size: 1.6em;
+    color: #333;
+    text-align: center;
+}
+.testimonial-submission-form p {
+    text-align: center;
+    font-size: 0.95em;
+    color: #666;
+    margin-bottom: 20px;
+}
+.testimonial-submission-form input[type="text"],
+.testimonial-submission-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: inherit;
+    box-sizing: border-box; /* Important */
+}
+.testimonial-submission-form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #BFA080;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.testimonial-submission-form button[type="submit"]:hover {
+    background-color: #a98b6f;
+}
+
+/* Section Divider */
+hr.section-divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 30px 0;
+}
+
+/* --- Admin Panel "Approve" Button --- */
+.admin-buttons .approve-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    font-size: 0.9em;
+    padding: 8px;
+    width: auto;
+}
+.admin-buttons .approve-button:hover {
+    background-color: #45a049;
 }
