@@ -375,3 +375,273 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     padding: 15px;
     border-top: 1px solid #FFECB3;
 }
+
+/* --- NAYA: Jap Counter (Device) Styles --- */
+
+/* Counter ko page par center karne ke liye */
+.counter-container {
+    position: relative;
+    padding: 80px 0;
+    display: grid;
+    place-items: center;
+    margin-top: 30px; /* Navbar se thoda neeche */
+}
+
+.belt {
+    position: absolute;
+    width: 30px;
+    height: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -1;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-image: radial-gradient(
+        circle at center, 
+        #e8e8f0 4px,
+        transparent 4.5px
+    );
+    background-size: 15px 20px;
+    background-repeat: repeat-y;
+    background-position: center;
+}
+
+.belt-top {
+    top: 0;
+    border-radius: 10px 10px 0 0;
+}
+
+.belt-bottom {
+    bottom: 0;
+    border-radius: 0 0 10px 10px;
+}
+
+.finger-counter {
+    width: 170px;
+    height: 200px;
+    background: linear-gradient(145deg, #333, #000);
+    border-radius: 35px;
+    border: 2px solid #111;
+    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.5), 
+                -4px -4px 10px rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 15px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+.screen {
+    width: 90%;
+    height: 45px;
+    background-color: #c0c0c0;
+    border: 2px solid #555;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    box-sizing: border-box;
+    box-shadow: inset 2px 2px 4px #444, inset -1px -1px 2px #d0d0d0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2em;
+    color: #1a1a1a;
+}
+
+.count-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #e0e0e0, #b0b0b0);
+    border: 2px solid #888;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5), 
+                -3px -3px 8px rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    /* Default 'button' styles ko override karna */
+    margin-bottom: 0; 
+}
+
+.count-button:active {
+    transform: translateY(2px);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), 
+                -1px -1px 3px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, #b0b0b0, #e0e0e0);
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin-top: 5px;
+}
+
+.small-button {
+    width: 48%;
+    height: 25px;
+    font-size: 10px;
+    font-weight: bold;
+    background-color: #444;
+    color: #aaa;
+    border: 1px solid #666;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.1s ease;
+    /* Default 'button' styles ko override karna */
+    padding: 0; 
+    margin-bottom: 0;
+}
+
+.small-button:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+#recordsButton {
+    background-color: #3a5a9a;
+    color: white;
+}
+
+/* --- Modal (पॉप-अप) का स्टाइल --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 20% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-button:hover {
+    color: #000;
+}
+
+.modal-content h2 {
+    font-family: Arial, sans-serif;
+    color: #333;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-top: 0; /* Default margin fix */
+}
+
+/* रिकॉर्ड्स की लिस्ट */
+#recordsList {
+    list-style-type: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+#recordsList li {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1em;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+}
+#recordsList li:last-child {
+    border-bottom: none;
+}
+#recordsList li .date {
+    color: #000;
+}
+#recordsList li .count {
+    color: #3a5a9a;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.delete-button {
+    background-color: #d9534f; 
+    color: white;
+    border: none;
+    border-radius: 5px; 
+    width: auto; 
+    height: 25px; 
+    font-size: 10px; 
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 8px; 
+    text-align: center;
+    margin-bottom: 0; /* Default margin fix */
+}
+
+.record-info {
+    flex-grow: 1; 
+}
+
+/* --- कन्फर्मेशन Modal के लिए CSS --- */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    z-index: 101; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); 
+    justify-content: center;
+    align-items: center;
+}
+.confirm-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.confirm-content p {
+    font-size: 1.1em;
+    color: #333;
+    margin-top: 0; /* Default margin fix */
+}
+.confirm-buttons {
+    margin-top: 20px;
+}
+.confirm-buttons button {
+    width: 40%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0 5%;
+    margin-bottom: 0; /* Default margin fix */
+}
+#confirmYes {
+    background-color: #d9534f;
+    color: white;
+}
+#confirmCancel {
+    background-color: #eee;
+    color: #333;
+}
