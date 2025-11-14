@@ -6,14 +6,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Cache खोला गया');
-      // ये वो फ़ाइलें हैं जो ऑफलाइन भी चलनी चाहिए
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/style.css',
-        '/offline.html',
-        '/android-chrome-192x192.png' // आइकॉन भी कैशे कर लो
-      ]);
+      // Naya aur Sahi code:
+return cache.addAll([
+  '/',
+  '/index.html',
+  '/style.css',
+  '/offline.html',
+  '/web-app-manifest-192x192.png' // <-- YEH SAHI HAI
+]);
     })
   );
   self.skipWaiting();
