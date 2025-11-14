@@ -716,3 +716,86 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     /* Neeche ka margin hata dein kyunki 'gap' ab spacing karega */
     margin-bottom: 0; 
 }
+
+/* --- NAYA: Testimonial Slider CSS --- */
+        .testimonialSwiper {
+          width: 100%;
+          max-width: 800px; 
+          margin: 0 auto;
+          height: 380px; /* Thodi height badha di */
+          padding-bottom: 50px; 
+        }
+
+        .testimonialSwiper .swiper-slide {
+          background: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 10px;
+        }
+
+        .testimonial-card-new {
+          background: #ffffff;
+          border-radius: 12px;
+          border: 1px solid #e0e0e0;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+          padding: 30px;
+          padding-top: 40px;
+          height: 300px; /* Card ki height */
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* Vertically center */
+          position: relative;
+          text-align: center;
+          box-sizing: border-box;
+        }
+
+        .testimonial-card-new .quote-icon {
+          position: absolute;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 80px;
+          color: #D84315; /* Aapke logo ka color */
+          line-height: 1;
+          opacity: 0.15;
+          font-family: Georgia, serif;
+        }
+
+        .testimonial-card-new .quote-text {
+          font-size: 1.1rem;
+          font-style: italic;
+          color: #333;
+          line-height: 1.6;
+          margin: 0;
+          z-index: 2;
+          flex-grow: 1; 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow-y: auto; /* Agar quote lamba ho */
+          padding-right: 5px;
+        }
+
+        .testimonial-card-new .author-details {
+          margin-top: 20px;
+          z-index: 2;
+          flex-shrink: 0;
+        }
+
+        .testimonial-card-new .author-name {
+          font-weight: 700;
+          font-size: 1rem;
+          color: #D84315; /* Logo color */
+          display: block;
+        }
+
+        /* Swiper Arrows & Dots */
+        .testimonialSwiper .swiper-button-next,
+        .testimonialSwiper .swiper-button-prev {
+          color: #D84315;
+        }
+        .testimonialSwiper .swiper-pagination-bullet-active {
+          background: #D84315;
+        }
