@@ -1,9 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-H5L4Y0WRMW');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
+    <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
+    <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 2, LearnGeeta, Artwork Gallery, Gita Recitation">
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Aaradhya Soni - The SMA Warrior",
+    "alternateName": "Warrior Aaradhya",
+    "url": "https://warrioraaradhya.in"
+    }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -113,6 +133,7 @@
     </footer>
 
     <script>
+        
         // --- FUNCTION 1: Create Video ---
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
@@ -121,18 +142,16 @@
             return videoWrapper;
         }
         
-        // --- FUNCTION 2: Create Shloka Item (UPDATED - Reverted to ID link) ---
+        // --- FUNCTION 2: Create Shloka Item (Reverted to ID link) ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item-card';
-            
             const shlokaId = `shloka-${shloka.adhyay}-${shloka.shloka}`;
             item.id = shlokaId;
-            
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             
-            // [REVERTED] Share link ab 'id' use karega
+            // Share link ab 'id' use karega
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
@@ -145,7 +164,7 @@
                     <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
                     <p class="shloka-text">${formattedText}</p>
                     <div class="shloka-actions">
-                        <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
+                        <button class="shloka-action-button like-button" data-id="${shloka._id}" data-type="shloka" ${isLiked ? 'disabled' : ''}>
                             ❤️ <span class="like-count">${shloka.likes || 0}</span>
                         </button>
                         <button class="shloka-action-button share-button" 
@@ -227,7 +246,7 @@
             }
         }
 
-        // --- FUNCTION 5: Load Artwork Gallery ---
+        // --- FUNCTION 5: Load Artwork Gallery (UPDATED) ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
@@ -239,18 +258,39 @@
                     return;
                 }
                 container.innerHTML = ''; 
+                
                 artworks.forEach((artwork, index) => {
                     const item = document.createElement('div');
                     item.className = 'carousel-item';
                     if (index === 0) item.classList.add('active'); 
-                    item.innerHTML = `<img src="${artwork.imageUrl}" alt="${artwork.title}">`;
+                    
+                    const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
+                    const shareUrl = `${window.location.origin}#tab-gallery`; // Gallery tab ka link
+                    const shareTitle = artwork.title;
+                    
+                    item.innerHTML = `
+                        <img src="${artwork.imageUrl}" alt="${artwork.title}">
+                        <div class="artwork-actions">
+                            <button class="shloka-action-button like-button" data-id="${artwork._id}" data-type="artwork" ${isLiked ? 'disabled' : ''}>
+                                ❤️ <span class="like-count">${artwork.likes || 0}</span>
+                            </button>
+                            <button class="shloka-action-button share-button"
+                                    data-url="${shareUrl}" 
+                                    data-title="${shareTitle}" 
+                                    data-text="Check out this artwork by Warrior Aaradhya:">
+                                🔗 Share
+                            </button>
+                        </div>
+                    `;
                     container.appendChild(item);
                 });
+                
                 container.innerHTML += `
                     <button class="carousel-button prev" id="carousel-prev">&#10094;</button>
                     <button class="carousel-button next" id="carousel-next">&#10095;</button>
                     <div class="slide-counter" id="slide-counter-text"></div>
                 `;
+                
                 setupCarouselListeners(artworks.length);
             } catch (err) {
                 console.error("Error loading artwork:", err);
@@ -279,22 +319,50 @@
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
         }
         
-        // --- FUNCTION 7: Load Blog posts ---
+        // --- FUNCTION 7: Load Blog posts (UPDATED) ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
                 const posts = await response.json();
+                
                 if (posts.length === 0) {
                     container.innerHTML = '<p>No blog posts added yet.</p>';
                     return;
                 }
+
                 posts.forEach(post => {
                     const item = document.createElement('article');
                     item.className = 'blog-post-item';
-                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-                    item.innerHTML = `<h3>${post.title}</h3><p class="blog-date">${postDate}</p><div class="blog-content">${post.content.replace(/\n/g, '<br>')}</div>`;
+                    item.id = `blog-${post._id}`; 
+                    
+                    const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                    });
+                    
+                    const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
+                    const shareUrl = `${window.location.origin}#${item.id}`; // Simple hash link
+                    const shareTitle = post.title;
+
+                    item.innerHTML = `
+                        <h3>${post.title}</h3>
+                        <p class="blog-date">${postDate}</p>
+                        <div class="blog-content">
+                            ${post.content.replace(/\n/g, '<br>')}
+                        </div>
+                        <div class="shloka-actions">
+                            <button class="shloka-action-button like-button" data-id="${post._id}" data-type="blog" ${isLiked ? 'disabled' : ''}>
+                                ❤️ <span class="like-count">${post.likes || 0}</span>
+                            </button>
+                            <button class="shloka-action-button share-button"
+                                    data-url="${shareUrl}" 
+                                    data-title="${shareTitle}" 
+                                    data-text="Check out this blog post from Warrior Aaradhya:">
+                                🔗 Share
+                            </button>
+                        </div>
+                    `;
                     container.appendChild(item);
                 });
             } catch (err) {
@@ -326,21 +394,33 @@
             }
         }
         
-        // --- FUNCTION 9: Deep Link Handler (UPDATED - Reverted to Hash) ---
+        // --- FUNCTION 9: Deep Link Handler (Folding Fix) ---
         function handleDeepLink() {
             const hash = window.location.hash;
             if (hash) {
                 try {
-                    const targetElement = document.getElementById(hash.substring(1)); // e.g., 'shloka-1-2'
+                    const targetElement = document.getElementById(hash.substring(1));
                     if (targetElement) {
+                        
+                        let tabToOpen = 'tab-shlokas'; // Default
+                        
+                        // Check karo ki element kis tab mein hai
+                        if (targetElement.closest('.main-tab-content').id === 'tab-blog') {
+                            tabToOpen = 'tab-blog';
+                        }
+                        
+                        // Parent <details> (adhyay) ko dhoondo
                         const parentDetails = targetElement.closest('details.adhyay-group');
                         if (parentDetails) {
                             parentDetails.open = true; 
                         }
+                        
+                        // Sahi tab ko switch karo
                         document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
                         document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                        document.querySelector('.main-tab-button[data-tab="tab-shlokas"]').classList.add('active');
-                        document.getElementById('tab-shlokas').classList.add('active');
+                        document.querySelector(`.main-tab-button[data-tab="${tabToOpen}"]`).classList.add('active');
+                        document.getElementById(tabToOpen).classList.add('active');
+                        
                         setTimeout(() => { 
                             targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             targetElement.classList.add('highlight');
@@ -366,16 +446,18 @@
             });
 
             tabButtons.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabButtons.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById(tab.dataset.tab).classList.add('active');
-                    if (window.innerWidth <= 768) {
-                        menuLinks.classList.remove('active');
-                        menuToggle.classList.remove('active');
-                    }
-                });
+                if(tab.tagName === 'BUTTON') {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                        if (window.innerWidth <= 768) {
+                            menuLinks.classList.remove('active');
+                            menuToggle.classList.remove('active');
+                        }
+                    });
+                }
             });
 
             loadGroupedShlokas(); 
@@ -411,38 +493,60 @@
                 } catch (err) { alert('Error connecting to server.'); }
             });
 
-            // Shloka Action Buttons (Like & Share) Event Listener
-            const shlokaContainer = document.getElementById('shloka-container');
-            shlokaContainer.addEventListener('click', async (e) => {
+            // --- NAYA: Universal Share Button Logic ---
+            async function handleShareClick(button) {
+                const urlToShare = button.dataset.url;
+                const title = button.dataset.title;
+                const text = button.dataset.text;
+                if (navigator.share) {
+                    try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
+                    catch (err) { console.error('Share failed:', err); }
+                } else {
+                    try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
+                    catch (err) { alert('Failed to copy link.'); }
+                }
+            }
+
+            // --- NAYA: Universal Like Button Logic ---
+            async function handleLikeClick(button) {
+                const id = button.dataset.id;
+                const type = button.dataset.type; // 'shloka', 'blog', or 'artwork'
+                const key = `liked_${type}_${id}`;
+                
+                if (localStorage.getItem(key)) { return; }
+                
+                button.disabled = true;
+                try {
+                    const response = await fetch(`/api/${type}/like/${id}`, { method: 'POST' });
+                    const data = await response.json();
+                    if (data.success) {
+                        button.querySelector('.like-count').textContent = data.likes;
+                        localStorage.setItem(key, 'true');
+                    } else {
+                        button.disabled = false;
+                    }
+                } catch (err) {
+                    button.disabled = false;
+                }
+            }
+            
+            // --- NAYA: Event Listeners for all content tabs ---
+            const mainPanels = document.querySelector('.main-tab-panels');
+            mainPanels.addEventListener('click', async (e) => {
+                
+                // Share Button
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
-                    const urlToShare = shareButton.dataset.url; // 'data-url' se lein
-                    const title = shareButton.dataset.title;
-                    const text = shareButton.dataset.text;
-                    if (navigator.share) {
-                        try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
-                        catch (err) { console.error('Share failed:', err); }
-                    } else {
-                        try { await navigator.clipboard.writeText(urlToShare); alert('Shloka link copied to clipboard!'); } 
-                        catch (err) { alert('Failed to copy link.'); }
-                    }
+                    handleShareClick(shareButton);
                 }
+                
+                // Like Button
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
-                    const shlokaDbId = likeButton.dataset.id;
-                    if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
-                    likeButton.disabled = true;
-                    try {
-                        const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, { method: 'POST' });
-                        const data = await response.json();
-                        if (data.success) {
-                            const countSpan = likeButton.querySelector('.like-count');
-                            countSpan.textContent = data.likes;
-                            localStorage.setItem('liked_' + shlokaDbId, 'true');
-                        } else { likeButton.disabled = false; }
-                    } catch (err) { likeButton.disabled = false; }
+                    handleLikeClick(likeButton);
                 }
             });
+
         });
     </script>
 </body>

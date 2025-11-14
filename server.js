@@ -17,13 +17,13 @@ mongoose.connect(dbURI)
     .then(() => console.log('MongoDB से जुड़ गए!'))
     .catch(err => console.error('MongoDB Connection Error:', err));
 
-// --- 1. Shloka Model (UPDATED) ---
+// --- 1. Shloka Model ---
 const shlokaSchema = new mongoose.Schema({
     adhyay: { type: Number, required: true },
     shloka: { type: Number, required: true },
     text: { type: String, required: false },
     video_id: { type: String, required: true },
-    likes: { type: Number, default: 0 } // NAYA: Like count
+    likes: { type: Number, default: 0 }
 });
 const Shloka = mongoose.model('Shloka', shlokaSchema);
 
@@ -35,18 +35,20 @@ const contentSchema = new mongoose.Schema({
 });
 const SiteContent = mongoose.model('SiteContent', contentSchema);
 
-// --- 3. Artwork Model ---
+// --- 3. Artwork Model (Updated) ---
 const artworkSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    imageUrl: { type: String, required: true }
+    imageUrl: { type: String, required: true },
+    likes: { type: Number, default: 0 } // Likes added
 });
 const Artwork = mongoose.model('Artwork', artworkSchema);
 
-// --- 4. Blog Model ---
+// --- 4. Blog Model (Updated) ---
 const blogSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    likes: { type: Number, default: 0 } // Likes added
 });
 const Blog = mongoose.model('Blog', blogSchema);
 
@@ -68,7 +70,6 @@ const Testimonial = mongoose.model('Testimonial', testimonialSchema);
 
 // --- Login API ---
 app.post('/api/login', (req, res) => {
-    // (Aapka puraana code... no change)
     const { password } = req.body;
     if (password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true });
@@ -77,13 +78,12 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// --- Shloka APIs (UPDATED) ---
+// --- Shloka APIs ---
 app.get('/api/shlokas', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        // NAYA: Likes ke saath sort karein
         const shlokas = await Shloka.find().sort({ adhyay: 1, shloka: 1 });
         res.json(shlokas);
     } catch (err) {
@@ -91,7 +91,7 @@ app.get('/api/shlokas', async (req, res) => {
     }
 });
 
-// NAYA: Ek single shloka ID se fetch karein (Public)
+// Single shloka ID se fetch karein (shloka.html ke liye)
 app.get('/api/shloka/:id', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -108,7 +108,7 @@ app.get('/api/shloka/:id', async (req, res) => {
     }
 });
 
-// NAYA: Shloka Like API
+// Shloka Like API
 app.post('/api/shlokas/like/:id', async (req, res) => {
     try {
         const shloka = await Shloka.findById(req.params.id);
@@ -123,40 +123,7 @@ app.post('/api/shlokas/like/:id', async (req, res) => {
     }
 });
 
-// NAYA: Ek shloka Adhyay aur Shloka number se fetch karein (FIXED)
-app.get('/api/shloka/find', async (req, res) => {
-    try {
-        const { adhyay, shloka } = req.query;
-
-        if (!adhyay || !shloka) {
-            return res.status(400).json({ message: 'Adhyay and Shloka parameters are required' });
-        }
-
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        
-        const foundShloka = await Shloka.findOne({ 
-            adhyay: Number(adhyay), 
-            shloka: Number(shloka) 
-        });
-
-        if (!foundShloka) {
-            // Agar database mein nahi mila, toh 404 bhejega
-            return res.status(404).json({ message: 'Shloka not found in database' });
-        }
-        
-        res.json(foundShloka);
-
-    } catch (err) {
-        // [NAYA FIX] Error ko Vercel logs mein print karo
-        console.error("ERROR FETCHING SHLOKA:", err); 
-        
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
-// (Shloka POST, PUT, DELETE APIs... aapka code yahaan... no change)
+// (Shloka POST, PUT, DELETE APIs)
 app.post('/api/shlokas', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
@@ -167,7 +134,6 @@ app.post('/api/shlokas', async (req, res) => {
             shloka: Number(req.body.shloka),
             text: req.body.text,
             video_id: req.body.video_url
-            // Likes default 0 ho jaayenge
         });
         await newShloka.save();
         res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
@@ -175,7 +141,6 @@ app.post('/api/shlokas', async (req, res) => {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
     }
 });
-
 app.put('/api/shlokas/:id', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
@@ -194,7 +159,6 @@ app.put('/api/shlokas/:id', async (req, res) => {
         res.status(500).json({ message: 'Shloka update karne mein error', error: err.message });
     }
 });
-
 app.delete('/api/shlokas/:id', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
@@ -209,7 +173,6 @@ app.delete('/api/shlokas/:id', async (req, res) => {
 });
 
 // --- 'About' APIs ---
-// (Aapka puraana code... no change)
 app.get('/api/about', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -248,7 +211,6 @@ app.post('/api/about', async (req, res) => {
 
 
 // --- Artwork APIs ---
-// (Aapka puraana code... no change)
 app.get('/api/artwork', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -260,6 +222,22 @@ app.get('/api/artwork', async (req, res) => {
         res.status(500).json({ message: 'Artwork laane mein error' });
     }
 });
+
+// Artwork Like API
+app.post('/api/artwork/like/:id', async (req, res) => {
+    try {
+        const artwork = await Artwork.findById(req.params.id);
+        if (!artwork) {
+            return res.status(404).json({ message: 'Artwork not found' });
+        }
+        artwork.likes += 1;
+        await artwork.save();
+        res.json({ success: true, likes: artwork.likes });
+    } catch (err) {
+        res.status(500).json({ message: 'Error liking artwork' });
+    }
+});
+
 app.post('/api/artwork', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
@@ -290,7 +268,6 @@ app.delete('/api/artwork/:id', async (req, res) => {
 });
 
 // --- Blog APIs ---
-// (Aapka puraana code... no change)
 app.get('/api/blog', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -302,6 +279,22 @@ app.get('/api/blog', async (req, res) => {
         res.status(500).json({ message: 'Blog posts laane mein error' });
     }
 });
+
+// Blog Post Like API
+app.post('/api/blog/like/:id', async (req, res) => {
+    try {
+        const post = await Blog.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Blog post not found' });
+        }
+        post.likes += 1;
+        await post.save();
+        res.json({ success: true, likes: post.likes });
+    } catch (err) {
+        res.status(500).json({ message: 'Error liking post' });
+    }
+});
+
 app.post('/api/blog', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
@@ -347,7 +340,6 @@ app.delete('/api/blog/:id', async (req, res) => {
 
 
 // --- Testimonial APIs ---
-// (Aapka puraana code... no change)
 app.get('/api/testimonials', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

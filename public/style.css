@@ -299,3 +299,57 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 .menu-links a.main-tab-button {
     text-decoration: none;
 }
+
+/* --- NAYA: Blog Post Action Styles --- */
+.blog-post-item .shloka-actions {
+    margin-top: 20px;
+    border-top: 1px solid #FFECB3;
+    padding-top: 15px;
+}
+
+/* --- NAYA: Artwork Overlay Action Styles --- */
+.carousel-item {
+    position: relative; /* Buttons ko position dene ke liye zaroori */
+}
+
+.artwork-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    opacity: 0; /* Shuru mein chhipa do */
+    transition: opacity 0.3s ease;
+}
+
+.carousel-item:hover .artwork-actions {
+    opacity: 1; /* Hover karne par dikhaao */
+}
+
+.artwork-actions .shloka-action-button {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: none;
+    flex: 1;
+}
+.artwork-actions .shloka-action-button:disabled {
+    background-color: rgba(255, 235, 238, 0.9);
+    color: #D84315;
+}
+
+/* Mobile par hamesha dikhaao */
+@media (max-width: 768px) {
+    .artwork-actions {
+        opacity: 1;
+        background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+        padding: 5px;
+        gap: 5px;
+    }
+    .artwork-actions .shloka-action-button {
+        font-size: 0.8em;
+        padding: 8px;
+    }
+}
