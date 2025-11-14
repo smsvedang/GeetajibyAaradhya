@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter with Sound & Vibration</title>
+    <title>Jap Counter</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS में कोई बदलाव नहीं है, यह पहले जैसा ही है */
+        /* CSS में Modal और Records Button के लिए स्टाइल जोड़े गए हैं */
         body {
             display: grid;
             place-items: center;
@@ -15,7 +15,6 @@
             background-color: #e8e8f0;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            /* मोबाइल पर क्लिक डिले हटाने के लिए */
             touch-action: manipulation;
         }
 
@@ -56,9 +55,10 @@
             border-radius: 0 0 10px 10px;
         }
 
+        /* काउंटर की बॉडी का साइज़ थोड़ा बढ़ाया गया है */
         .finger-counter {
-            width: 150px;
-            height: 180px;
+            width: 170px; /* थोड़ा चौड़ा */
+            height: 200px; /* थोड़ा लंबा */
             background: linear-gradient(145deg, #333, #000);
             border-radius: 35px;
             border: 2px solid #111;
@@ -110,127 +110,416 @@
             background: linear-gradient(145deg, #b0b0b0, #e0e0e0);
         }
 
-        .reset-button {
-            width: 40px;
-            height: 20px;
+        /* --- नया स्टाइल --- */
+
+        /* छोटे बटनों को एक लाइन में रखने के लिए */
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            margin-top: 5px; /* बड़े बटन से थोड़ी दूरी */
+        }
+        
+        .small-button {
+            width: 48%; /* दो बटन हैं इसलिए 50% से कम */
+            height: 25px;
             font-size: 10px;
+            font-weight: bold;
             background-color: #444;
             color: #aaa;
             border: 1px solid #666;
             border-radius: 5px;
             cursor: pointer;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            transition: all 0.1s ease;
         }
 
-        .reset-button:active {
+        .small-button:active {
             transform: translateY(1px);
             box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+        
+        #recordsButton {
+            background-color: #3a5a9a; /* नीला रंग */
+            color: white;
+        }
+        
+        /* --- लोडिंग औरModal (पॉप-अप) का स्टाइल --- */
+        
+        /* लोडिंग मैसेज */
+        #loadingMessage {
+            font-size: 1.2em;
+            font-family: 'Share Tech Mono', monospace;
+            color: #333;
+        }
+
+        /* Modal (पॉप-अप) बैकग्राउंड */
+        .modal {
+            display: none; /* डिफ़ॉल्ट रूप से छिपा हुआ */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6); /* डार्क बैकग्राउंड */
+        }
+
+        /* Modal का कंटेंट बॉक्स */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 20% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        /* Modal का क्लोज बटन (X) */
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover {
+            color: #000;
+        }
+        
+        .modal-content h2 {
+            font-family: Arial, sans-serif;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        /* रिकॉर्ड्स की लिस्ट */
+        #recordsList {
+            list-style-type: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #recordsList li {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        #recordsList li:last-child {
+            border-bottom: none;
+        }
+        #recordsList li .date {
+            color: #000;
+        }
+        #recordsList li .count {
+            color: #3a5a9a;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="counter-container">
+    <!-- लोडिंग मैसेज (डिफ़ॉल्ट रूप से दिखेगा) -->
+    <div id="loadingMessage">Connecting to database...</div>
+
+    <!-- काउंटर कंटेनर (डिफ़ॉल्ट रूप से छिपा रहेगा) -->
+    <div class="counter-container" id="mainCounter" style="display: none;">
         
         <div class="belt belt-top"></div>
         
         <div class="finger-counter">
             <div class="screen" id="display">00000</div>
             <button class="count-button" id="incrementButton"></button>
-            <button class="reset-button" id="resetButton">RESET</button>
+            
+            <!-- छोटे बटनों के लिए एक रो -->
+            <div class="button-row">
+                <button class="small-button" id="resetButton">RESET</button>
+                <button class="small-button" id="recordsButton">RECORDS</button>
+            </div>
         </div>
         
         <div class="belt belt-bottom"></div>
-
     </div>
 
-    <script>
-        // --- JavaScript (Sound और Vibration के साथ) ---
-        
+    <!-- रिकॉर्ड्स के लिए Modal (पॉप-अप) -->
+    <div id="recordsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <h2>Previous Records</h2>
+            <ul id="recordsList">
+                <!-- रिकॉर्ड्स यहाँ JavaScript से भरे जाएँगे -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Firebase लाइब्रेरीज -->
+    <script type="module">
+        // Firebase इम्पोर्ट्स
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            onSnapshot,
+            collection,
+            getDocs,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- 1. DOM एलिमेंट्स ---
         const displayElement = document.getElementById('display');
         const incrementButton = document.getElementById('incrementButton');
         const resetButton = document.getElementById('resetButton');
+        const recordsButton = document.getElementById('recordsButton');
+        const modal = document.getElementById('recordsModal');
+        const closeModal = document.getElementById('closeModal');
+        const recordsList = document.getElementById('recordsList');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const mainCounter = document.getElementById('mainCounter');
 
+        // --- 2. ग्लोबल वेरिएबल्स ---
         let count = 0;
-        
-        // 1. साउंड के लिए AudioContext तैयार करना
-        // (AudioContext को 'null' से शुरू करते हैं ताकि ब्राउज़र इसे ब्लॉक न करे)
+        let todayDate = getTodayDateString();
+        let db; // Firestore इंस्टैंस
+        let auth; // Auth इंस्टैंस
+        let userId; // यूनीक यूजर ID
+        let appId; // यूनीक ऐप ID
+        let currentDayDocRef; // आज के डॉक्यूमेंट का रेफरेन्स
+        let unsubscribe; // onSnapshot को बंद करने के लिए
+
+        // --- 3. साउंड और वाइब्रेशन (पहले जैसा) ---
         let audioCtx = null;
-
-        // क्लिक की "टिक" आवाज़ बजाने का फंक्शन
         function playClickSound() {
-            // अगर AudioContext शुरू नहीं हुआ है, तो उसे शुरू करो
-            if (audioCtx === null) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
+            if (audioCtx === null) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-
-            oscillator.type = 'triangle'; // 'टिक' के लिए 'triangle' वेव अच्छी है
-            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // आवाज़ की तेज़ी
-            
-            // आवाज़ को तुरंत शुरू और बंद करके "टिक" इफ़ेक्ट बनाना
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-
             oscillator.start(audioCtx.currentTime);
             oscillator.stop(audioCtx.currentTime + 0.05);
         }
-        
-        // रीसेट की "बीप" आवाज़ बजाने का फंक्शन
         function playResetSound() {
-            if (audioCtx === null) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (audioCtx === null) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sine'; // 'बीप' के लिए 'sine' वेव
-            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // थोड़ी कम फ्रीक्वेंसी
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
             oscillator.connect(audioCtx.destination);
             oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.1); // 0.1 सेकंड के लिए
+            oscillator.stop(audioCtx.currentTime + 0.1);
         }
-
-        // 2. वाइब्रेशन का फंक्शन
         function triggerVibration(duration) {
-            // चेक करना कि क्या ब्राउज़र वाइब्रेशन को सपोर्ट करता है
-            if ("vibrate" in navigator) {
-                navigator.vibrate(duration);
-            }
+            if ("vibrate" in navigator) navigator.vibrate(duration);
         }
 
-        // डिस्प्ले अपडेट फंक्शन
+        // --- 4. हेल्पर फंक्शन्स ---
+        
+        // आज की तारीख "YYYY-MM-DD" फॉर्मेट में पाने के लिए
+        function getTodayDateString() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        
+        // डिस्प्ले को 5 अंकों के साथ अपडेट करना
         function updateDisplay() {
             displayElement.textContent = String(count).padStart(5, '0');
         }
 
-        // 3. बड़े बटन पर इफ़ेक्ट्स जोड़ना
+        // --- 5. Firebase लॉजिक ---
+
+        // Firebase को शुरू करने वाला मेन फंक्शन
+        async function initializeFirebase() {
+            try {
+                // अनिवार्य वेरिएबल्स को लोड करना
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jap-counter';
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                
+                // ऐप्स को इनिशियलाइज़ करना
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug'); // डीबगिंग के लिए
+
+                // ऑथेंटिकेशन स्टेट को सुनना
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        // यूज़र लॉग इन है, अब डेटाबेस से कनेक्ट करें
+                        connectToDatabase();
+                        // लोडिंग छुपाएं, काउंटर दिखाएं
+                        loadingMessage.style.display = 'none';
+                        mainCounter.style.display = 'grid';
+                    }
+                });
+
+                // साइन-इन करना
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Firebase init error:", error);
+                loadingMessage.textContent = "Error connecting to database.";
+            }
+        }
+        
+        // डेटाबेस से कनेक्ट और आज का डेटा सुनना
+        function connectToDatabase() {
+            if (!userId) return;
+            
+            todayDate = getTodayDateString();
+            const collectionPath = `artifacts/${appId}/users/${userId}/jap-counts`;
+            
+            // आज के डॉक्यूमेंट का रेफरेन्स सेट करें
+            currentDayDocRef = doc(db, collectionPath, todayDate);
+            
+            // अगर पहले से कोई लिस्नर है, तो उसे बंद करें
+            if (unsubscribe) unsubscribe();
+
+            // आज के डॉक्यूमेंट में होने वाले बदलावों को सुनें (onSnapshot)
+            unsubscribe = onSnapshot(currentDayDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    // अगर आज का डेटा मौजूद है, तो गिनती लोड करें
+                    count = docSnap.data().count;
+                } else {
+                    // अगर नहीं है (नया दिन), तो गिनती 0
+                    count = 0;
+                }
+                updateDisplay();
+            }, (error) => {
+                console.error("onSnapshot error:", error);
+            });
+        }
+        
+        // गिनती को Firestore में सेव करना
+        async function saveCount() {
+            if (!currentDayDocRef) return;
+            try {
+                // setDoc का इस्तेमाल करके डेटा सेव करें
+                // { merge: true } यह सुनिश्चित करता है कि 'date' फ़ील्ड ओवरराइट न हो
+                await setDoc(currentDayDocRef, { 
+                    count: count, 
+                    date: todayDate // रिकॉर्ड्स में सॉर्टिंग के लिए तारीख भी सेव करें
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error saving count: ", error);
+            }
+        }
+        
+        // दिन में बदलाव की जाँच करना
+        function checkDayChange() {
+            const newDate = getTodayDateString();
+            if (newDate !== todayDate) {
+                // नया दिन!
+                // लिस्नर को रीसेट करें ताकि वह नए दिन के डॉक्यूमेंट को सुने
+                connectToDatabase();
+            }
+        }
+
+        // --- 6. इवेंट लिस्नर्स ---
+
+        // बड़ा बटन (गिनती)
         incrementButton.addEventListener('click', () => {
+            checkDayChange(); // क्या दिन बदल गया?
+            
             count++;
             if (count > 99999) {
                 count = 0;
             }
             updateDisplay();
             
-            // इफ़ेक्ट्स चलाओ!
+            saveCount(); // Firestore में सेव करें
+            
             playClickSound();
-            triggerVibration(50); // 50 मिलीसेकंड का हल्का झटका
+            triggerVibration(50);
         });
 
-        // 4. रीसेट बटन पर इफ़ेक्ट्स जोड़ना
+        // रीसेट बटन
         resetButton.addEventListener('click', () => {
+            checkDayChange();
+            
             count = 0;
             updateDisplay();
             
-            // अलग इफ़ेक्ट्स चलाओ!
+            saveCount(); // 0 को सेव करें
+            
             playResetSound();
-            triggerVibration([80, 50, 80]); // दो बार झटका (झटका-गैप-झटका)
+            triggerVibration([80, 50, 80]);
         });
+        
+        // "Records" बटन
+        recordsButton.addEventListener('click', async () => {
+            if (!db || !userId) return;
+            
+            recordsList.innerHTML = '<li>Loading...</li>'; // लिस्ट खाली करें
+            modal.style.display = 'block'; // Modal दिखाएँ
+            
+            try {
+                const collectionRef = collection(db, `artifacts/${appId}/users/${userId}/jap-counts`);
+                const querySnapshot = await getDocs(collectionRef);
+                
+                let records = [];
+                querySnapshot.forEach((doc) => {
+                    records.push(doc.data());
+                });
+                
+                // JavaScript में रिकॉर्ड्स को तारीख के हिसाब से सॉर्ट करें (नया पहले)
+                records.sort((a, b) => b.date.localeCompare(a.date));
+                
+                recordsList.innerHTML = ''; // लिस्ट को फिर से खाली करें
+                
+                if (records.length === 0) {
+                     recordsList.innerHTML = '<li>No previous records found.</li>';
+                     return;
+                }
+                
+                records.forEach(record => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="date">${record.date}</span> <span class="count">${record.count}</span>`;
+                    recordsList.appendChild(li);
+                });
+                
+            } catch (error) {
+                console.error("Error fetching records: ", error);
+                recordsList.innerHTML = '<li>Could not fetch records.</li>';
+            }
+        });
+        
+        // Modal को बंद करने वाले
+        closeModal.onclick = () => {
+            modal.style.display = "none";
+        }
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
-        updateDisplay();
+        // --- 7. ऐप शुरू करें ---
+        initializeFirebase();
+        
     </script>
 
 </body>
