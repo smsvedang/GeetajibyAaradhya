@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jap Counter</title>
+    <title>Counter with Sound & Vibration</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
@@ -55,10 +55,9 @@
             border-radius: 0 0 10px 10px;
         }
 
-        /* काउंटर की बॉडी का साइज़ थोड़ा बढ़ाया गया है */
         .finger-counter {
-            width: 170px; /* थोड़ा चौड़ा */
-            height: 200px; /* थोड़ा लंबा */
+            width: 170px;
+            height: 200px;
             background: linear-gradient(145deg, #333, #000);
             border-radius: 35px;
             border: 2px solid #111;
@@ -110,18 +109,15 @@
             background: linear-gradient(145deg, #b0b0b0, #e0e0e0);
         }
 
-        /* --- नया स्टाइल --- */
-
-        /* छोटे बटनों को एक लाइन में रखने के लिए */
         .button-row {
             display: flex;
             justify-content: space-between;
             width: 90%;
-            margin-top: 5px; /* बड़े बटन से थोड़ी दूरी */
+            margin-top: 5px;
         }
         
         .small-button {
-            width: 48%; /* दो बटन हैं इसलिए 50% से कम */
+            width: 48%;
             height: 25px;
             font-size: 10px;
             font-weight: bold;
@@ -140,22 +136,15 @@
         }
         
         #recordsButton {
-            background-color: #3a5a9a; /* नीला रंग */
+            background-color: #3a5a9a;
             color: white;
         }
         
-        /* --- लोडिंग औरModal (पॉप-अप) का स्टाइल --- */
+        /* --- लोडिंग और Modal (पॉप-अप) का स्टाइल --- */
         
-        /* लोडिंग मैसेज */
-        #loadingMessage {
-            font-size: 1.2em;
-            font-family: 'Share Tech Mono', monospace;
-            color: #333;
-        }
-
         /* Modal (पॉप-अप) बैकग्राउंड */
         .modal {
-            display: none; /* डिफ़ॉल्ट रूप से छिपा हुआ */
+            display: none;
             position: fixed;
             z-index: 100;
             left: 0;
@@ -163,7 +152,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6); /* डार्क बैकग्राउंड */
+            background-color: rgba(0, 0, 0, 0.6);
         }
 
         /* Modal का कंटेंट बॉक्स */
@@ -211,6 +200,7 @@
             border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
+            align-items: center; /* डिलीट बटन को सेंटर करने के लिए */
         }
         #recordsList li:last-child {
             border-bottom: none;
@@ -221,16 +211,83 @@
         #recordsList li .count {
             color: #3a5a9a;
             font-weight: bold;
+            margin-left: 10px;
         }
+        
+        /* --- नया डिलीट बटन स्टाइल --- */
+        .delete-button {
+            background-color: #d9534f; /* लाल रंग */
+            color: white;
+            border: none;
+            border-radius: 5px; /* गोल की जगह चौकोर */
+            width: auto; /* टेक्स्ट के हिसाब से चौड़ाई */
+            height: 25px; /* थोड़ी ऊंचाई */
+            font-size: 10px; /* छोटा फॉन्ट */
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 8px; /* टेक्स्ट के अगल-बगल जगह */
+            text-align: center;
+        }
+        
+        .record-info {
+            flex-grow: 1; /* तारीख और गिनती को लेफ्ट में रखने के लिए */
+        }
+        
+        /* --- कन्फर्मेशन Modal के लिए नया CSS --- */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 101; /* रिकॉर्ड्स modal के ऊपर */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* ज़्यादा डार्क */
+            justify-content: center;
+            align-items: center;
+        }
+        .confirm-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .confirm-content p {
+            font-size: 1.1em;
+            color: #333;
+        }
+        .confirm-buttons {
+            margin-top: 20px;
+        }
+        .confirm-buttons button {
+            width: 40%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 5%;
+        }
+        #confirmYes {
+            background-color: #d9534f;
+            color: white;
+        }
+        #confirmCancel {
+            background-color: #eee;
+            color: #333;
+        }
+
     </style>
 </head>
 <body>
 
-    <!-- लोडिंग मैसेज (डिफ़ॉल्ट रूप से दिखेगा) -->
-    <div id="loadingMessage">Connecting to database...</div>
+    <!-- लोडिंग मैसेज हटा दिया गया है -->
 
-    <!-- काउंटर कंटेनर (डिफ़ॉल्ट रूप से छिपा रहेगा) -->
-    <div class="counter-container" id="mainCounter" style="display: none;">
+    <!-- काउंटर कंटेनर अब डिफ़ॉल्ट रूप से दिखेगा -->
+    <div class="counter-container" id="mainCounter">
         
         <div class="belt belt-top"></div>
         
@@ -238,7 +295,6 @@
             <div class="screen" id="display">00000</div>
             <button class="count-button" id="incrementButton"></button>
             
-            <!-- छोटे बटनों के लिए एक रो -->
             <div class="button-row">
                 <button class="small-button" id="resetButton">RESET</button>
                 <button class="small-button" id="recordsButton">RECORDS</button>
@@ -259,26 +315,20 @@
         </div>
     </div>
 
-    <!-- Firebase लाइब्रेरीज -->
-    <script type="module">
-        // Firebase इम्पोर्ट्स
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            onSnapshot,
-            collection,
-            getDocs,
-            setLogLevel
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- --- नया कन्फर्मेशन Modal HTML --- -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-content">
+            <p id="confirmText">Are you sure you want to delete this record?</p>
+            <div class="confirm-buttons">
+                <button id="confirmCancel">Cancel</button>
+                <button id="confirmYes">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
 
+
+    <!-- Firebase हटा दिया गया है -->
+    <script type"module">
         // --- 1. DOM एलिमेंट्स ---
         const displayElement = document.getElementById('display');
         const incrementButton = document.getElementById('incrementButton');
@@ -287,18 +337,17 @@
         const modal = document.getElementById('recordsModal');
         const closeModal = document.getElementById('closeModal');
         const recordsList = document.getElementById('recordsList');
-        const loadingMessage = document.getElementById('loadingMessage');
-        const mainCounter = document.getElementById('mainCounter');
-
+        // --- नए DOM एलिमेंट्स ---
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmCancel = document.getElementById('confirmCancel');
+        const confirmText = document.getElementById('confirmText');
+        
         // --- 2. ग्लोबल वेरिएबल्स ---
         let count = 0;
         let todayDate = getTodayDateString();
-        let db; // Firestore इंस्टैंस
-        let auth; // Auth इंस्टैंस
-        let userId; // यूनीक यूजर ID
-        let appId; // यूनीक ऐप ID
-        let currentDayDocRef; // आज के डॉक्यूमेंट का रेफरेन्स
-        let unsubscribe; // onSnapshot को बंद करने के लिए
+        const STORAGE_KEY = 'japCounterRecords'; // LocalStorage के लिए की
+        let dateToDelete = null; // डिलीट करने वाली तारीख को सेव करने के लिए
 
         // --- 3. साउंड और वाइब्रेशन (पहले जैसा) ---
         let audioCtx = null;
@@ -330,7 +379,6 @@
 
         // --- 4. हेल्पर फंक्शन्स ---
         
-        // आज की तारीख "YYYY-MM-DD" फॉर्मेट में पाने के लिए
         function getTodayDateString() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -339,93 +387,52 @@
             return `${yyyy}-${mm}-${dd}`;
         }
         
-        // डिस्प्ले को 5 अंकों के साथ अपडेट करना
         function updateDisplay() {
             displayElement.textContent = String(count).padStart(5, '0');
         }
 
-        // --- 5. Firebase लॉजिक ---
-
-        // Firebase को शुरू करने वाला मेन फंक्शन
-        async function initializeFirebase() {
-            try {
-                // अनिवार्य वेरिएबल्स को लोड करना
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-jap-counter';
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
-                // ऐप्स को इनिशियलाइज़ करना
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                setLogLevel('Debug'); // डीबगिंग के लिए
-
-                // ऑथेंटिकेशन स्टेट को सुनना
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        // यूज़र लॉग इन है, अब डेटाबेस से कनेक्ट करें
-                        connectToDatabase();
-                        // लोडिंग छुपाएं, काउंटर दिखाएं
-                        loadingMessage.style.display = 'none';
-                        mainCounter.style.display = 'grid';
-                    }
-                });
-
-                // साइन-इन करना
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-            } catch (error) {
-                console.error("Firebase init error:", error);
-                loadingMessage.textContent = "Error connecting to database.";
-            }
+        // --- 5. LocalStorage लॉजिक ---
+        
+        // स्टोरेज से सभी रिकॉर्ड्स पाना
+        function getRecords() {
+            const recordsJSON = localStorage.getItem(STORAGE_KEY);
+            return recordsJSON ? JSON.parse(recordsJSON) : [];
         }
         
-        // डेटाबेस से कनेक्ट और आज का डेटा सुनना
-        function connectToDatabase() {
-            if (!userId) return;
-            
+        // रिकॉर्ड्स को स्टोरेज में सेव करना
+        function saveRecords(records) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+        
+        // ऐप लोड होने पर आज की गिनती लोड करना
+        function loadTodaysCount() {
             todayDate = getTodayDateString();
-            const collectionPath = `artifacts/${appId}/users/${userId}/jap-counts`;
+            const records = getRecords();
+            const todayRecord = records.find(record => record.date === todayDate);
             
-            // आज के डॉक्यूमेंट का रेफरेन्स सेट करें
-            currentDayDocRef = doc(db, collectionPath, todayDate);
-            
-            // अगर पहले से कोई लिस्नर है, तो उसे बंद करें
-            if (unsubscribe) unsubscribe();
-
-            // आज के डॉक्यूमेंट में होने वाले बदलावों को सुनें (onSnapshot)
-            unsubscribe = onSnapshot(currentDayDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    // अगर आज का डेटा मौजूद है, तो गिनती लोड करें
-                    count = docSnap.data().count;
-                } else {
-                    // अगर नहीं है (नया दिन), तो गिनती 0
-                    count = 0;
-                }
-                updateDisplay();
-            }, (error) => {
-                console.error("onSnapshot error:", error);
-            });
+            if (todayRecord) {
+                count = todayRecord.count;
+            } else {
+                count = 0;
+            }
+            updateDisplay();
         }
         
-        // गिनती को Firestore में सेव करना
-        async function saveCount() {
-            if (!currentDayDocRef) return;
-            try {
-                // setDoc का इस्तेमाल करके डेटा सेव करें
-                // { merge: true } यह सुनिश्चित करता है कि 'date' फ़ील्ड ओवरराइट न हो
-                await setDoc(currentDayDocRef, { 
-                    count: count, 
-                    date: todayDate // रिकॉर्ड्स में सॉर्टिंग के लिए तारीख भी सेव करें
-                }, { merge: true });
-            } catch (error) {
-                console.error("Error saving count: ", error);
+        // गिनती को LocalStorage में सेव करना
+        function saveCurrentCount() {
+            todayDate = getTodayDateString(); // सुनिश्चित करें कि तारीख ताज़ा है
+            let records = getRecords();
+            const todayIndex = records.findIndex(record => record.date === todayDate);
+            
+            if (todayIndex > -1) {
+                // आज का रिकॉर्ड मौजूद है, उसे अपडेट करें
+                records[todayIndex].count = count;
+            } else {
+                // आज का कोई रिकॉर्ड नहीं है, नया बनाएँ
+                records.push({ date: todayDate, count: count });
             }
+            
+            saveRecords(records); // अपडेटेड लिस्ट को सेव करें
         }
         
         // दिन में बदलाव की जाँच करना
@@ -433,24 +440,50 @@
             const newDate = getTodayDateString();
             if (newDate !== todayDate) {
                 // नया दिन!
-                // लिस्नर को रीसेट करें ताकि वह नए दिन के डॉक्यूमेंट को सुने
-                connectToDatabase();
+                todayDate = newDate;
+                count = 0; // नए दिन के लिए गिनती रीसेट करें
+                updateDisplay();
             }
+        }
+        
+        // रिकॉर्ड्स पॉप-अप को भरना
+        function populateRecordsModal() {
+            recordsList.innerHTML = ''; // लिस्ट खाली करें
+            let records = getRecords();
+            
+            // तारीख के हिसाब से सॉर्ट करें (नया पहले)
+            records.sort((a, b) => b.date.localeCompare(a.date));
+
+            if (records.length === 0) {
+                 recordsList.innerHTML = '<li>No previous records found.</li>';
+                 return;
+            }
+            
+            records.forEach(record => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="record-info">
+                        <span class="date">${record.date}</span>
+                        <span class="count">${record.count}</span>
+                    </span>
+                    <button class="delete-button" data-date="${record.date}">DELETE</button>
+                `;
+                recordsList.appendChild(li);
+            });
         }
 
         // --- 6. इवेंट लिस्नर्स ---
 
         // बड़ा बटन (गिनती)
         incrementButton.addEventListener('click', () => {
-            checkDayChange(); // क्या दिन बदल गया?
+            checkDayChange();
             
             count++;
             if (count > 99999) {
                 count = 0;
             }
             updateDisplay();
-            
-            saveCount(); // Firestore में सेव करें
+            saveCurrentCount();
             
             playClickSound();
             triggerVibration(50);
@@ -462,49 +495,16 @@
             
             count = 0;
             updateDisplay();
-            
-            saveCount(); // 0 को सेव करें
+            saveCurrentCount(); // 0 को सेव करें
             
             playResetSound();
             triggerVibration([80, 50, 80]);
         });
         
         // "Records" बटन
-        recordsButton.addEventListener('click', async () => {
-            if (!db || !userId) return;
-            
-            recordsList.innerHTML = '<li>Loading...</li>'; // लिस्ट खाली करें
-            modal.style.display = 'block'; // Modal दिखाएँ
-            
-            try {
-                const collectionRef = collection(db, `artifacts/${appId}/users/${userId}/jap-counts`);
-                const querySnapshot = await getDocs(collectionRef);
-                
-                let records = [];
-                querySnapshot.forEach((doc) => {
-                    records.push(doc.data());
-                });
-                
-                // JavaScript में रिकॉर्ड्स को तारीख के हिसाब से सॉर्ट करें (नया पहले)
-                records.sort((a, b) => b.date.localeCompare(a.date));
-                
-                recordsList.innerHTML = ''; // लिस्ट को फिर से खाली करें
-                
-                if (records.length === 0) {
-                     recordsList.innerHTML = '<li>No previous records found.</li>';
-                     return;
-                }
-                
-                records.forEach(record => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="date">${record.date}</span> <span class="count">${record.count}</span>`;
-                    recordsList.appendChild(li);
-                });
-                
-            } catch (error) {
-                console.error("Error fetching records: ", error);
-                recordsList.innerHTML = '<li>Could not fetch records.</li>';
-            }
+        recordsButton.addEventListener('click', () => {
+            populateRecordsModal();
+            modal.style.display = 'block';
         });
         
         // Modal को बंद करने वाले
@@ -516,9 +516,51 @@
                 modal.style.display = "none";
             }
         }
+        
+        // --- 6. (बदला हुआ) डिलीट बटन का लॉजिक ---
+        
+        // डिलीट बटन के लिए इवेंट लिस्नर (Event Delegation)
+        recordsList.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-button')) {
+                // तारीख को सेव करें
+                dateToDelete = event.target.getAttribute('data-date');
+                // कन्फर्मेशन Modal दिखाएँ
+                confirmText.textContent = `Are you sure you want to delete the record for ${dateToDelete}?`;
+                confirmModal.style.display = 'flex';
+            }
+        });
+
+        // कन्फर्मेशन Modal - "Yes" बटन
+        confirmYes.addEventListener('click', () => {
+            if (dateToDelete) {
+                // रिकॉर्ड्स से डिलीट करें
+                let records = getRecords();
+                let newRecords = records.filter(record => record.date !== dateToDelete);
+                saveRecords(newRecords);
+                
+                // Modal को रिफ्रेश करें
+                populateRecordsModal();
+                
+                // अगर आज का रिकॉर्ड डिलीट किया है, तो मुख्य काउंटर को रीसेट करें
+                if (dateToDelete === todayDate) {
+                    count = 0;
+                    updateDisplay();
+                }
+            }
+            // Modal छुपाएँ और तारीख रीसेट करें
+            confirmModal.style.display = 'none';
+            dateToDelete = null;
+        });
+
+        // कन्फर्मेशन Modal - "Cancel" बटन
+        confirmCancel.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            dateToDelete = null;
+        });
+
 
         // --- 7. ऐप शुरू करें ---
-        initializeFirebase();
+        loadTodaysCount();
         
     </script>
 
