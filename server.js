@@ -223,6 +223,24 @@ app.get('/api/artwork', async (req, res) => {
     }
 });
 
+// NAYA: Ek single artwork ID se fetch karein (Public)
+app.get('/api/artwork/:id', async (req, res) => {
+    try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        const artwork = await Artwork.findById(req.params.id);
+        if (!artwork) {
+            return res.status(404).json({ message: 'Artwork not found' });
+        }
+        res.json(artwork);
+    } catch (err) {
+        console.error("ERROR FETCHING ARTWORK:", err);
+        res.status(500).json({ message: 'Artwork laane mein error' });
+    }
+});
+
 // Artwork Like API
 app.post('/api/artwork/like/:id', async (req, res) => {
     try {

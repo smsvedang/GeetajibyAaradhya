@@ -353,3 +353,25 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
         padding: 8px;
     }
 }
+
+/* --- NAYA: Single Artwork Page Style --- */
+#single-artwork-container {
+    max-width: 700px; /* Center mein rakhein */
+    margin: 40px auto; /* Upar/neeche margin */
+}
+#single-artwork-container .artwork-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+#single-artwork-container .artwork-image img {
+    width: 100%;
+    display: block;
+}
+#single-artwork-container .shloka-actions {
+    display: flex; /* Like/Share buttons ko side-by-side rakhein */
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #FFECB3;
+}

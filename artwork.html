@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaradhya Soni - Artwork</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+<body>
+    
+    <nav class="top-navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="index.html" style="text-decoration: none; color: #D84315;">Warrior Aaradhya</a>
+            </div>
+            <div class="shloka-nav-links">
+                <a href="index.html" class="home-button">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main id="single-artwork-container">
+            <p>Loading artwork...</p>
+        </main>
+    </div>
+
+    <footer class="footer">
+        </footer>
+
+    <script>
+        // Single artwork card banane ka function
+        function createSingleArtworkCard(artwork) {
+            const item = document.createElement('div');
+            item.className = 'artwork-card'; // Naya style
+            
+            const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
+            
+            // Share data
+            const shareTitle = artwork.title + " - by Warrior Aaradhya";
+            const shareText = "Check out this artwork by Warrior Aaradhya!";
+            const shareUrl = window.location.href; 
+
+            item.innerHTML = `
+                <div class="artwork-image">
+                    <img src="${artwork.imageUrl}" alt="${artwork.title}">
+                </div>
+                <div class="shloka-actions">
+                    <button class="shloka-action-button like-button" data-id="${artwork._id}" ${isLiked ? 'disabled' : ''}>
+                        ❤️ <span class="like-count">${artwork.likes || 0}</span>
+                    </button>
+                    <button class="shloka-action-button share-button" 
+                            data-url="${shareUrl}" 
+                            data-title="${shareTitle}" 
+                            data-text="${shareText}">
+                        🔗 Share
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        // Page load hone par artwork fetch karo
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('single-artwork-container');
+            const params = new URLSearchParams(window.location.search);
+            const artworkId = params.get('id');
+
+            if (!artworkId) {
+                container.innerHTML = "<p>Error: No artwork ID provided.</p>";
+                return;
+            }
+
+            try {
+                const cacheBuster = `?cache_buster=${new Date().getTime()}`;
+                const response = await fetch(`/api/artwork/${artworkId}${cacheBuster}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Artwork not found');
+                }
+                const artwork = await response.json();
+                
+                container.innerHTML = ''; 
+                const artworkCard = createSingleArtworkCard(artwork);
+                container.appendChild(artworkCard);
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p>Error: ${err.message}</p>`;
+            }
+        });
+        
+        // Like/Share button logic
+        document.getElementById('single-artwork-container').addEventListener('click', async (e) => {
+            const shareButton = e.target.closest('.share-button');
+            if (shareButton) {
+                // (Share logic...)
+            }
+            
+            const likeButton = e.target.closest('.like-button');
+            if (likeButton) {
+                const artId = likeButton.dataset.id;
+                const key = 'liked_art_' + artId;
+                if (localStorage.getItem(key)) { return; }
+                
+                likeButton.disabled = true;
+                try {
+                    const response = await fetch(`/api/artwork/like/${artId}`, { method: 'POST' });
+                    const data = await response.json();
+                    if (data.success) {
+                        likeButton.querySelector('.like-count').textContent = data.likes;
+                        localStorage.setItem(key, 'true');
+                    } else {
+                        likeButton.disabled = false;
+                    }
+                } catch (err) {
+                    likeButton.disabled = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -265,8 +265,10 @@
                     if (index === 0) item.classList.add('active'); 
                     
                     const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
-                    const shareUrl = `${window.location.origin}#tab-gallery`; // Gallery tab ka link
-                    const shareTitle = artwork.title;
+                    
+                    // [NAYA FIX] Share link ab 'artwork.html?id=...' use karega
+                    const shareUrl = `${window.location.origin}/artwork.html?id=${artwork._id}`;
+                    const shareTitle = artwork.title + " - by Warrior Aaradhya";
                     
                     item.innerHTML = `
                         <img src="${artwork.imageUrl}" alt="${artwork.title}">
