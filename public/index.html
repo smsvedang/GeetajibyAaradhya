@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
@@ -716,6 +717,40 @@
     
     <!-- [STEP 4] SWIPER SLIDER KI JAVASCRIPT FILE (SABSE AAKHIR MEIN) -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
+    <script>
+  // Service Worker (PWA) ko register karein
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('Service Worker रजिस्टर हो गया:', registration);
+        })
+        .catch(error => {
+          console.log('Service Worker रजिस्ट्रेशन फ़ेल हो गया:', error);
+        });
+    });
+  }
+</script>
+<script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('Service Worker रजिस्टर हो गया:', registration);
+            })
+            .catch(error => {
+              console.log('Service Worker रजिस्ट्रेशन फ़ेल हो गया:', error);
+            });
+        });
+      }
+    </script>
+
+    <script>
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Browser ko automatic prompt dikhane se roko
+        console.log('Install prompt roka gaya');
+        e.preventDefault();
+      });
+    </script>
 </body>
 </html>
