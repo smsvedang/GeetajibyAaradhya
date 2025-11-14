@@ -25,7 +25,95 @@
     }
     </script>
     <link rel="stylesheet" href="style.css">
+
+    <!-- [STEP 1] SWIPER SLIDER KI CSS FILE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <!-- [STEP 2] NAYE TESTIMONIAL SLIDER KA STYLE -->
+    <style>
+        .testimonialSwiper {
+          width: 100%;
+          max-width: 800px; 
+          margin: 0 auto;
+          height: 380px; /* Thodi height badha di */
+          padding-bottom: 50px; 
+        }
+
+        .testimonialSwiper .swiper-slide {
+          background: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 10px;
+        }
+
+        .testimonial-card-new {
+          background: #ffffff;
+          border-radius: 12px;
+          border: 1px solid #e0e0e0;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+          padding: 30px;
+          padding-top: 40px;
+          height: 300px; /* Card ki height */
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* Vertically center */
+          position: relative;
+          text-align: center;
+          box-sizing: border-box;
+        }
+
+        .testimonial-card-new .quote-icon {
+          position: absolute;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 80px;
+          color: #D84315; /* Aapke logo ka color */
+          line-height: 1;
+          opacity: 0.15;
+          font-family: Georgia, serif;
+        }
+
+        .testimonial-card-new .quote-text {
+          font-size: 1.1rem;
+          font-style: italic;
+          color: #333;
+          line-height: 1.6;
+          margin: 0;
+          z-index: 2;
+          flex-grow: 1; 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow-y: auto; /* Agar quote lamba ho */
+          padding-right: 5px;
+        }
+
+        .testimonial-card-new .author-details {
+          margin-top: 20px;
+          z-index: 2;
+          flex-shrink: 0;
+        }
+
+        .testimonial-card-new .author-name {
+          font-weight: 700;
+          font-size: 1rem;
+          color: #D84315; /* Logo color */
+          display: block;
+        }
+
+        /* Swiper Arrows & Dots */
+        .testimonialSwiper .swiper-button-next,
+        .testimonialSwiper .swiper-button-prev {
+          color: #D84315;
+        }
+        .testimonialSwiper .swiper-pagination-bullet-active {
+          background: #D84315;
+        }
+    </style>
+
 </head>
 <body>
     
@@ -119,6 +207,7 @@
                         <p id="testimonial-thanks" style="display:none; text-align:center; color: green; font-weight: bold;">Thank you! Your testimonial has been submitted.</p>
                     </div>
                     <hr class="section-divider">
+                    <!-- NAYA SLIDER YAHAN LOAD HOGA -->
                     <div id="testimonials-list-container">
                         <p>Loading testimonials...</p>
                     </div>
@@ -225,7 +314,7 @@
                     adhyayGroup.className = 'adhyay-group';
                     adhyayGroup.id = `adhyay-${adhyayNum}`;
                     if (parseInt(adhyayNum, 10) === 1) {
-                         adhyayGroup.open = true; 
+                        adhyayGroup.open = true; 
                     }
                     const adhyayTitle = document.createElement('summary');
                     adhyayTitle.className = 'adhyay-title';
@@ -301,25 +390,35 @@
             }
         }
 
-        // --- FUNCTION 6: Carousel logic ---
+        // --- FUNCTION 6: Carousel logic (AUTOPLAY ADDED) ---
         function setupCarouselListeners(totalSlides) {
             let currentSlide = 0;
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const counterText = document.getElementById('slide-counter-text');
-            if (!prevButton || !nextButton || !counterText) return;
+            
+            if (!prevButton || !nextButton || !counterText || slides.length === 0) return; // Guard clause
+            
             function showSlide(index) {
                 if (index >= totalSlides) { currentSlide = 0; }
                 else if (index < 0) { currentSlide = totalSlides - 1; }
                 else { currentSlide = index; }
+                
                 slides.forEach(slide => { slide.classList.remove('active'); });
                 slides[currentSlide].classList.add('active');
                 counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
             }
+            
             showSlide(0);
+            
             prevButton.addEventListener('click', () => { showSlide(currentSlide - 1); });
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
+            
+            // [NAYA] AUTOPLAY FOR ARTWORK GALLERY
+            setInterval(() => {
+                showSlide(currentSlide + 1);
+            }, 5000); // Har 5 second mein slide change
         }
         
         // --- FUNCTION 7: Load Blog posts (UPDATED for Grid/Excerpt) ---
@@ -371,10 +470,10 @@
             }
         }
         
-        // --- FUNCTION 8: Load Approved Testimonials (UPDATED for Grid) ---
+        // --- [STEP 3] FUNCTION 8: (SWIPER SLIDER MEIN BADAL DIYA GAYA) ---
         async function loadTestimonials() {
             const container = document.getElementById('testimonials-list-container');
-            container.innerHTML = '';
+            container.innerHTML = '<p>Loading testimonials...</p>'; // Loading message
             try {
                 const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
                 const testimonials = await response.json();
@@ -384,15 +483,73 @@
                     return;
                 }
                 
-                // [NAYA] Grid layout ke liye class add karein
-                container.classList.add('testimonial-grid');
+                container.innerHTML = ''; // Loading message clear karein
 
+                // 1. Swiper ka main structure banayein
+                const swiperContainer = document.createElement('div');
+                swiperContainer.className = 'swiper testimonialSwiper';
+
+                const swiperWrapper = document.createElement('div');
+                swiperWrapper.className = 'swiper-wrapper';
+
+                // 2. Loop karein aur har testimonial ke liye slide banayein
                 testimonials.forEach(testimonial => {
-                    const item = document.createElement('div');
-                    item.className = 'testimonial-item';
-                    item.innerHTML = `<blockquote>${testimonial.quote.replace(/\n/g, '<br>')}</blockquote><cite>- ${testimonial.author}</cite>`;
-                    container.appendChild(item);
+                    const slide = document.createElement('div');
+                    slide.className = 'swiper-slide';
+                    
+                    // Naya card design
+                    slide.innerHTML = `
+                    <div class="testimonial-card-new">
+                      <span class="quote-icon">“</span>
+                      <p class="quote-text">
+                        ${testimonial.quote.replace(/\n/g, '<br>')}
+                      </p>
+                      <div class="author-details">
+                        <span class="author-name">- ${testimonial.author}</span>
+                      </div>
+                    </div>
+                    `;
+                    swiperWrapper.appendChild(slide);
                 });
+
+                // 3. Wrapper ko main container mein daalein
+                swiperContainer.appendChild(swiperWrapper);
+                
+                // 4. Navigation (Arrows) aur Pagination (Dots) add karein
+                swiperContainer.innerHTML += `
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                `;
+                
+                // 5. Poora slider container mein dikhayein
+                container.appendChild(swiperContainer);
+
+                // 6. Swiper ko CHALU (Initialize) karein
+                // YEH SABSE ZAROORI HAI: new Swiper() ko data load hone ke BAAD call karna
+                new Swiper(".testimonialSwiper", {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    loop: true, // Taaki end ke baad wapas start ho
+                    
+                    autoplay: {
+                       delay: 5000, // Har 5 second mein slide
+                       disableOnInteraction: false,
+                    },
+
+                    // Arrows
+                    navigation: {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev",
+                    },
+                    
+                    // Dots
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true,
+                    },
+                });
+
             } catch (err) {
                 console.error("Error loading testimonials:", err);
                 container.innerHTML = '<p>Could not load testimonials.</p>';
@@ -469,7 +626,7 @@
             loadAboutSection(); 
             loadArtworkGallery();
             loadBlogPosts();
-            loadTestimonials(); 
+            loadTestimonials(); // YEH NAYA SLIDER LOAD KAREGA
 
             // Public Testimonial Form Handler
             const addButton = document.getElementById('add-yours-button');
@@ -554,6 +711,9 @@
 
         });
     </script>
+    
+    <!-- [STEP 4] SWIPER SLIDER KI JAVASCRIPT FILE (SABSE AAKHIR MEIN) -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
 </body>
 </html>
