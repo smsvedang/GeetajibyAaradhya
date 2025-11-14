@@ -99,36 +99,49 @@
                 console.error(err);
                 container.innerHTML = `<p>Error: ${err.message}</p>`;
             }
-        });
-        
-        // Like/Share button logic
-        document.getElementById('single-blog-container').addEventListener('click', async (e) => {
-            const shareButton = e.target.closest('.share-button');
-            if (shareButton) {
-                // (Share logic...)
-            }
             
-            const likeButton = e.target.closest('.like-button');
-            if (likeButton) {
-                const postId = likeButton.dataset.id;
-                const key = 'liked_blog_' + postId;
-                if (localStorage.getItem(key)) { return; }
-                
-                likeButton.disabled = true;
-                try {
-                    const response = await fetch(`/api/blog/like/${postId}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        likeButton.querySelector('.like-count').textContent = data.likes;
-                        localStorage.setItem(key, 'true');
+            // --- [NAYA FIX] ---
+            // Click listener ko DOMContentLoaded ke ANDAR yahaan move kar diya hai
+            // Taaki yeh content load hone ke BAAD attach ho
+            document.getElementById('single-blog-container').addEventListener('click', async (e) => {
+                const shareButton = e.target.closest('.share-button');
+                if (shareButton) {
+                    const urlToShare = shareButton.dataset.url;
+                    const title = shareButton.dataset.title;
+                    const text = shareButton.dataset.text;
+                    if (navigator.share) {
+                        try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
+                        catch (err) { console.error('Share failed:', err); }
                     } else {
+                        try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
+                        catch (err) { alert('Failed to copy link.'); }
+                    }
+                }
+                
+                const likeButton = e.target.closest('.like-button');
+                if (likeButton) {
+                    const postId = likeButton.dataset.id;
+                    const key = 'liked_blog_' + postId;
+                    if (localStorage.getItem(key)) { return; }
+                    
+                    likeButton.disabled = true;
+                    try {
+                        const response = await fetch(`/api/blog/like/${postId}`, { method: 'POST' });
+                        const data = await response.json();
+                        if (data.success) {
+                            likeButton.querySelector('.like-count').textContent = data.likes;
+                            localStorage.setItem(key, 'true');
+                        } else {
+                            likeButton.disabled = false;
+                        }
+                    } catch (err) {
                         likeButton.disabled = false;
                     }
-                } catch (err) {
-                    likeButton.disabled = false;
                 }
-            }
+            });
+            // --- FIX END ---
         });
+        
     </script>
 </body>
 </html>
