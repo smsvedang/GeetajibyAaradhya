@@ -186,7 +186,16 @@ button.cancel-button { background-color: #6c757d; }
 .blog-post-item { background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 .blog-post-item h3 { font-size: 1.6em; color: #333; margin-top: 0; margin-bottom: 5px; }
 .blog-post-item .blog-date { font-size: 0.9em; color: #777; margin-bottom: 15px; font-style: italic; }
-.blog-post-item .blog-content { font-size: 1em; line-height: 1.7; color: #555; white-space: pre-wrap; }
+.blog-post-item .blog-content {
+    font-size: 1em;
+    line-height: 1.7;
+    color: #555;
+    white-space: pre-wrap; 
+    
+    /* [NAYA FIX] Lambe shabdon ya line ko todne ke liye */
+    overflow-wrap: break-word;
+    word-wrap: break-word; /* Puraane browsers ke liye */
+}
 .testimonial-item { background-color: #FFFDF9; border-left: 5px solid #BFA080; padding: 20px 25px; margin-bottom: 20px; border-radius: 0 8px 8px 0; }
 .testimonial-item blockquote { font-size: 1.1em; font-style: italic; color: #444; line-height: 1.6; margin: 0 0 10px 0; padding: 0; position: relative; white-space: pre-wrap; }
 .testimonial-item cite { font-size: 1em; font-weight: bold; color: #BFA080; display: block; text-align: right; font-style: normal; }
