@@ -1,4 +1,4 @@
-/* --- Aaradhya Geetaji - Final Server Code --- */
+/* --- Aaradhya Geetaji - Final Server Code (All Likes Fixed) --- */
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -108,20 +108,26 @@ app.get('/api/shloka/:id', async (req, res) => {
     }
 });
 
-// Shloka Like API
-app.post('/api/shlokas/like/:id', async (req, res) => {
+// --- [FIXED & UPDATED] Shloka Like API ---
+// Note: URL 'shloka' (singular) kar diya hai, frontend se match karne ke liye
+app.post('/api/shloka/like/:id', async (req, res) => {
     try {
-        const shloka = await Shloka.findById(req.params.id);
-        if (!shloka) {
-            return res.status(404).json({ message: 'Shloka not found' });
+        const updatedShloka = await Shloka.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { likes: 1 } }, // 'likes' count ko 1 se badhao
+            { new: true } // Taki naya data wapas mile
+        );
+
+        if (!updatedShloka) {
+            return res.status(404).json({ success: false, message: 'Shloka not found' });
         }
-        shloka.likes += 1;
-        await shloka.save();
-        res.json({ success: true, likes: shloka.likes });
+        res.json({ success: true, likes: updatedShloka.likes });
+
     } catch (err) {
         res.status(500).json({ message: 'Error liking shloka' });
     }
 });
+
 
 // (Shloka POST, PUT, DELETE APIs)
 app.post('/api/shlokas', async (req, res) => {
@@ -241,16 +247,20 @@ app.get('/api/artwork/:id', async (req, res) => {
     }
 });
 
-// Artwork Like API
+// --- [UPDATED] Artwork Like API ---
 app.post('/api/artwork/like/:id', async (req, res) => {
     try {
-        const artwork = await Artwork.findById(req.params.id);
-        if (!artwork) {
-            return res.status(404).json({ message: 'Artwork not found' });
+        const updatedArtwork = await Artwork.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { likes: 1 } },
+            { new: true }
+        );
+
+        if (!updatedArtwork) {
+            return res.status(404).json({ success: false, message: 'Artwork not found' });
         }
-        artwork.likes += 1;
-        await artwork.save();
-        res.json({ success: true, likes: artwork.likes });
+        res.json({ success: true, likes: updatedArtwork.likes });
+
     } catch (err) {
         res.status(500).json({ message: 'Error liking artwork' });
     }
@@ -316,16 +326,20 @@ app.get('/api/blog/:id', async (req, res) => {
     }
 });
 
-// Blog Post Like API
+// --- [UPDATED] Blog Post Like API ---
 app.post('/api/blog/like/:id', async (req, res) => {
     try {
-        const post = await Blog.findById(req.params.id);
-        if (!post) {
-            return res.status(404).json({ message: 'Blog post not found' });
+        const updatedPost = await Blog.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { likes: 1 } },
+            { new: true }
+        );
+
+        if (!updatedPost) {
+            return res.status(404).json({ success: false, message: 'Blog post not found' });
         }
-        post.likes += 1;
-        await post.save();
-        res.json({ success: true, likes: post.likes });
+        res.json({ success: true, likes: updatedPost.likes });
+
     } catch (err) {
         res.status(500).json({ message: 'Error liking post' });
     }
