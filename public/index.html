@@ -321,7 +321,7 @@
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
         }
         
-        // --- FUNCTION 7: Load Blog posts (UPDATED for new share link) ---
+        // --- FUNCTION 7: Load Blog posts (UPDATED for Grid/Excerpt) ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
@@ -333,40 +333,35 @@
                     container.innerHTML = '<p>No blog posts added yet.</p>';
                     return;
                 }
+                
+                // [NAYA] Grid layout ke liye class add karein
+                container.classList.add('blog-grid');
 
                 posts.forEach(post => {
                     const item = document.createElement('article');
-                    item.className = 'blog-post-item';
-                    item.id = `blog-${post._id}`; // Hash link ke liye ID
+                    item.className = 'blog-post-item'; // Wahi style reuse hoga
+                    item.id = `blog-${post._id}`; 
                     
                     const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'long', year: 'numeric'
                     });
                     
-                    const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
+                    // [NAYA] Post ka chhota preview (excerpt) banayein
+                    const excerpt = post.content.substring(0, 100) + "..."; // Pehle 100 characters
                     
-                    // [NAYA FIX] Share link ab 'blog.html?id=...' use karega
-                    const shareUrl = `${window.location.origin}/blog.html?id=${post._id}`;
-                    const shareTitle = post.title;
+                    // [NAYA] Permalink (poora post padhne ka link)
+                    const permalink = `blog.html?id=${post._id}`;
 
                     item.innerHTML = `
                         <h3>${post.title}</h3>
                         <p class="blog-date">${postDate}</p>
                         <div class="blog-content">
-                            ${post.content.replace(/\n/g, '<br>')}
-                        </div>
-                        <div class="shloka-actions">
-                            <button class="shloka-action-button like-button" data-id="${post._id}" data-type="blog" ${isLiked ? 'disabled' : ''}>
-                                ❤️ <span class="like-count">${post.likes || 0}</span>
-                            </button>
-                            <button class="shloka-action-button share-button"
-                                    data-url="${shareUrl}" 
-                                    data-title="${shareTitle}" 
-                                    data-text="Check out this blog post from Warrior Aaradhya:">
-                                🔗 Share
-                            </button>
-                        </div>
+                            ${excerpt} </div>
+                        <a href="${permalink}" class="read-more-link">Read More...</a>
                     `;
+                    // Like/Share buttons yahaan se hata diye gaye hain (taaki list saaf dikhe)
+                    // Woh buttons ab 'blog.html' page par hain
+                    
                     container.appendChild(item);
                 });
             } catch (err) {

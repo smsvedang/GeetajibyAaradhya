@@ -650,3 +650,33 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     max-width: 700px; /* Blog ko center mein rakhein */
     margin: 40px auto; /* Upar/neeche margin */
 }
+
+/* --- NAYA: Blog Grid Layout --- */
+#blog-posts-container.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Blog item card ko grid ke liye adjust karein */
+.blog-post-item {
+    display: flex;
+    flex-direction: column; /* Taaki 'Read More' hamesha neeche rahe */
+}
+
+.blog-post-item .blog-content {
+    flex-grow: 1; /* Content ko stretch karein taaki card ek size ke dikhein */
+}
+
+/* NAYA: Read More link ka style */
+.read-more-link {
+    display: inline-block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #D84315;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+.read-more-link:hover {
+    text-decoration: underline;
+}
