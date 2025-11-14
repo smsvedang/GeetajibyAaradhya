@@ -205,10 +205,20 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 .admin-buttons .approve-button:hover { background-color: #45a049; }
 
 
-/* --- [NAYA] Mobile Menu Styles (UPDATED FIX) --- */
+/* --- Mobile Menu Styles (UPDATED) --- */
 @media (max-width: 768px) {
     body { padding-top: 60px; }
     .logo { font-size: 1.2em; }
+
+    /* [NAYA FIX] Mobile par padding kam karein */
+    .container {
+        padding: 10px; /* 20px se 10px kiya */
+    }
+    .blog-post-item {
+        padding: 15px; /* 20px 25px se 15px kiya */
+    }
+    /* --- End Fix --- */
+
     .nav-container { justify-content: space-between; }
     .menu-toggle {
         display: block; 
@@ -238,28 +248,23 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
         top: 60px; 
         left: 0;
         width: 100%;
-        background-color: #FFF3E0; /* Container ka background */
+        background-color: #FFF3E0; 
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         border-top: 1px solid #FFECB3;
     }
     .menu-links.active { display: flex; }
-    
     .main-tab-button {
         padding: 15px 20px;
         font-size: 1.1em;
         text-align: left;
         border-bottom: 1px solid #FFECB3;
         height: auto; 
-        
-        /* [FIX] Button ko default solid background diya */
         background-color: #FFF3E0; 
     }
-    
-    /* [FIX] Active aur Hover state ke liye alag color */
     .main-tab-button.active,
     .main-tab-button:hover {
         border-bottom-color: #D84315;
-        background-color: #FFECB3; /* Thoda alag color */
+        background-color: #FFECB3; 
     }
     
     .shloka-grid {
