@@ -298,6 +298,24 @@ app.get('/api/blog', async (req, res) => {
     }
 });
 
+// NAYA: Ek single blog post ID se fetch karein (Public)
+app.get('/api/blog/:id', async (req, res) => {
+    try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        const post = await Blog.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Blog post not found' });
+        }
+        res.json(post);
+    } catch (err) {
+        console.error("ERROR FETCHING BLOG POST:", err);
+        res.status(500).json({ message: 'Blog post laane mein error' });
+    }
+});
+
 // Blog Post Like API
 app.post('/api/blog/like/:id', async (req, res) => {
     try {

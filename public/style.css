@@ -645,3 +645,8 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     background-color: #eee;
     color: #333;
 }
+
+#single-blog-container {
+    max-width: 700px; /* Blog ko center mein rakhein */
+    margin: 40px auto; /* Upar/neeche margin */
+}

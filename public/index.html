@@ -321,7 +321,7 @@
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
         }
         
-        // --- FUNCTION 7: Load Blog posts (UPDATED) ---
+        // --- FUNCTION 7: Load Blog posts (UPDATED for new share link) ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
@@ -337,14 +337,16 @@
                 posts.forEach(post => {
                     const item = document.createElement('article');
                     item.className = 'blog-post-item';
-                    item.id = `blog-${post._id}`; 
+                    item.id = `blog-${post._id}`; // Hash link ke liye ID
                     
                     const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'long', year: 'numeric'
                     });
                     
                     const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
-                    const shareUrl = `${window.location.origin}#${item.id}`; // Simple hash link
+                    
+                    // [NAYA FIX] Share link ab 'blog.html?id=...' use karega
+                    const shareUrl = `${window.location.origin}/blog.html?id=${post._id}`;
                     const shareTitle = post.title;
 
                     item.innerHTML = `

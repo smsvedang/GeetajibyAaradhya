@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaradhya Soni - Artwork</title>
+    <title>Blog Post - Warrior Aaradhya</title>
     <link rel="stylesheet" href="style.css">
     </head>
 <body>
@@ -20,38 +20,44 @@
     </nav>
 
     <div class="container">
-        <main id="single-artwork-container">
-            <p>Loading artwork...</p>
+        <main id="single-blog-container">
+            <p>Loading blog post...</p>
         </main>
     </div>
 
     <footer class="footer">
-          <p>Contact: Aaradhya Soni</p>
+        <p>Contact: Aaradhya Soni</p>
         <p>Email: warrioraaradhya111@gmail.com</p>
         <p>Whatsapp: +91 9243714402</p>
         <p>&copy; 2025 - All Rights Reserved.</p>
-        </footer>
+    </footer>
 
     <script>
-        // Single artwork card banane ka function
-        function createSingleArtworkCard(artwork) {
-            const item = document.createElement('div');
-            item.className = 'artwork-card'; // Naya style
+        // Single blog post card banane ka function
+        function createSingleBlogCard(post) {
+            const item = document.createElement('article');
+            item.className = 'blog-post-item'; // Puraana style reuse karein
             
-            const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
+            const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+            
+            const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
             
             // Share data
-            const shareTitle = artwork.title + " - by Warrior Aaradhya";
-            const shareText = "Check out this artwork by Warrior Aaradhya!";
+            const shareTitle = post.title + " - by Warrior Aaradhya";
+            const shareText = "Check out this blog post from Warrior Aaradhya!";
             const shareUrl = window.location.href; 
 
             item.innerHTML = `
-                <div class="artwork-image">
-                    <img src="${artwork.imageUrl}" alt="${artwork.title}">
+                <h3>${post.title}</h3>
+                <p class="blog-date">${postDate}</p>
+                <div class="blog-content">
+                    ${post.content.replace(/\n/g, '<br>')}
                 </div>
                 <div class="shloka-actions">
-                    <button class="shloka-action-button like-button" data-id="${artwork._id}" ${isLiked ? 'disabled' : ''}>
-                        ❤️ <span class="like-count">${artwork.likes || 0}</span>
+                    <button class="shloka-action-button like-button" data-id="${post._id}" ${isLiked ? 'disabled' : ''}>
+                        ❤️ <span class="like-count">${post.likes || 0}</span>
                     </button>
                     <button class="shloka-action-button share-button" 
                             data-url="${shareUrl}" 
@@ -64,30 +70,30 @@
             return item;
         }
 
-        // Page load hone par artwork fetch karo
+        // Page load hone par post fetch karo
         document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('single-artwork-container');
+            const container = document.getElementById('single-blog-container');
             const params = new URLSearchParams(window.location.search);
-            const artworkId = params.get('id');
+            const postId = params.get('id');
 
-            if (!artworkId) {
-                container.innerHTML = "<p>Error: No artwork ID provided.</p>";
+            if (!postId) {
+                container.innerHTML = "<p>Error: No post ID provided.</p>";
                 return;
             }
 
             try {
                 const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                const response = await fetch(`/api/artwork/${artworkId}${cacheBuster}`);
+                const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.message || 'Artwork not found');
+                    throw new Error(errorData.message || 'Blog post not found');
                 }
-                const artwork = await response.json();
+                const post = await response.json();
                 
                 container.innerHTML = ''; 
-                const artworkCard = createSingleArtworkCard(artwork);
-                container.appendChild(artworkCard);
+                const blogCard = createSingleBlogCard(post);
+                container.appendChild(blogCard);
 
             } catch (err) {
                 console.error(err);
@@ -96,7 +102,7 @@
         });
         
         // Like/Share button logic
-        document.getElementById('single-artwork-container').addEventListener('click', async (e) => {
+        document.getElementById('single-blog-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {
                 // (Share logic...)
@@ -104,13 +110,13 @@
             
             const likeButton = e.target.closest('.like-button');
             if (likeButton) {
-                const artId = likeButton.dataset.id;
-                const key = 'liked_art_' + artId;
+                const postId = likeButton.dataset.id;
+                const key = 'liked_blog_' + postId;
                 if (localStorage.getItem(key)) { return; }
                 
                 likeButton.disabled = true;
                 try {
-                    const response = await fetch(`/api/artwork/like/${artId}`, { method: 'POST' });
+                    const response = await fetch(`/api/blog/like/${postId}`, { method: 'POST' });
                     const data = await response.json();
                     if (data.success) {
                         likeButton.querySelector('.like-count').textContent = data.likes;
