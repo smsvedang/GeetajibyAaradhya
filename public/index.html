@@ -370,17 +370,22 @@
             }
         }
         
-        // --- FUNCTION 8: Load Approved Testimonials ---
+        // --- FUNCTION 8: Load Approved Testimonials (UPDATED for Grid) ---
         async function loadTestimonials() {
             const container = document.getElementById('testimonials-list-container');
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
                 const testimonials = await response.json();
+                
                 if (testimonials.length === 0) {
                     container.innerHTML = '<p>No testimonials added yet.</p>';
                     return;
                 }
+                
+                // [NAYA] Grid layout ke liye class add karein
+                container.classList.add('testimonial-grid');
+
                 testimonials.forEach(testimonial => {
                     const item = document.createElement('div');
                     item.className = 'testimonial-item';

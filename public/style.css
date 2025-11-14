@@ -182,8 +182,17 @@ button.cancel-button { background-color: #6c757d; }
 /* --- Blog & Testimonial Styling --- */
 /* (Aapka puraana code... no change) */
 .blog-container h2, 
-.testimonials-container h2 { text-align: center; font-size: 2em; color: #D84315; margin-bottom: 25px; margin-top: 0; border-bottom: 2px solid #FF9800; padding-bottom: 10px; }
-.blog-post-item { background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+.testimonials-container h2 {
+     text-align: center;
+     font-size: 2em;
+    color: #D84315; 
+    margin-bottom: 25px; 
+    margin-top: 0; 
+    border-bottom: 2px solid #FF9800; 
+    padding-bottom: 10px;
+ }
+
+ .blog-post-item { background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 .blog-post-item h3 { font-size: 1.6em; color: #333; margin-top: 0; margin-bottom: 5px; }
 .blog-post-item .blog-date { font-size: 0.9em; color: #777; margin-bottom: 15px; font-style: italic; }
 .blog-post-item .blog-content {
@@ -693,4 +702,17 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 }
 .read-more-link:hover {
     text-decoration: underline;
+}
+
+/* --- NAYA: Testimonial Grid Layout --- */
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Testimonial item ko grid ke liye adjust karein */
+.testimonial-item {
+    /* Neeche ka margin hata dein kyunki 'gap' ab spacing karega */
+    margin-bottom: 0; 
 }
