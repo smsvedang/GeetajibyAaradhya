@@ -600,6 +600,38 @@
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
+        function switchTabFromHash() {
+                const hash = window.location.hash; // Jaise "#tab-testimonials"
+                if (!hash) return; // Agar hash nahi hai, toh default (Shlokas) dikhega
+
+                // Hash se 'tab-testimonials' hissa nikalo
+                const tabId = hash.substring(1); 
+                
+                // Check karo ki yeh ek valid MAIN tab ID hai ya nahi
+                // (Yeh shloka-1-1 jaise ID ko ignore kar dega)
+                const validTabIds = ['tab-shlokas', 'tab-about', 'tab-gallery', 'tab-blog', 'tab-testimonials'];
+                
+                if (validTabIds.includes(tabId)) {
+                    
+                    // 1. Saare active class hatao (default 'shlokas' wale)
+                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 2. Sahi button ko active karo
+                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabId}"]`);
+                    if (buttonToActivate) {
+                        buttonToActivate.classList.add('active');
+                    }
+                    
+                    // 3. Sahi content (div) ko active karo
+                    const contentToActivate = document.getElementById(tabId);
+                    if (contentToActivate) {
+                        contentToActivate.classList.add('active');
+                    }
+                }
+            }
+            // Page load hote hi is function ko chalao
+            switchTabFromHash();
             const tabButtons = document.querySelectorAll('.main-tab-button');
             const tabContents = document.querySelectorAll('.main-tab-content');
             const menuToggle = document.getElementById('menu-toggle-button');
