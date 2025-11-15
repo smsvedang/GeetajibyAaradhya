@@ -559,33 +559,56 @@
             }
         }
         
-        // --- FUNCTION 9: Deep Link Handler (Folding Fix) ---
+       // --- FUNCTION 9: Deep Link Handler (TABS + FOLDING FIX) ---
         function handleDeepLink() {
-            const hash = window.location.hash;
-            if (hash) {
-                try {
-                    const targetElement = document.getElementById(hash.substring(1));
-                    if (targetElement) {
-                        
-                        let tabToOpen = 'tab-shlokas'; // Default
-                        
-                        // Check karo ki element kis tab mein hai
-                        if (targetElement.closest('.main-tab-content').id === 'tab-blog') {
-                            tabToOpen = 'tab-blog';
-                        }
-                        
+            const hash = window.location.hash; // Jaise "#tab-testimonials" YA "#shloka-1-1"
+            if (!hash) return; // Agar hash nahi hai toh kuch mat karo
+
+            try {
+                const targetId = hash.substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (!targetElement) return; // Agar ID se kuch nahi mila toh chhod do
+
+                let tabToOpenId = '';
+                
+                // CASE 1: Link seedha TAB ka hai (jaise #tab-testimonials)
+                if (targetElement.classList.contains('main-tab-content')) {
+                    tabToOpenId = targetId;
+                } 
+                // CASE 2: Link tab ke ANDAR kisi cheez ka hai (jaise #shloka-1-1)
+                else if (targetElement.closest('.main-tab-content')) {
+                    tabToOpenId = targetElement.closest('.main-tab-content').id;
+                }
+
+                // Agar hamein ek valid tab ID mil gayi hai
+                if (tabToOpenId) {
+                    
+                    // 1. Saare active class hatao
+                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 2. Sahi button ko active karo
+                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabToOpenId}"]`);
+                    if (buttonToActivate) {
+                        buttonToActivate.classList.add('active');
+                    }
+                    
+                    // 3. Sahi content (div) ko active karo
+                    const contentToActivate = document.getElementById(tabToOpenId);
+                    if (contentToActivate) {
+                        contentToActivate.classList.add('active');
+                    }
+
+                    // 4. Agar link tab ke andar ka tha (CASE 2), toh wahan tak scroll karo
+                    if (!targetElement.classList.contains('main-tab-content')) {
                         // Parent <details> (adhyay) ko dhoondo
                         const parentDetails = targetElement.closest('details.adhyay-group');
                         if (parentDetails) {
                             parentDetails.open = true; 
                         }
                         
-                        // Sahi tab ko switch karo
-                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                        document.querySelector(`.main-tab-button[data-tab="${tabToOpen}"]`).classList.add('active');
-                        document.getElementById(tabToOpen).classList.add('active');
-                        
+                        // Element tak scroll karo
                         setTimeout(() => { 
                             targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             targetElement.classList.add('highlight');
@@ -594,9 +617,10 @@
                             }, 2500); 
                         }, 100); 
                     }
-                } catch (e) { console.error("Error handling deep link:", e); }
-            }
+                }
+            } catch (e) { console.error("Error handling deep link:", e); }
         }
+
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
