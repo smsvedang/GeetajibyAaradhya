@@ -491,30 +491,36 @@
                 menuToggle.classList.toggle('active');
             });
 
-            // --- [FIX 2] INSTANT TAB SWITCH (Yeh click karne par kaam karega) ---
-            tabButtons.forEach(tab => {
-                if(tab.tagName === 'BUTTON') { 
-                    // Sirf <button> tags par yeh logic lagao
-                    tab.addEventListener('click', () => {
-                        
-                        // 1. Sabko inactive karo
-                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                        tabContents.forEach(c => c.classList.remove('active'));
-                        
-                        // 2. Click wale ko active karo
-                        tab.classList.add('active');
-                        document.getElementById(tab.dataset.tab).classList.add('active');
-                        
-                        // 3. Mobile menu band karo
-                        if (window.innerWidth <= 768) {
-                            menuLinks.classList.remove('active');
-                            menuToggle.classList.remove('active');
-                        }
-                    });
-                }
-                // Note: <a> tags (Testimonials, JapCounter) ko yeh code ignore kar dega
-            });
-            // --- [FIX 2 END] ---
+            // --- [NAYA FIX] INSTANT TAB SWITCH + HASH UPDATE ---
+       tabButtons.forEach(tab => {
+        if(tab.tagName === 'BUTTON') { 
+        // Sirf <button> tags par yeh logic lagao
+        tab.addEventListener('click', () => {
+
+            const tabId = tab.dataset.tab; // Jaise "tab-about"
+
+            // 1. Sabko inactive karo
+            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+
+            // 2. Click wale ko active karo
+            tab.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            // 3. [ASLI FIX] URL ka HASH update karo (bina reload kiye)
+            // Yeh URL ko "...index.html#tab-about" kar dega
+            history.pushState(null, null, '#' + tabId); 
+
+            // 4. Mobile menu band karo
+            if (window.innerWidth <= 768) {
+                menuLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+    }
+    // Note: A tags (Testimonials, JapCounter) ko yeh code ignore kar dega
+});
+// --- [NAYA FIX END] ---
             
 
             loadGroupedShlokas(); 
