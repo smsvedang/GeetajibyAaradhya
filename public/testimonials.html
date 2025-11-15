@@ -12,10 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="manifest" href="/site.webmanifest">
+    <title>Testimonials | Warrior Aaradhya</title>
     <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
     <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 2, LearnGeeta, Artwork Gallery, Gita Recitation">
     <script type="application/ld+json">
@@ -29,19 +26,20 @@
     </script>
     <link rel="stylesheet" href="style.css">
 
-    <!-- [STEP 1] SWIPER SLIDER KI CSS FILE -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     
-    <!-- [STEP 2] NAYE TESTIMONIAL SLIDER KA STYLE -->
     <style>
+        /* (Testimonial slider wala CSS code yahaan hai) */
         .testimonialSwiper {
           width: 100%;
           max-width: 800px; 
           margin: 0 auto;
-          height: 500px; /* Thodi height badha di */
+          height: 420px;
           padding-bottom: 50px; 
         }
-
         .testimonialSwiper .swiper-slide {
           background: none;
           display: flex;
@@ -49,7 +47,6 @@
           align-items: center;
           padding: 10px;
         }
-
         .testimonial-card-new {
           background: #ffffff;
           border-radius: 12px;
@@ -57,28 +54,26 @@
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
           padding: 30px;
           padding-top: 40px;
-          height: 500px; /* Card ki height */
+          height: 340px; 
           width: 100%;
           display: flex;
           flex-direction: column;
-          justify-content: center; /* Vertically center */
+          justify-content: center;
           position: relative;
           text-align: center;
           box-sizing: border-box;
         }
-
         .testimonial-card-new .quote-icon {
           position: absolute;
           top: -10px;
           left: 50%;
           transform: translateX(-50%);
           font-size: 80px;
-          color: #D84315; /* Aapke logo ka color */
+          color: #D84315;
           line-height: 1;
           opacity: 0.15;
           font-family: Georgia, serif;
         }
-
         .testimonial-card-new .quote-text {
           font-size: 1.1rem;
           font-style: italic;
@@ -88,26 +83,22 @@
           z-index: 2;
           flex-grow: 1; 
           display: flex;
-          align-items: flex-start;  /* <<-- YEH HAI PROBLEM */
+          align-items: flex-start; /* FIX: Text ko upar se start karein */
           justify-content: center;
           overflow-y: auto; 
           padding-right: 5px;
         }
-
         .testimonial-card-new .author-details {
           margin-top: 20px;
           z-index: 2;
           flex-shrink: 0;
         }
-
         .testimonial-card-new .author-name {
           font-weight: 700;
           font-size: 1rem;
-          color: #D84315; /* Logo color */
+          color: #D84315;
           display: block;
         }
-
-        /* Swiper Arrows & Dots */
         .testimonialSwiper .swiper-button-next,
         .testimonialSwiper .swiper-button-prev {
           color: #D84315;
@@ -133,11 +124,13 @@
             </button>
             
             <div class="menu-links" id="menu-links-container">
-                <button class="main-tab-button active" data-tab="tab-shlokas">Home (Shlokas)</button>
+                <button class="main-tab-button" data-tab="tab-shlokas">Home (Shlokas)</button>
                 <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
                 <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
                 <button class="main-tab-button" data-tab="tab-blog">Blog</button>
-                <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
+                
+                <button class="main-tab-button active" data-tab="tab-testimonials">Testimonials</button>
+                
                 <a href="japcounter.html" class="main-tab-button">Jap Counter</a>
             </div>
         </div>
@@ -146,7 +139,7 @@
     <div class="container">
         <div class="main-tab-panels">
 
-            <div id="tab-shlokas" class="main-tab-content active">
+            <div id="tab-shlokas" class="main-tab-content">
                 
                 <header class="shloka-welcome-hero">
                     <h1>Shrimad Bhagavad Gita</h1>
@@ -192,7 +185,7 @@
                 </section>
             </div>
 
-            <div id="tab-testimonials" class="main-tab-content">
+            <div id="tab-testimonials" class="main-tab-content active">
                 <section class="testimonials-container">
                     <h2>Testimonials</h2>
                     <div class="add-testimonial-toggle">
@@ -210,7 +203,6 @@
                         <p id="testimonial-thanks" style="display:none; text-align:center; color: green; font-weight: bold;">Thank you! Your testimonial has been submitted.</p>
                     </div>
                     <hr class="section-divider">
-                    <!-- NAYA SLIDER YAHAN LOAD HOGA -->
                     <div id="testimonials-list-container">
                         <p>Loading testimonials...</p>
                     </div>
@@ -235,7 +227,7 @@
             return videoWrapper;
         }
         
-        // --- FUNCTION 2: Create Shloka Item (Reverted to ID link) ---
+        // --- FUNCTION 2: Create Shloka Item ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item-card';
@@ -244,7 +236,6 @@
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             
-            // Share link ab 'id' use karega
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
@@ -332,14 +323,14 @@
                     adhyayGroup.appendChild(shlokaGrid);
                     container.appendChild(adhyayGroup);
                 }
-                handleDeepLink(); 
+                handleDeepLink(); // Yeh ab bhi shloka links ke liye kaam karega
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
             }
         }
 
-        // --- FUNCTION 5: Load Artwork Gallery (UPDATED) ---
+        // --- FUNCTION 5: Load Artwork Gallery ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
@@ -359,7 +350,6 @@
                     
                     const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
                     
-                    // [NAYA FIX] Share link ab 'artwork.html?id=...' use karega
                     const shareUrl = `${window.location.origin}/artwork.html?id=${artwork._id}`;
                     const shareTitle = artwork.title + " - by Warrior Aaradhya";
                     
@@ -393,7 +383,7 @@
             }
         }
 
-        // --- FUNCTION 6: Carousel logic (AUTOPLAY ADDED) ---
+        // --- FUNCTION 6: Carousel logic (Autoplay) ---
         function setupCarouselListeners(totalSlides) {
             let currentSlide = 0;
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
@@ -401,7 +391,7 @@
             const nextButton = document.getElementById('carousel-next');
             const counterText = document.getElementById('slide-counter-text');
             
-            if (!prevButton || !nextButton || !counterText || slides.length === 0) return; // Guard clause
+            if (!prevButton || !nextButton || !counterText || slides.length === 0) return;
             
             function showSlide(index) {
                 if (index >= totalSlides) { currentSlide = 0; }
@@ -418,13 +408,12 @@
             prevButton.addEventListener('click', () => { showSlide(currentSlide - 1); });
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
             
-            // [NAYA] AUTOPLAY FOR ARTWORK GALLERY
             setInterval(() => {
                 showSlide(currentSlide + 1);
-            }, 5000); // Har 5 second mein slide change
+            }, 5000); 
         }
         
-        // --- FUNCTION 7: Load Blog posts (UPDATED for Grid/Excerpt) ---
+        // --- FUNCTION 7: Load Blog posts ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
@@ -437,22 +426,18 @@
                     return;
                 }
                 
-                // [NAYA] Grid layout ke liye class add karein
                 container.classList.add('blog-grid');
 
                 posts.forEach(post => {
                     const item = document.createElement('article');
-                    item.className = 'blog-post-item'; // Wahi style reuse hoga
+                    item.className = 'blog-post-item'; 
                     item.id = `blog-${post._id}`; 
                     
                     const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'long', year: 'numeric'
                     });
                     
-                    // [NAYA] Post ka chhota preview (excerpt) banayein
-                    const excerpt = post.content.substring(0, 100) + "..."; // Pehle 100 characters
-                    
-                    // [NAYA] Permalink (poora post padhne ka link)
+                    const excerpt = post.content.substring(0, 100) + "...";
                     const permalink = `blog.html?id=${post._id}`;
 
                     item.innerHTML = `
@@ -462,9 +447,6 @@
                             ${excerpt} </div>
                         <a href="${permalink}" class="read-more-link">Read More...</a>
                     `;
-                    // Like/Share buttons yahaan se hata diye gaye hain (taaki list saaf dikhe)
-                    // Woh buttons ab 'blog.html' page par hain
-                    
                     container.appendChild(item);
                 });
             } catch (err) {
@@ -473,10 +455,10 @@
             }
         }
         
-        // --- [STEP 3] FUNCTION 8: (SWIPER SLIDER MEIN BADAL DIYA GAYA) ---
+        // --- FUNCTION 8: Load Testimonials (Swiper Slider) ---
         async function loadTestimonials() {
             const container = document.getElementById('testimonials-list-container');
-            container.innerHTML = '<p>Loading testimonials...</p>'; // Loading message
+            container.innerHTML = '<p>Loading testimonials...</p>';
             try {
                 const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
                 const testimonials = await response.json();
@@ -486,21 +468,17 @@
                     return;
                 }
                 
-                container.innerHTML = ''; // Loading message clear karein
+                container.innerHTML = ''; 
 
-                // 1. Swiper ka main structure banayein
                 const swiperContainer = document.createElement('div');
                 swiperContainer.className = 'swiper testimonialSwiper';
-
                 const swiperWrapper = document.createElement('div');
                 swiperWrapper.className = 'swiper-wrapper';
 
-                // 2. Loop karein aur har testimonial ke liye slide banayein
                 testimonials.forEach(testimonial => {
                     const slide = document.createElement('div');
                     slide.className = 'swiper-slide';
                     
-                    // Naya card design
                     slide.innerHTML = `
                     <div class="testimonial-card-new">
                       <span class="quote-icon">“</span>
@@ -515,38 +493,28 @@
                     swiperWrapper.appendChild(slide);
                 });
 
-                // 3. Wrapper ko main container mein daalein
                 swiperContainer.appendChild(swiperWrapper);
                 
-                // 4. Navigation (Arrows) aur Pagination (Dots) add karein
                 swiperContainer.innerHTML += `
                     <div class="swiper-button-next"></div>
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-pagination"></div>
                 `;
                 
-                // 5. Poora slider container mein dikhayein
                 container.appendChild(swiperContainer);
 
-                // 6. Swiper ko CHALU (Initialize) karein
-                // YEH SABSE ZAROORI HAI: new Swiper() ko data load hone ke BAAD call karna
                 new Swiper(".testimonialSwiper", {
                     slidesPerView: 1,
                     spaceBetween: 30,
-                    loop: true, // Taaki end ke baad wapas start ho
-                    
+                    loop: true, 
                     autoplay: {
-                       delay: 5000, // Har 5 second mein slide
+                       delay: 5000,
                        disableOnInteraction: false,
                     },
-
-                    // Arrows
                     navigation: {
                         nextEl: ".swiper-button-next",
                         prevEl: ".swiper-button-prev",
                     },
-                    
-                    // Dots
                     pagination: {
                         el: ".swiper-pagination",
                         clickable: true,
@@ -559,56 +527,37 @@
             }
         }
         
-       // --- FUNCTION 9: Deep Link Handler (TABS + FOLDING FIX) ---
+        // --- FUNCTION 9: Deep Link Handler (Fixed) ---
+        // (Yeh function ab bhi shloka/blog links ke liye zaroori hai)
         function handleDeepLink() {
-            const hash = window.location.hash; // Jaise "#tab-testimonials" YA "#shloka-1-1"
-            if (!hash) return; // Agar hash nahi hai toh kuch mat karo
+            const hash = window.location.hash;
+            if (!hash) return; 
 
             try {
                 const targetId = hash.substring(1);
                 const targetElement = document.getElementById(targetId);
 
-                if (!targetElement) return; // Agar ID se kuch nahi mila toh chhod do
+                if (!targetElement) return;
 
                 let tabToOpenId = '';
                 
-                // CASE 1: Link seedha TAB ka hai (jaise #tab-testimonials)
                 if (targetElement.classList.contains('main-tab-content')) {
                     tabToOpenId = targetId;
                 } 
-                // CASE 2: Link tab ke ANDAR kisi cheez ka hai (jaise #shloka-1-1)
                 else if (targetElement.closest('.main-tab-content')) {
                     tabToOpenId = targetElement.closest('.main-tab-content').id;
                 }
 
-                // Agar hamein ek valid tab ID mil gayi hai
                 if (tabToOpenId) {
+                    // Is page par tab switch karne ki zaroorat nahi,
+                    // lekin agar link shloka ka hai toh scroll karna zaroori hai
                     
-                    // 1. Saare active class hatao
-                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // 2. Sahi button ko active karo
-                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabToOpenId}"]`);
-                    if (buttonToActivate) {
-                        buttonToActivate.classList.add('active');
-                    }
-                    
-                    // 3. Sahi content (div) ko active karo
-                    const contentToActivate = document.getElementById(tabToOpenId);
-                    if (contentToActivate) {
-                        contentToActivate.classList.add('active');
-                    }
-
-                    // 4. Agar link tab ke andar ka tha (CASE 2), toh wahan tak scroll karo
                     if (!targetElement.classList.contains('main-tab-content')) {
-                        // Parent <details> (adhyay) ko dhoondo
                         const parentDetails = targetElement.closest('details.adhyay-group');
                         if (parentDetails) {
                             parentDetails.open = true; 
                         }
                         
-                        // Element tak scroll karo
                         setTimeout(() => { 
                             targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             targetElement.classList.add('highlight');
@@ -620,42 +569,9 @@
                 }
             } catch (e) { console.error("Error handling deep link:", e); }
         }
-
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
-        function switchTabFromHash() {
-                const hash = window.location.hash; // Jaise "#tab-testimonials"
-                if (!hash) return; // Agar hash nahi hai, toh default (Shlokas) dikhega
-
-                // Hash se 'tab-testimonials' hissa nikalo
-                const tabId = hash.substring(1); 
-                
-                // Check karo ki yeh ek valid MAIN tab ID hai ya nahi
-                // (Yeh shloka-1-1 jaise ID ko ignore kar dega)
-                const validTabIds = ['tab-shlokas', 'tab-about', 'tab-gallery', 'tab-blog', 'tab-testimonials'];
-                
-                if (validTabIds.includes(tabId)) {
-                    
-                    // 1. Saare active class hatao (default 'shlokas' wale)
-                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // 2. Sahi button ko active karo
-                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabId}"]`);
-                    if (buttonToActivate) {
-                        buttonToActivate.classList.add('active');
-                    }
-                    
-                    // 3. Sahi content (div) ko active karo
-                    const contentToActivate = document.getElementById(tabId);
-                    if (contentToActivate) {
-                        contentToActivate.classList.add('active');
-                    }
-                }
-            }
-            // Page load hote hi is function ko chalao
-            switchTabFromHash();
             const tabButtons = document.querySelectorAll('.main-tab-button');
             const tabContents = document.querySelectorAll('.main-tab-content');
             const menuToggle = document.getElementById('menu-toggle-button');
@@ -666,24 +582,25 @@
                 menuToggle.classList.toggle('active');
             });
 
-           // TAB SWITCHING LOGIC (Ab link par kaam karega)
+            // TAB SWITCHING LOGIC (Ab link par kaam karega)
             tabButtons.forEach(tab => {
                 if(tab.tagName === 'BUTTON') {
                     // Agar koi button click karta hai
                     tab.addEventListener('click', () => {
-                        // Toh use index.html par bhej do uss hash ke saath
+                        // Toh use index.html par bhej do
                         const tabId = tab.dataset.tab;
                         window.location.href = `index.html#${tabId}`;
                     });
                 }
             });
-            
 
+            // Is page par zaroori content load karein
+            // (Hum sabkuch load kar rahe hain taaki JS error na aaye)
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery();
             loadBlogPosts();
-            loadTestimonials(); // YEH NAYA SLIDER LOAD KAREGA
+            loadTestimonials(); // Yeh sabse zaroori hai
 
             // Public Testimonial Form Handler
             const addButton = document.getElementById('add-yours-button');
@@ -712,7 +629,7 @@
                 } catch (err) { alert('Error connecting to server.'); }
             });
 
-            // --- NAYA: Universal Share Button Logic ---
+            // --- Universal Share Button Logic ---
             async function handleShareClick(button) {
                 const urlToShare = button.dataset.url;
                 const title = button.dataset.title;
@@ -726,10 +643,10 @@
                 }
             }
 
-            // --- NAYA: Universal Like Button Logic ---
+            // --- Universal Like Button Logic ---
             async function handleLikeClick(button) {
                 const id = button.dataset.id;
-                const type = button.dataset.type; // 'shloka', 'blog', or 'artwork'
+                const type = button.dataset.type;
                 const key = `liked_${type}_${id}`;
                 
                 if (localStorage.getItem(key)) { return; }
@@ -749,17 +666,15 @@
                 }
             }
             
-            // --- NAYA: Event Listeners for all content tabs ---
+            // --- Event Listeners for all content tabs ---
             const mainPanels = document.querySelector('.main-tab-panels');
             mainPanels.addEventListener('click', async (e) => {
                 
-                // Share Button
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
                     handleShareClick(shareButton);
                 }
                 
-                // Like Button
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
                     handleLikeClick(likeButton);
@@ -769,23 +684,10 @@
         });
     </script>
     
-    <!-- [STEP 4] SWIPER SLIDER KI JAVASCRIPT FILE (SABSE AAKHIR MEIN) -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <script>
-  // Service Worker (PWA) ko register karein
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('Service Worker रजिस्टर हो गया:', registration);
-        })
-        .catch(error => {
-          console.log('Service Worker रजिस्ट्रेशन फ़ेल हो गया:', error);
-        });
-    });
-  }
-</script>
-<script>
+      // Service Worker (PWA) ko register karein
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
@@ -797,14 +699,13 @@
             });
         });
       }
-    </script>
-
-    <script>
+      
+      // Mobile install prompt ko roko
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Browser ko automatic prompt dikhane se roko
         console.log('Install prompt roka gaya');
         e.preventDefault();
       });
     </script>
+    
 </body>
 </html>
