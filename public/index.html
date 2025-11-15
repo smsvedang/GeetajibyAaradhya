@@ -137,7 +137,7 @@
                 <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
                 <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
                 <button class="main-tab-button" data-tab="tab-blog">Blog</button>
-                <button class="main-tab-button" data-tab="tab-testimonials">Testimonials</button>
+                <a href="testimonials.html" class="main-tab-button">Testimonials</a>
                 <a href="japcounter.html" class="main-tab-button">Jap Counter</a>
             </div>
         </div>
@@ -559,67 +559,67 @@
             }
         }
         
-       // --- FUNCTION 9: Deep Link Handler (TABS + FOLDING FIX) ---
-        function handleDeepLink() {
-            const hash = window.location.hash; // Jaise "#tab-testimonials" YA "#shloka-1-1"
-            if (!hash) return; // Agar hash nahi hai toh kuch mat karo
+      // --- FUNCTION 9: Deep Link Handler (TABS + FOLDING FIX) ---
+function handleDeepLink() {
+    const hash = window.location.hash; // Jaise "#tab-testimonials" YA "#shloka-1-1"
+    if (!hash) return; // Agar hash nahi hai toh kuch mat karo
 
-            try {
-                const targetId = hash.substring(1);
-                const targetElement = document.getElementById(targetId);
+    try {
+        const targetId = hash.substring(1);
+        const targetElement = document.getElementById(targetId);
 
-                if (!targetElement) return; // Agar ID se kuch nahi mila toh chhod do
+        if (!targetElement) return; // Agar ID se kuch nahi mila toh chhod do
 
-                let tabToOpenId = '';
-                
-                // CASE 1: Link seedha TAB ka hai (jaise #tab-testimonials)
-                if (targetElement.classList.contains('main-tab-content')) {
-                    tabToOpenId = targetId;
-                } 
-                // CASE 2: Link tab ke ANDAR kisi cheez ka hai (jaise #shloka-1-1)
-                else if (targetElement.closest('.main-tab-content')) {
-                    tabToOpenId = targetElement.closest('.main-tab-content').id;
-                }
+        let tabToOpenId = '';
 
-                // Agar hamein ek valid tab ID mil gayi hai
-                if (tabToOpenId) {
-                    
-                    // 1. Saare active class hatao
-                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // 2. Sahi button ko active karo
-                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabToOpenId}"]`);
-                    if (buttonToActivate) {
-                        buttonToActivate.classList.add('active');
-                    }
-                    
-                    // 3. Sahi content (div) ko active karo
-                    const contentToActivate = document.getElementById(tabToOpenId);
-                    if (contentToActivate) {
-                        contentToActivate.classList.add('active');
-                    }
-
-                    // 4. Agar link tab ke andar ka tha (CASE 2), toh wahan tak scroll karo
-                    if (!targetElement.classList.contains('main-tab-content')) {
-                        // Parent <details> (adhyay) ko dhoondo
-                        const parentDetails = targetElement.closest('details.adhyay-group');
-                        if (parentDetails) {
-                            parentDetails.open = true; 
-                        }
-                        
-                        // Element tak scroll karo
-                        setTimeout(() => { 
-                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            targetElement.classList.add('highlight');
-                            setTimeout(() => {
-                                targetElement.classList.remove('highlight');
-                            }, 2500); 
-                        }, 100); 
-                    }
-                }
-            } catch (e) { console.error("Error handling deep link:", e); }
+        // CASE 1: Link seedha TAB ka hai (jaise #tab-testimonials)
+        if (targetElement.classList.contains('main-tab-content')) {
+            tabToOpenId = targetId;
+        } 
+        // CASE 2: Link tab ke ANDAR kisi cheez ka hai (jaise #shloka-1-1)
+        else if (targetElement.closest('.main-tab-content')) {
+            tabToOpenId = targetElement.closest('.main-tab-content').id;
         }
+
+        // Agar hamein ek valid tab ID mil gayi hai
+        if (tabToOpenId) {
+
+            // 1. Saare active class hatao
+            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+
+            // 2. Sahi button ko active karo
+            const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabToOpenId}"]`);
+            if (buttonToActivate) {
+                buttonToActivate.classList.add('active');
+            }
+
+            // 3. Sahi content (div) ko active karo
+            const contentToActivate = document.getElementById(tabToOpenId);
+            if (contentToActivate) {
+                contentToActivate.classList.add('active');
+            }
+
+            // 4. Agar link tab ke andar ka tha (CASE 2), toh wahan tak scroll karo
+            if (!targetElement.classList.contains('main-tab-content')) {
+                // Parent <details> (adhyay) ko dhoondo
+                const parentDetails = targetElement.closest('details.adhyay-group');
+                if (parentDetails) {
+                    parentDetails.open = true; 
+                }
+
+                // Element tak scroll karo
+                setTimeout(() => { 
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetElement.classList.add('highlight');
+                    setTimeout(() => {
+                        targetElement.classList.remove('highlight');
+                    }, 2500); 
+                }, 100); 
+            }
+        }
+    } catch (e) { console.error("Error handling deep link:", e); }
+}
 
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
