@@ -207,17 +207,16 @@
         <p>&copy; 2025 - All Rights Reserved.</p>
     </footer>
 
-    <script>
+   <script>
         
-        // --- FUNCTION 1: Create Video ---
+        // --- FUNCTION 1-7 (Inme koi change nahi) ---
+        
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
             videoWrapper.className = 'video-wrapper';
             videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${video_id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             return videoWrapper;
         }
-        
-        // --- FUNCTION 2: Create Shloka Item (Reverted to ID link) ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item-card';
@@ -225,12 +224,9 @@
             item.id = shlokaId;
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
-            
-            // Share link ab 'id' use karega
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-
             item.innerHTML = `
                 <div class="card-video-container">
                     ${createVideo(shloka.video_id).innerHTML}
@@ -249,12 +245,9 @@
                             🔗 Share
                         </button>
                     </div>
-                </div>
-            `;
+                </div>`;
             return item;
         }
-        
-        // --- FUNCTION 3: Load About Section ---
         async function loadAboutSection() {
             const aboutContainer = document.getElementById('about-text-content');
             const aboutImage = document.getElementById('about-image-src');
@@ -275,8 +268,6 @@
                 aboutContainer.innerHTML = '<p>Could not load details.</p>';
             }
         }
-        
-        // --- FUNCTION 4: Load Shlokas (Folding Grid) ---
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
             container.innerHTML = ''; 
@@ -314,14 +305,11 @@
                     adhyayGroup.appendChild(shlokaGrid);
                     container.appendChild(adhyayGroup);
                 }
-                // Deep link function hata diya gaya hai
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
             }
         }
-
-        // --- FUNCTION 5: Load Artwork Gallery (UPDATED) ---
         async function loadArtworkGallery() {
             const container = document.getElementById('gallery-carousel-container'); 
             if (!container) return; 
@@ -333,17 +321,13 @@
                     return;
                 }
                 container.innerHTML = ''; 
-                
                 artworks.forEach((artwork, index) => {
                     const item = document.createElement('div');
                     item.className = 'carousel-item';
                     if (index === 0) item.classList.add('active'); 
-                    
                     const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
-                    
                     const shareUrl = `${window.location.origin}/artwork.html?id=${artwork._id}`;
                     const shareTitle = artwork.title + " - by Warrior Aaradhya";
-                    
                     item.innerHTML = `
                         <img src="${artwork.imageUrl}" alt="${artwork.title}">
                         <div class="artwork-actions">
@@ -356,91 +340,67 @@
                                     data-text="Check out this artwork by Warrior Aaradhya:">
                                 🔗 Share
                             </button>
-                        </div>
-                    `;
+                        </div>`;
                     container.appendChild(item);
                 });
-                
                 container.innerHTML += `
                     <button class="carousel-button prev" id="carousel-prev">&#10094;</button>
                     <button class="carousel-button next" id="carousel-next">&#10095;</button>
-                    <div class="slide-counter" id="slide-counter-text"></div>
-                `;
-                
+                    <div class="slide-counter" id="slide-counter-text"></div>`;
                 setupCarouselListeners(artworks.length);
             } catch (err) {
                 console.error("Error loading artwork:", err);
                 container.innerHTML = '<p>Could not load gallery.</p>';
             }
         }
-
-        // --- FUNCTION 6: Carousel logic (AUTOPLAY ADDED) ---
         function setupCarouselListeners(totalSlides) {
             let currentSlide = 0;
             const slides = document.querySelectorAll('#gallery-carousel-container .carousel-item');
             const prevButton = document.getElementById('carousel-prev');
             const nextButton = document.getElementById('carousel-next');
             const counterText = document.getElementById('slide-counter-text');
-            
-            if (!prevButton || !nextButton || !counterText || slides.length === 0) return; // Guard clause
-            
+            if (!prevButton || !nextButton || !counterText || slides.length === 0) return;
             function showSlide(index) {
                 if (index >= totalSlides) { currentSlide = 0; }
                 else if (index < 0) { currentSlide = totalSlides - 1; }
                 else { currentSlide = index; }
-                
                 slides.forEach(slide => { slide.classList.remove('active'); });
                 slides[currentSlide].classList.add('active');
                 counterText.textContent = `${currentSlide + 1} / ${totalSlides}`;
             }
-            
             showSlide(0);
-            
             prevButton.addEventListener('click', () => { showSlide(currentSlide - 1); });
             nextButton.addEventListener('click', () => { showSlide(currentSlide + 1); });
-            
-            // [NAYA] AUTOPLAY FOR ARTWORK GALLERY
             setInterval(() => {
                 showSlide(currentSlide + 1);
-            }, 5000); // Har 5 second mein slide change
+            }, 5000);
         }
-        
-        // --- FUNCTION 7: Load Blog posts (UPDATED for Grid/Excerpt) ---
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
                 const posts = await response.json();
-                
                 if (posts.length === 0) {
                     container.innerHTML = '<p>No blog posts added yet.</p>';
                     return;
                 }
-                
                 container.classList.add('blog-grid');
-
                 posts.forEach(post => {
                     const item = document.createElement('article');
-                    item.className = 'blog-post-item'; 
+                    item.className = 'blog-post-item';
                     item.id = `blog-${post._id}`; 
-                    
                     const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'long', year: 'numeric'
                     });
-                    
                     const excerpt = post.content.substring(0, 100) + "..."; 
-                    
                     const permalink = `blog.html?id=${post._id}`;
-
                     item.innerHTML = `
                         <h3>${post.title}</h3>
                         <p class="blog-date">${postDate}</p>
                         <div class="blog-content">
                             ${excerpt} </div>
-                        <a href="${permalink}" class="read-more-link">Read More...</a>
-                    `;
-                    
+                        <a href="${permalink}" class="read-more-link">Read More...</a>`;
                     container.appendChild(item);
                 });
             } catch (err) {
@@ -448,22 +408,78 @@
                 container.innerHTML = '<p>Could not load blog posts.</p>';
             }
         }
-        
-        // --- FUNCTION 8: Load Testimonials ---
-        // (Yeh function ab index.html par zaroori nahi hai, 
-        //  kyunki testimonial ab alag page par hain. 
-        //  Lekin hum ise error se bachne ke liye chhod rahe hain)
         async function loadTestimonials() {
              const container = document.getElementById('testimonials-list-container');
              if (container) {
-                container.innerHTML = '<p>Testimonials ke liye <a href="testimonials.html">yahaan click karein</a>.</p>';
+                // Yeh div ab 'testimonials.html' par hai
+                container.innerHTML = ''; 
              }
         }
+
+        // --- Like/Share Functions (Inme koi change nahi) ---
+        async function handleShareClick(button) {
+            const urlToShare = button.dataset.url;
+            const title = button.dataset.title;
+            const text = button.dataset.text;
+            if (navigator.share) {
+                try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
+                catch (err) { console.error('Share failed:', err); }
+            } else {
+                try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
+                catch (err) { alert('Failed to copy link.'); }
+            }
+        }
+        async function handleLikeClick(button) {
+            const id = button.dataset.id;
+            const type = button.dataset.type;
+            const key = `liked_${type}_${id}`;
+            if (localStorage.getItem(key)) { return; }
+            button.disabled = true;
+            try {
+                const response = await fetch(`/api/${type}/like/${id}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    button.querySelector('.like-count').textContent = data.likes;
+                    localStorage.setItem(key, 'true');
+                } else {
+                    button.disabled = false;
+                }
+            } catch (err) {
+                button.disabled = false;
+            }
+        }
+
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
             
-            // (switchTabFromHash function hata diya gaya hai)
+            // --- [FIX 1] HASH CHECKER (Yeh 'testimonials.html' se wapas aane par kaam karega) ---
+            function switchTabFromHash() {
+                const hash = window.location.hash; // Jaise "#tab-gallery"
+                if (!hash) return; 
+
+                const tabId = hash.substring(1); 
+                const validTabIds = ['tab-shlokas', 'tab-about', 'tab-gallery', 'tab-blog'];
+                
+                if (validTabIds.includes(tabId)) {
+                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabId}"]`);
+                    if (buttonToActivate) {
+                        buttonToActivate.classList.add('active');
+                    }
+                    
+                    const contentToActivate = document.getElementById(tabId);
+                    if (contentToActivate) {
+                        contentToActivate.classList.add('active');
+                    }
+                }
+            }
+            // Page load hote hi is function ko chalao
+            switchTabFromHash();
+            // --- [FIX 1 END] ---
+
             
             const tabButtons = document.querySelectorAll('.main-tab-button');
             const tabContents = document.querySelectorAll('.main-tab-content');
@@ -475,7 +491,7 @@
                 menuToggle.classList.toggle('active');
             });
 
-            // --- [FIXED] TAB SWITCHING LOGIC (Instant JS Switch) ---
+            // --- [FIX 2] INSTANT TAB SWITCH (Yeh click karne par kaam karega) ---
             tabButtons.forEach(tab => {
                 if(tab.tagName === 'BUTTON') { 
                     // Sirf <button> tags par yeh logic lagao
@@ -498,71 +514,23 @@
                 }
                 // Note: <a> tags (Testimonials, JapCounter) ko yeh code ignore kar dega
             });
-            // --- [FIX] YAHAN KHATM ---
+            // --- [FIX 2 END] ---
             
 
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery();
             loadBlogPosts();
-            loadTestimonials(); // Yeh ab sirf link dikhayega
+            loadTestimonials(); // Yeh ab kuch nahi karega
 
-            // Public Testimonial Form Handler (ab testimonials.html par hai)
-            // Hum is code ko yahaan se hata sakte hain ya chhod sakte hain
-            const addButton = document.getElementById('add-yours-button');
-            if (addButton) {
-                 // Yeh code ab testimonials.html par hai
-                 // Isse yahaan se hata dena behtar hai
-            }
-
-            // --- NAYA: Universal Share Button Logic ---
-            async function handleShareClick(button) {
-                const urlToShare = button.dataset.url;
-                const title = button.dataset.title;
-                const text = button.dataset.text;
-                if (navigator.share) {
-                    try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
-                    catch (err) { console.error('Share failed:', err); }
-                } else {
-                    try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
-                    catch (err) { alert('Failed to copy link.'); }
-                }
-            }
-
-            // --- NAYA: Universal Like Button Logic ---
-            async function handleLikeClick(button) {
-                const id = button.dataset.id;
-                const type = button.dataset.type; // 'shloka', 'blog', or 'artwork'
-                const key = `liked_${type}_${id}`;
-                
-                if (localStorage.getItem(key)) { return; }
-                
-                button.disabled = true;
-                try {
-                    const response = await fetch(`/api/${type}/like/${id}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        button.querySelector('.like-count').textContent = data.likes;
-                        localStorage.setItem(key, 'true');
-                    } else {
-                        button.disabled = false;
-                    }
-                } catch (err) {
-                    button.disabled = false;
-                }
-            }
             
-            // --- NAYA: Event Listeners for all content tabs ---
+            // --- Event Listeners (Inme koi change nahi) ---
             const mainPanels = document.querySelector('.main-tab-panels');
             mainPanels.addEventListener('click', async (e) => {
-                
-                // Share Button
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
                     handleShareClick(shareButton);
                 }
-                
-                // Like Button
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
                     handleLikeClick(likeButton);
