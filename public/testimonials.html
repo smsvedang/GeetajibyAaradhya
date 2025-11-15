@@ -587,9 +587,10 @@
                 if(tab.tagName === 'BUTTON') {
                     // Agar koi button click karta hai
                     tab.addEventListener('click', () => {
-                        // Toh use index.html par bhej do
-                        const tabId = tab.dataset.tab;
-                        window.location.href = `index.html#${tabId}`;
+                        // Toh use seedha index.html par bhej do
+                        window.location.href = 'index.html';
+                        
+                        // (Wahaan jaakar default 'Home' tab khul jaayega)
                     });
                 }
             });

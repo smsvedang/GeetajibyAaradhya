@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Aaradhya Soni | Inspiring Gita Shlokas & Artwork Gallery</title>
+    <title>Aaradhya Soni-The SMA Warrior</title>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="manifest" href="/site.webmanifest">
@@ -29,10 +29,8 @@
     </script>
     <link rel="stylesheet" href="style.css">
 
-    <!-- [STEP 1] SWIPER SLIDER KI CSS FILE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     
-    <!-- [STEP 2] NAYE TESTIMONIAL SLIDER KA STYLE -->
     <style>
         .testimonialSwiper {
           width: 100%;
@@ -88,7 +86,7 @@
           z-index: 2;
           flex-grow: 1; 
           display: flex;
-          align-items: flex-start;  /* <<-- YEH HAI PROBLEM */
+          align-items: flex-start;  /* Text ko upar se start karein */
           justify-content: center;
           overflow-y: auto; 
           padding-right: 5px;
@@ -195,24 +193,8 @@
             <div id="tab-testimonials" class="main-tab-content">
                 <section class="testimonials-container">
                     <h2>Testimonials</h2>
-                    <div class="add-testimonial-toggle">
-                        <button id="add-yours-button">Add Your Testimonial</button>
-                    </div>
-                    <div class="testimonial-submission-form" id="public-testimonial-form-container" style="display:none;">
-                        <h3>Share your thoughts!</h3>
-                        <p>Your testimonial will be visible after admin approval.</p>
-                        <form id="public-testimonial-form">
-                            <input type="text" id="public-author-name" placeholder="Your Name" required>
-                            <textarea id="public-author-quote" rows="4" placeholder="Your Message" required></textarea>
-                            <button type="submit" id="public-submit-button">Submit for Review</button>
-                            <button type="button" id="public-cancel-button" class="cancel-button">Cancel</button>
-                        </form>
-                        <p id="testimonial-thanks" style="display:none; text-align:center; color: green; font-weight: bold;">Thank you! Your testimonial has been submitted.</p>
-                    </div>
-                    <hr class="section-divider">
-                    <!-- NAYA SLIDER YAHAN LOAD HOGA -->
                     <div id="testimonials-list-container">
-                        <p>Loading testimonials...</p>
+                        <p>Testimonials load karne ke liye, lütfen <a href="testimonials.html">Testimonials page</a> par jaayein.</p>
                     </div>
                 </section>
             </div>
@@ -332,7 +314,7 @@
                     adhyayGroup.appendChild(shlokaGrid);
                     container.appendChild(adhyayGroup);
                 }
-                handleDeepLink(); 
+                // Deep link function hata diya gaya hai
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
@@ -359,7 +341,6 @@
                     
                     const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
                     
-                    // [NAYA FIX] Share link ab 'artwork.html?id=...' use karega
                     const shareUrl = `${window.location.origin}/artwork.html?id=${artwork._id}`;
                     const shareTitle = artwork.title + " - by Warrior Aaradhya";
                     
@@ -437,22 +418,19 @@
                     return;
                 }
                 
-                // [NAYA] Grid layout ke liye class add karein
                 container.classList.add('blog-grid');
 
                 posts.forEach(post => {
                     const item = document.createElement('article');
-                    item.className = 'blog-post-item'; // Wahi style reuse hoga
+                    item.className = 'blog-post-item'; 
                     item.id = `blog-${post._id}`; 
                     
                     const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'long', year: 'numeric'
                     });
                     
-                    // [NAYA] Post ka chhota preview (excerpt) banayein
-                    const excerpt = post.content.substring(0, 100) + "..."; // Pehle 100 characters
+                    const excerpt = post.content.substring(0, 100) + "..."; 
                     
-                    // [NAYA] Permalink (poora post padhne ka link)
                     const permalink = `blog.html?id=${post._id}`;
 
                     item.innerHTML = `
@@ -462,8 +440,6 @@
                             ${excerpt} </div>
                         <a href="${permalink}" class="read-more-link">Read More...</a>
                     `;
-                    // Like/Share buttons yahaan se hata diye gaye hain (taaki list saaf dikhe)
-                    // Woh buttons ab 'blog.html' page par hain
                     
                     container.appendChild(item);
                 });
@@ -473,189 +449,22 @@
             }
         }
         
-        // --- [STEP 3] FUNCTION 8: (SWIPER SLIDER MEIN BADAL DIYA GAYA) ---
+        // --- FUNCTION 8: Load Testimonials ---
+        // (Yeh function ab index.html par zaroori nahi hai, 
+        //  kyunki testimonial ab alag page par hain. 
+        //  Lekin hum ise error se bachne ke liye chhod rahe hain)
         async function loadTestimonials() {
-            const container = document.getElementById('testimonials-list-container');
-            container.innerHTML = '<p>Loading testimonials...</p>'; // Loading message
-            try {
-                const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
-                const testimonials = await response.json();
-                
-                if (testimonials.length === 0) {
-                    container.innerHTML = '<p>No testimonials added yet.</p>';
-                    return;
-                }
-                
-                container.innerHTML = ''; // Loading message clear karein
-
-                // 1. Swiper ka main structure banayein
-                const swiperContainer = document.createElement('div');
-                swiperContainer.className = 'swiper testimonialSwiper';
-
-                const swiperWrapper = document.createElement('div');
-                swiperWrapper.className = 'swiper-wrapper';
-
-                // 2. Loop karein aur har testimonial ke liye slide banayein
-                testimonials.forEach(testimonial => {
-                    const slide = document.createElement('div');
-                    slide.className = 'swiper-slide';
-                    
-                    // Naya card design
-                    slide.innerHTML = `
-                    <div class="testimonial-card-new">
-                      <span class="quote-icon">“</span>
-                      <p class="quote-text">
-                        ${testimonial.quote.replace(/\n/g, '<br>')}
-                      </p>
-                      <div class="author-details">
-                        <span class="author-name">- ${testimonial.author}</span>
-                      </div>
-                    </div>
-                    `;
-                    swiperWrapper.appendChild(slide);
-                });
-
-                // 3. Wrapper ko main container mein daalein
-                swiperContainer.appendChild(swiperWrapper);
-                
-                // 4. Navigation (Arrows) aur Pagination (Dots) add karein
-                swiperContainer.innerHTML += `
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                `;
-                
-                // 5. Poora slider container mein dikhayein
-                container.appendChild(swiperContainer);
-
-                // 6. Swiper ko CHALU (Initialize) karein
-                // YEH SABSE ZAROORI HAI: new Swiper() ko data load hone ke BAAD call karna
-                new Swiper(".testimonialSwiper", {
-                    slidesPerView: 1,
-                    spaceBetween: 30,
-                    loop: true, // Taaki end ke baad wapas start ho
-                    
-                    autoplay: {
-                       delay: 5000, // Har 5 second mein slide
-                       disableOnInteraction: false,
-                    },
-
-                    // Arrows
-                    navigation: {
-                        nextEl: ".swiper-button-next",
-                        prevEl: ".swiper-button-prev",
-                    },
-                    
-                    // Dots
-                    pagination: {
-                        el: ".swiper-pagination",
-                        clickable: true,
-                    },
-                });
-
-            } catch (err) {
-                console.error("Error loading testimonials:", err);
-                container.innerHTML = '<p>Could not load testimonials.</p>';
-            }
+             const container = document.getElementById('testimonials-list-container');
+             if (container) {
+                container.innerHTML = '<p>Testimonials ke liye <a href="testimonials.html">yahaan click karein</a>.</p>';
+             }
         }
-        
-      // --- FUNCTION 9: Deep Link Handler (TABS + FOLDING FIX) ---
-function handleDeepLink() {
-    const hash = window.location.hash; // Jaise "#tab-testimonials" YA "#shloka-1-1"
-    if (!hash) return; // Agar hash nahi hai toh kuch mat karo
-
-    try {
-        const targetId = hash.substring(1);
-        const targetElement = document.getElementById(targetId);
-
-        if (!targetElement) return; // Agar ID se kuch nahi mila toh chhod do
-
-        let tabToOpenId = '';
-
-        // CASE 1: Link seedha TAB ka hai (jaise #tab-testimonials)
-        if (targetElement.classList.contains('main-tab-content')) {
-            tabToOpenId = targetId;
-        } 
-        // CASE 2: Link tab ke ANDAR kisi cheez ka hai (jaise #shloka-1-1)
-        else if (targetElement.closest('.main-tab-content')) {
-            tabToOpenId = targetElement.closest('.main-tab-content').id;
-        }
-
-        // Agar hamein ek valid tab ID mil gayi hai
-        if (tabToOpenId) {
-
-            // 1. Saare active class hatao
-            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-
-            // 2. Sahi button ko active karo
-            const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabToOpenId}"]`);
-            if (buttonToActivate) {
-                buttonToActivate.classList.add('active');
-            }
-
-            // 3. Sahi content (div) ko active karo
-            const contentToActivate = document.getElementById(tabToOpenId);
-            if (contentToActivate) {
-                contentToActivate.classList.add('active');
-            }
-
-            // 4. Agar link tab ke andar ka tha (CASE 2), toh wahan tak scroll karo
-            if (!targetElement.classList.contains('main-tab-content')) {
-                // Parent <details> (adhyay) ko dhoondo
-                const parentDetails = targetElement.closest('details.adhyay-group');
-                if (parentDetails) {
-                    parentDetails.open = true; 
-                }
-
-                // Element tak scroll karo
-                setTimeout(() => { 
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetElement.classList.add('highlight');
-                    setTimeout(() => {
-                        targetElement.classList.remove('highlight');
-                    }, 2500); 
-                }, 100); 
-            }
-        }
-    } catch (e) { console.error("Error handling deep link:", e); }
-}
-
         
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
-        function switchTabFromHash() {
-                const hash = window.location.hash; // Jaise "#tab-testimonials"
-                if (!hash) return; // Agar hash nahi hai, toh default (Shlokas) dikhega
-
-                // Hash se 'tab-testimonials' hissa nikalo
-                const tabId = hash.substring(1); 
-                
-                // Check karo ki yeh ek valid MAIN tab ID hai ya nahi
-                // (Yeh shloka-1-1 jaise ID ko ignore kar dega)
-                const validTabIds = ['tab-shlokas', 'tab-about', 'tab-gallery', 'tab-blog', 'tab-testimonials'];
-                
-                if (validTabIds.includes(tabId)) {
-                    
-                    // 1. Saare active class hatao (default 'shlokas' wale)
-                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // 2. Sahi button ko active karo
-                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabId}"]`);
-                    if (buttonToActivate) {
-                        buttonToActivate.classList.add('active');
-                    }
-                    
-                    // 3. Sahi content (div) ko active karo
-                    const contentToActivate = document.getElementById(tabId);
-                    if (contentToActivate) {
-                        contentToActivate.classList.add('active');
-                    }
-                }
-            }
-            // Page load hote hi is function ko chalao
-            switchTabFromHash();
+            
+            // (switchTabFromHash function hata diya gaya hai)
+            
             const tabButtons = document.querySelectorAll('.main-tab-button');
             const tabContents = document.querySelectorAll('.main-tab-content');
             const menuToggle = document.getElementById('menu-toggle-button');
@@ -666,62 +475,45 @@ function handleDeepLink() {
                 menuToggle.classList.toggle('active');
             });
 
-           // TAB SWITCHING LOGIC (Ab link par kaam karega)
+            // --- [FIXED] TAB SWITCHING LOGIC (Instant JS Switch) ---
             tabButtons.forEach(tab => {
-    if(tab.tagName === 'BUTTON') {
-        // Agar koi BUTTON click karta hai (Testimonials/JapCounter ko chhodkar)
-        tab.addEventListener('click', () => {
-
-            // 1. Sabko inactive karo
-            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-
-            // 2. Click wale ko active karo
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
-
-            // 3. Mobile menu band karo
-            if (window.innerWidth <= 768) {
-                menuLinks.classList.remove('active');
-                menuToggle.classList.remove('active');
-            }
-        });
-    }
-});
+                if(tab.tagName === 'BUTTON') { 
+                    // Sirf <button> tags par yeh logic lagao
+                    tab.addEventListener('click', () => {
+                        
+                        // 1. Sabko inactive karo
+                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        // 2. Click wale ko active karo
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                        
+                        // 3. Mobile menu band karo
+                        if (window.innerWidth <= 768) {
+                            menuLinks.classList.remove('active');
+                            menuToggle.classList.remove('active');
+                        }
+                    });
+                }
+                // Note: <a> tags (Testimonials, JapCounter) ko yeh code ignore kar dega
+            });
+            // --- [FIX] YAHAN KHATM ---
             
 
             loadGroupedShlokas(); 
             loadAboutSection(); 
             loadArtworkGallery();
             loadBlogPosts();
-            loadTestimonials(); // YEH NAYA SLIDER LOAD KAREGA
+            loadTestimonials(); // Yeh ab sirf link dikhayega
 
-            // Public Testimonial Form Handler
+            // Public Testimonial Form Handler (ab testimonials.html par hai)
+            // Hum is code ko yahaan se hata sakte hain ya chhod sakte hain
             const addButton = document.getElementById('add-yours-button');
-            const formContainer = document.getElementById('public-testimonial-form-container');
-            const publicForm = document.getElementById('public-testimonial-form');
-            const cancelButton = document.getElementById('public-cancel-button');
-            const thanksMessage = document.getElementById('testimonial-thanks');
-            addButton.addEventListener('click', () => { formContainer.style.display = 'block'; addButton.style.display = 'none'; thanksMessage.style.display = 'none'; });
-            cancelButton.addEventListener('click', () => { formContainer.style.display = 'none'; addButton.style.display = 'block'; publicForm.reset(); });
-            publicForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const author = document.getElementById('public-author-name').value;
-                const quote = document.getElementById('public-author-quote').value;
-                if (!author || !quote) { alert('Please fill in both fields.'); return; }
-                try {
-                    const response = await fetch('/api/testimonials', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ author, quote })
-                    });
-                    if (response.ok) {
-                        publicForm.reset();
-                        formContainer.style.display = 'none';
-                        thanksMessage.style.display = 'block';
-                    } else { alert('Error submitting. Please try again.'); }
-                } catch (err) { alert('Error connecting to server.'); }
-            });
+            if (addButton) {
+                 // Yeh code ab testimonials.html par hai
+                 // Isse yahaan se hata dena behtar hai
+            }
 
             // --- NAYA: Universal Share Button Logic ---
             async function handleShareClick(button) {
@@ -780,23 +572,10 @@ function handleDeepLink() {
         });
     </script>
     
-    <!-- [STEP 4] SWIPER SLIDER KI JAVASCRIPT FILE (SABSE AAKHIR MEIN) -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <script>
-  // Service Worker (PWA) ko register karein
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('Service Worker रजिस्टर हो गया:', registration);
-        })
-        .catch(error => {
-          console.log('Service Worker रजिस्ट्रेशन फ़ेल हो गया:', error);
-        });
-    });
-  }
-</script>
-<script>
+      // Service Worker (PWA) ko register karein
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
@@ -808,11 +587,9 @@ function handleDeepLink() {
             });
         });
       }
-    </script>
-
-    <script>
+    
+      // Browser ko automatic prompt dikhane se roko
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Browser ko automatic prompt dikhane se roko
         console.log('Install prompt roka gaya');
         e.preventDefault();
       });
