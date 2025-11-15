@@ -209,7 +209,7 @@
 
    <script>
         
-        // --- FUNCTION 1-7 (Inme koi change nahi) ---
+        // --- FUNCTIONS 1-7 (Data Loaders) ---
         
         function createVideo(video_id) {
             const videoWrapper = document.createElement('div');
@@ -220,8 +220,7 @@
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
             item.className = 'shloka-item-card';
-            const shlokaId = `shloka-${shloka.adhyay}-${shloka.shloka}`;
-            item.id = shlokaId;
+            item.id = `shloka-${shloka.adhyay}-${shloka.shloka}`;
             const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
@@ -270,6 +269,7 @@
         }
         async function loadGroupedShlokas() {
             const container = document.getElementById('shloka-container');
+            if (!container) return;
             container.innerHTML = ''; 
             try {
                 const response = await fetch('/api/shlokas?cache_buster=' + new Date().getTime());
@@ -377,6 +377,7 @@
         }
         async function loadBlogPosts() {
             const container = document.getElementById('blog-posts-container');
+            if (!container) return;
             container.innerHTML = '';
             try {
                 const response = await fetch('/api/blog?cache_buster=' + new Date().getTime());
@@ -409,14 +410,14 @@
             }
         }
         async function loadTestimonials() {
+             // index.html par testimonials nahi dikhane hain
              const container = document.getElementById('testimonials-list-container');
              if (container) {
-                // Yeh div ab 'testimonials.html' par hai
-                container.innerHTML = ''; 
+                container.innerHTML = ''; // Bas khaali rakho
              }
         }
-
-        // --- Like/Share Functions (Inme koi change nahi) ---
+        
+        // --- Like/Share Functions ---
         async function handleShareClick(button) {
             const urlToShare = button.dataset.url;
             const title = button.dataset.title;
@@ -453,33 +454,7 @@
         // --- PAGE INITIALIZATION & TAB SWITCHING ---
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- [FIX 1] HASH CHECKER (Yeh 'testimonials.html' se wapas aane par kaam karega) ---
-            function switchTabFromHash() {
-                const hash = window.location.hash; // Jaise "#tab-gallery"
-                if (!hash) return; 
-
-                const tabId = hash.substring(1); 
-                const validTabIds = ['tab-shlokas', 'tab-about', 'tab-gallery', 'tab-blog'];
-                
-                if (validTabIds.includes(tabId)) {
-                    document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    const buttonToActivate = document.querySelector(`.main-tab-button[data-tab="${tabId}"]`);
-                    if (buttonToActivate) {
-                        buttonToActivate.classList.add('active');
-                    }
-                    
-                    const contentToActivate = document.getElementById(tabId);
-                    if (contentToActivate) {
-                        contentToActivate.classList.add('active');
-                    }
-                }
-            }
-            // Page load hote hi is function ko chalao
-            switchTabFromHash();
-            // --- [FIX 1 END] ---
-
+            // (Sabhi Hash (#) wale function hata diye gaye hain)
             
             const tabButtons = document.querySelectorAll('.main-tab-button');
             const tabContents = document.querySelectorAll('.main-tab-content');
@@ -491,36 +466,30 @@
                 menuToggle.classList.toggle('active');
             });
 
-            // --- [NAYA FIX] INSTANT TAB SWITCH + HASH UPDATE ---
-       tabButtons.forEach(tab => {
-        if(tab.tagName === 'BUTTON') { 
-        // Sirf <button> tags par yeh logic lagao
-        tab.addEventListener('click', () => {
-
-            const tabId = tab.dataset.tab; // Jaise "tab-about"
-
-            // 1. Sabko inactive karo
-            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
-
-            // 2. Click wale ko active karo
-            tab.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-
-            // 3. [ASLI FIX] URL ka HASH update karo (bina reload kiye)
-            // Yeh URL ko "...index.html#tab-about" kar dega
-            history.pushState(null, null, '#' + tabId); 
-
-            // 4. Mobile menu band karo
-            if (window.innerWidth <= 768) {
-                menuLinks.classList.remove('active');
-                menuToggle.classList.remove('active');
-            }
-        });
-    }
-    // Note: A tags (Testimonials, JapCounter) ko yeh code ignore kar dega
-});
-// --- [NAYA FIX END] ---
+            // --- [ASLI FIX] INSTANT SWITCH CODE ---
+            tabButtons.forEach(tab => {
+                if(tab.tagName === 'BUTTON') { 
+                    // Sirf <button> tags par yeh logic lagao
+                    tab.addEventListener('click', () => {
+                        
+                        // 1. Sabko inactive karo
+                        document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        // 2. Click wale ko active karo
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                        
+                        // 3. Mobile menu band karo
+                        if (window.innerWidth <= 768) {
+                            menuLinks.classList.remove('active');
+                            menuToggle.classList.remove('active');
+                        }
+                    });
+                }
+                // Note: <a> tags (Testimonials, JapCounter) ko yeh code ignore kar dega
+            });
+            // --- [FIX END] ---
             
 
             loadGroupedShlokas(); 
@@ -530,7 +499,7 @@
             loadTestimonials(); // Yeh ab kuch nahi karega
 
             
-            // --- Event Listeners (Inme koi change nahi) ---
+            // --- Event Listeners (Like/Share) ---
             const mainPanels = document.querySelector('.main-tab-panels');
             mainPanels.addEventListener('click', async (e) => {
                 const shareButton = e.target.closest('.share-button');
@@ -568,5 +537,6 @@
         e.preventDefault();
       });
     </script>
+    
 </body>
 </html>
