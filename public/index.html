@@ -668,15 +668,26 @@ function handleDeepLink() {
 
            // TAB SWITCHING LOGIC (Ab link par kaam karega)
             tabButtons.forEach(tab => {
-                if(tab.tagName === 'BUTTON') {
-                    // Agar koi button click karta hai
-                    tab.addEventListener('click', () => {
-                        // Toh use index.html par bhej do uss hash ke saath
-                        const tabId = tab.dataset.tab;
-                        window.location.href = `index.html#${tabId}`;
-                    });
-                }
-            });
+    if(tab.tagName === 'BUTTON') {
+        // Agar koi BUTTON click karta hai (Testimonials/JapCounter ko chhodkar)
+        tab.addEventListener('click', () => {
+
+            // 1. Sabko inactive karo
+            document.querySelectorAll('.main-tab-button').forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            // 2. Click wale ko active karo
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+
+            // 3. Mobile menu band karo
+            if (window.innerWidth <= 768) {
+                menuLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+    }
+});
             
 
             loadGroupedShlokas(); 
