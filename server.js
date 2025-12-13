@@ -459,18 +459,6 @@ app.delete('/api/courses/:id', async (req, res) => {
 
 
 //---Progress APIs---
-app.post('/api/progress/save', async (req, res) => {
-    const { mobile, courseId, completed } = req.body;
-
-    await Progress.findOneAndUpdate(
-        { mobile, courseId },
-        { completed },
-        { upsert: true }
-    );
-
-    res.json({ success: true });
-});
-
 app.get('/api/progress/:mobile/:courseId', async (req, res) => {
     try {
         const { mobile, courseId } = req.params;
@@ -538,7 +526,7 @@ app.post('/api/quiz/complete', async (req, res) => {
     const { mobile, courseId, score } = req.body;
 
     await Progress.findOneAndUpdate(
-        { mobile, course: courseId },
+        { mobile, courseId },
         {
             quizPassed: true,
             quizScore: score
@@ -624,6 +612,11 @@ app.post('/api/certificate', async (req, res) => {
 
     doc.end();
 });
+if (!progress || !progress.quizPassed) {
+    return res.status(403).json({
+        message: 'Please pass the quiz first'
+    });
+}
 
 
 

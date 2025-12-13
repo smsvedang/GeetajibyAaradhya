@@ -5,6 +5,7 @@
 /* ===== GLOBALS ===== */
 let quiz = null;
 let courseId = null;
+const userMobile = localStorage.getItem('userMobile');
 
 /* ===== INIT ===== */
 const params = new URLSearchParams(window.location.search);
@@ -66,33 +67,29 @@ async function submitQuiz() {
         const chosen = selected ? Number(selected.value) : -1;
         const correct = Number(q.correctIndex);
 
-        if (chosen === correct) {
-            score++;
-        }
+        if (chosen === correct) score++;
     });
 
     const total = quiz.questions.length;
     const percent = Math.round((score / total) * 100);
-
-    // 🔐 SAFE PASS %
     const passPercentage = Number(quiz.passPercentage || 50);
 
-   if (percentage >= quiz.passPercentage) {
+    if (percent >= passPercentage) {
+        await fetch('/api/quiz/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                mobile: userMobile,
+                courseId,
+                score: percent
+            })
+        });
 
-    // ✅ SAVE PASS STATUS TO SERVER
-    await fetch('/api/quiz/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            mobile: userMobile,
-            courseId,
-            score: percentage
-        })
-    });
-
-    alert('Quiz Passed 🎉');
-    window.location.href = `/courses.html?course=${courseId}`;
-}
+        alert('Quiz Passed 🎉');
+        window.location.href = `/courses.html?course=${courseId}`;
+    } else {
+        alert('Quiz Failed ❌');
+    }
 }
 
 /* ===== START ===== */
