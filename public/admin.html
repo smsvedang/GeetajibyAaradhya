@@ -84,25 +84,51 @@
             </div>
 
     <div id="tab-courses" class="content-page">
+
     <h1 class="page-header">Manage Courses</h1>
 
-<button id="show-course-form">➕ Add Course</button>
-<div id="course-form-wrapper" style="display:none;"></div>
-    <form id="course-form">
-        <input type="text" id="course-title" placeholder="Course Title" required>
-        <textarea id="course-description" rows="3" placeholder="Course Description"></textarea>
+    <!-- ADD COURSE BUTTON -->
+    <button id="show-course-form" class="primary-btn">
+        ➕ Add Course
+    </button>
 
-        <label>Select Adhyay</label>
-        <select id="course-adhyay">
-            <option value="">Select Adhyay</option>
-        </select>
+    <!-- COURSE FORM (HIDDEN BY DEFAULT) -->
+    <div id="course-form-wrapper" style="display:none; margin-top:20px;">
+        <form id="course-form">
 
-        <label>Select Shlokas</label>
-        <div id="course-shloka-list"></div>
+            <input type="text"
+                   id="course-title"
+                   placeholder="Course Title"
+                   required>
 
-        <button type="submit">Save Course</button>
-    </form>
-     <div class="admin-item-list" id="course-list"></div>
+            <textarea id="course-description"
+                      rows="3"
+                      placeholder="Course Description"></textarea>
+
+            <label>Select Adhyay</label>
+            <select id="course-adhyay" required>
+                <option value="">Select Adhyay</option>
+            </select>
+
+            <label>Select Shlokas</label>
+            <div id="course-shloka-list"></div>
+
+            <button type="submit" class="primary-btn">
+                Save Course
+            </button>
+
+            <button type="button"
+                    id="cancel-course-form"
+                    class="cancel-button">
+                Cancel
+            </button>
+
+        </form>
+    </div>
+
+    <!-- COURSE LIST -->
+    <div class="admin-item-list" id="course-list"></div>
+
 </div>
 
 <div id="tab-quizzes" class="content-page">
@@ -241,6 +267,16 @@
                 document.getElementById(button.dataset.tab).classList.add('active');
             });
         });
+        sidebarButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (button.dataset.tab === 'tab-courses') {
+            loadCoursesAdmin();
+        }
+        if (button.dataset.tab === 'tab-certificates') {
+            loadCoursesForCertificate();
+        }
+    });
+});
 
         // --- Data Loading Functions ---
         async function loadAboutContent() {
@@ -736,13 +772,6 @@ courseForm?.addEventListener('submit', async (e) => {
         alert(data.message || 'Failed to add course');
     }
     document.getElementById('course-form-wrapper').style.display = 'none';
-    sidebarButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        if (button.dataset.tab === 'tab-courses') {
-            loadCoursesAdmin();
-        }
-    });
-});
 });
 
 // ===== LOAD COURSES (ADMIN) =====
