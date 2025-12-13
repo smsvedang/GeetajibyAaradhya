@@ -46,6 +46,9 @@ async function openCourse(id) {
     document.getElementById('course-title').textContent = currentCourse.title;
     document.getElementById('header-title').textContent = currentCourse.title;
 
+    document.getElementById('quiz-box').style.display = 'none';
+    document.getElementById('certificate-box').style.display = 'none';
+
     const box = document.getElementById('course-shlokas');
     box.innerHTML = '';
 
@@ -63,23 +66,23 @@ async function openCourse(id) {
         `;
     });
 
-    // ✅ STEP-1: players
+    // init players first
     setTimeout(() => {
         initPlayers();
 
-        // ✅ STEP-2: restore AFTER players
+        // restore progress AFTER players
         setTimeout(() => {
             restoreProgress();
-        }, 200);
+        }, 300);
 
-    }, 300);
+    }, 400);
 }
 
 /***********************
  * YOUTUBE PLAYERS
  ***********************/
 function initPlayers() {
-    if (!window.YT || !YT.Player) return;
+    if (!window.YT || !YT.Player || !currentCourse) return;
 
     currentCourse.shlokas.forEach(s => {
         players[s._id] = new YT.Player(`player-${s._id}`, {
@@ -134,12 +137,7 @@ async function saveProgress() {
  * RESTORE PROGRESS
  ***********************/
 async function restoreProgress() {
-    if (!currentCourse || !currentCourse._id) return;
-
-    if (!userMobile) {
-        userMobile = localStorage.getItem('userMobile');
-        if (!userMobile) return;
-    }
+    if (!currentCourse || !currentCourse._id || !userMobile) return;
 
     const res = await fetch(
         `/api/progress/${userMobile}/${currentCourse._id}`
@@ -147,22 +145,25 @@ async function restoreProgress() {
     if (!res.ok) return;
 
     const data = await res.json();
-    if (!data || !data.completed) return;
+    if (!data) return;
 
-    data.completed.forEach(id => {
-        completedShlokas.add(id);
+    // restore completed shlokas
+    if (Array.isArray(data.completed)) {
+        data.completed.forEach(id => {
+            completedShlokas.add(id);
+            const el = document.getElementById(`status-${id}`);
+            if (el) el.textContent = '✅ Completed';
+        });
+    }
 
-        const el = document.getElementById(`status-${id}`);
-        if (el && !el.textContent.includes('Completed')) {
-            el.textContent = '✅ Completed';
-        }
-    });
-
+    // unlock quiz if all completed
     checkQuizUnlock();
-}
-if (data.quizPassed) {
-    quizPassed = true;
-    document.getElementById('certificate-box').style.display = 'block';
+
+    // ✅ unlock certificate from DB
+    if (data.quizPassed === true) {
+        quizPassed = true;
+        document.getElementById('certificate-box').style.display = 'block';
+    }
 }
 
 /***********************
