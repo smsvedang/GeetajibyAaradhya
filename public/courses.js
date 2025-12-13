@@ -11,18 +11,18 @@ let userMobile = localStorage.getItem('userMobile') || '';
  * LOAD COURSES LIST
  ***********************/
 async function loadCourses() {
-    const r = await fetch('/api/courses');
-    const courses = await r.json();
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
 
     const list = document.getElementById('course-list');
     list.innerHTML = '';
 
-    courses.forEach(c => {
+    courses.forEach(course => {
         list.innerHTML += `
             <div class="course-card">
-                <h3>${c.title}</h3>
-                <p>${c.description || ''}</p>
-                <button onclick="openCourse('${c._id}')">
+                <h3>${course.title}</h3>
+                <p>${course.description || ''}</p>
+                <button onclick="openCourse('${course._id}')">
                     Start Course
                 </button>
             </div>
@@ -31,14 +31,14 @@ async function loadCourses() {
 }
 
 /***********************
- * OPEN SINGLE COURSE
+ * OPEN COURSE
  ***********************/
-async function openCourse(id) {
+async function openCourse(courseId) {
     document.getElementById('course-list').style.display = 'none';
     document.getElementById('single-course').style.display = 'block';
 
-    const r = await fetch(`/api/courses/${id}`);
-    currentCourse = await r.json();
+    const res = await fetch(`/api/courses/${courseId}`);
+    currentCourse = await res.json();
 
     completedShlokas.clear();
     quizPassed = false;
@@ -49,32 +49,26 @@ async function openCourse(id) {
     document.getElementById('quiz-box').style.display = 'none';
     document.getElementById('certificate-box').style.display = 'none';
 
-    const box = document.getElementById('course-shlokas');
-    box.innerHTML = '';
+    const shlokaBox = document.getElementById('course-shlokas');
+    shlokaBox.innerHTML = '';
 
-    currentCourse.shlokas.forEach(s => {
-        box.innerHTML += `
+    currentCourse.shlokas.forEach(shloka => {
+        shlokaBox.innerHTML += `
             <div class="shloka-item-card">
                 <div class="video-wrapper">
-                    <div id="player-${s._id}"></div>
+                    <div id="player-${shloka._id}"></div>
                 </div>
                 <div class="card-content">
-                    <p>${s.text || ''}</p>
-                    <p id="status-${s._id}">⏳ Not completed</p>
+                    <p>${shloka.text || ''}</p>
+                    <p id="status-${shloka._id}">⏳ Not completed</p>
                 </div>
             </div>
         `;
     });
 
-    // init players first
     setTimeout(() => {
         initPlayers();
-
-        // restore progress AFTER players
-        setTimeout(() => {
-            restoreProgress();
-        }, 300);
-
+        setTimeout(restoreProgress, 300);
     }, 400);
 }
 
@@ -84,22 +78,19 @@ async function openCourse(id) {
 function initPlayers() {
     if (!window.YT || !YT.Player || !currentCourse) return;
 
-    currentCourse.shlokas.forEach(s => {
-        players[s._id] = new YT.Player(`player-${s._id}`, {
-            videoId: s.video_id,
+    currentCourse.shlokas.forEach(shloka => {
+        players[shloka._id] = new YT.Player(`player-${shloka._id}`, {
+            videoId: shloka.video_id,
             width: '100%',
             height: '100%',
-            playerVars: {
-                rel: 0,
-                modestbranding: 1
-            },
+            playerVars: { rel: 0, modestbranding: 1 },
             events: {
                 onStateChange: e => {
                     if (e.data === YT.PlayerState.ENDED) {
-                        completedShlokas.add(s._id);
+                        completedShlokas.add(shloka._id);
 
-                        const st = document.getElementById(`status-${s._id}`);
-                        if (st) st.textContent = '✅ Completed';
+                        const el = document.getElementById(`status-${shloka._id}`);
+                        if (el) el.textContent = '✅ Completed';
 
                         saveProgress();
                         checkQuizUnlock();
@@ -117,7 +108,7 @@ async function saveProgress() {
     if (!currentCourse || !currentCourse._id) return;
 
     if (!userMobile) {
-        userMobile = prompt('Enter mobile number');
+        userMobile = prompt('Enter your mobile number');
         if (!userMobile) return;
         localStorage.setItem('userMobile', userMobile);
     }
@@ -134,19 +125,6 @@ async function saveProgress() {
 }
 
 /***********************
- * START QUIZ
- ***********************/
-function startQuiz() {
-    if (!currentCourse || !currentCourse._id) {
-        alert('Course not loaded');
-        return;
-    }
-
-    // redirect to quiz page
-    window.location.href = `/quiz.html?courseId=${currentCourse._id}`;
-}
-
-/***********************
  * RESTORE PROGRESS
  ***********************/
 async function restoreProgress() {
@@ -158,9 +136,7 @@ async function restoreProgress() {
     if (!res.ok) return;
 
     const data = await res.json();
-    if (!data) return;
 
-    // restore completed shlokas
     if (Array.isArray(data.completed)) {
         data.completed.forEach(id => {
             completedShlokas.add(id);
@@ -169,10 +145,9 @@ async function restoreProgress() {
         });
     }
 
-    // unlock quiz if all completed
     checkQuizUnlock();
 
-    // ✅ unlock certificate from DB
+    // ✅ restore quiz pass status
     if (data.quizPassed === true) {
         quizPassed = true;
         document.getElementById('certificate-box').style.display = 'block';
@@ -192,7 +167,19 @@ function checkQuizUnlock() {
 }
 
 /***********************
- * CERTIFICATE
+ * START QUIZ
+ ***********************/
+function startQuiz() {
+    if (!currentCourse || !currentCourse._id) {
+        alert('Course not loaded');
+        return;
+    }
+
+    window.location.href = `/quiz.html?courseId=${currentCourse._id}`;
+}
+
+/***********************
+ * CERTIFICATE (HTML ONLY)
  ***********************/
 function generateCertificate() {
     if (!quizPassed) {
@@ -209,11 +196,9 @@ function generateCertificate() {
     }
 
     const url =
-        `/api/certificate` +
-        `?mobile=${userMobile}` +
-        `&courseId=${currentCourse._id}` +
-        `&name=${encodeURIComponent(name)}` +
-        `&courseTitle=${encodeURIComponent(currentCourse.title)}` +
+        `/certificate.html` +
+        `?name=${encodeURIComponent(name)}` +
+        `&course=${encodeURIComponent(currentCourse.title)}` +
         `&lang=${lang}`;
 
     window.open(url, '_blank');
@@ -228,7 +213,7 @@ function goBack() {
 }
 
 function goHome() {
-    location.href = '/';
+    window.location.href = '/';
 }
 
 /***********************
