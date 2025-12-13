@@ -214,21 +214,15 @@ function startQuiz() {
         return;
     }
 
-    // Quiz page ya section open
-    // Agar quiz same page par hai
-    document.getElementById('quiz-box').style.display = 'block';
-
-    // Agar alag page hai
-    // location.href = `/quiz.html?course=${currentCourse._id}`;
-}
-function startQuiz() {
     if (completedShlokas.size !== currentCourse.shlokas.length) {
-        alert('Please complete all shlokas first');
+        alert('Please complete all shlokas before starting quiz');
         return;
     }
 
-    document.getElementById('quiz-box').style.display = 'block';
+    // ✅ Redirect to quiz.html with courseId
+    window.location.href = `/quiz.html?course=${currentCourse._id}`;
 }
+
 /***********************
  * NAVIGATION
  ***********************/

@@ -536,12 +536,11 @@ app.delete('/api/quiz/:id', async (req, res) => {
     res.json({ success: true });
 });
 app.get('/api/quiz/:courseId', async (req, res) => {
-    try {
-        const quiz = await Quiz.findOne({ course: req.params.courseId });
-        res.json(quiz);
-    } catch (err) {
-        res.status(500).json({ message: 'Quiz laane mein error' });
+    const quiz = await Quiz.findOne({ course: req.params.courseId });
+    if (!quiz) {
+        return res.status(404).json({ questions: [] });
     }
+    res.json(quiz);
 });
 app.delete('/api/quizzes/:courseId', async (req, res) => {
     try {
@@ -632,20 +631,13 @@ app.get('/api/quiz/:courseId', async (req,res)=>{
     const quiz = await Quiz.findOne({ course: req.params.courseId });
     res.json(quiz);
 });
-app.post('/api/quiz/submit', async (req,res)=>{
+app.post('/api/quiz/submit', async (req, res) => {
     const { courseId, percent } = req.body;
 
     const quiz = await Quiz.findOne({ course: courseId });
-    const pass = percent >= quiz.passingMarks;
+    if (!quiz) return res.json({ pass: false });
 
-    if(pass){
-        await QuizResult.create({
-            course: courseId,
-            percent,
-            passedAt: new Date()
-        });
-    }
-
+    const pass = percent >= quiz.passPercent;
     res.json({ pass });
 });
 
