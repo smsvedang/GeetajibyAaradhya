@@ -102,10 +102,9 @@
 
         <button type="submit">Save Course</button>
     </form>
-    </div>
-
-    <div class="admin-item-list" id="course-list"></div>
+     <div class="admin-item-list" id="course-list"></div>
 </div>
+    </div>
 
 <div id="tab-quizzes" class="content-page">
     <h1 class="page-header">Manage Quizzes</h1>
@@ -738,7 +737,7 @@ courseForm?.addEventListener('submit', async (e) => {
         alert(data.message || 'Failed to add course');
     }
     document.getElementById('course-form-wrapper').style.display = 'none';
-    //loadCoursesAdmin();
+    loadCoursesAdmin();
 });
 
 // ===== LOAD COURSES (ADMIN) =====
