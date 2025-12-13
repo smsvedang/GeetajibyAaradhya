@@ -612,11 +612,6 @@ app.post('/api/certificate', async (req, res) => {
 
     doc.end();
 });
-if (!progress || !progress.quizPassed) {
-    return res.status(403).json({
-        message: 'Please pass the quiz first'
-    });
-}
 
 
 
