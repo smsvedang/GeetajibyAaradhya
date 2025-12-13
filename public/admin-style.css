@@ -26,6 +26,44 @@ body {
     min-height: 100vh;
 }
 
+/* ===== COURSES ===== */
+#course-shloka-list {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+#course-shloka-list label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* ===== QUIZ BUILDER ===== */
+#quiz-questions > div {
+    background: #f4f4f8;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+#quiz-questions input {
+    margin: 6px 0;
+}
+
+#add-question {
+    background: #455a64;
+}
+/* ===== COURSE & QUIZ FORMS ===== */
+#tab-courses form,
+#tab-quizzes form {
+    margin-bottom: 30px;
+}
+
+
 /* --- Sidebar --- */
 .sidebar {
     width: 240px;
