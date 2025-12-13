@@ -77,14 +77,22 @@ async function submitQuiz() {
     // 🔐 SAFE PASS %
     const passPercentage = Number(quiz.passPercentage || 50);
 
-    if (percent >= passPercentage) {
-        alert(`✅ Passed! Score: ${percent}%`);
+   if (percentage >= quiz.passPercentage) {
 
-        window.location.href =
-            `/courses.html?course=${courseId}&quiz=passed`;
-    } else {
-        alert(`❌ Failed! Score: ${percent}%`);
-    }
+    // ✅ SAVE PASS STATUS TO SERVER
+    await fetch('/api/quiz/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            mobile: userMobile,
+            courseId,
+            score: percentage
+        })
+    });
+
+    alert('Quiz Passed 🎉');
+    window.location.href = `/courses.html?course=${courseId}`;
+}
 }
 
 /* ===== START ===== */

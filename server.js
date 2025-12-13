@@ -534,6 +534,20 @@ app.post('/api/quiz', async (req, res) => {
 
     res.json({ success: true, quiz });
 });
+app.post('/api/quiz/complete', async (req, res) => {
+    const { mobile, courseId, score } = req.body;
+
+    await Progress.findOneAndUpdate(
+        { mobile, course: courseId },
+        {
+            quizPassed: true,
+            quizScore: score
+        },
+        { upsert: true }
+    );
+
+    res.json({ success: true });
+});
 app.get('/api/quiz', async (req, res) => {
     const quizzes = await Quiz.find().populate('course');
     res.json(quizzes);
