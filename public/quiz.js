@@ -64,7 +64,7 @@ async function submitQuiz() {
         );
 
         const chosen = selected ? Number(selected.value) : -1;
-        const correct = Number(q.answer);
+        const correct = Number(q.correctIndex);
 
         if (chosen === correct) {
             score++;

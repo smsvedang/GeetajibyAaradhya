@@ -515,6 +515,10 @@ app.post('/api/progress/save', async (req, res) => {
 });
 
 // --- Quiz APIs ---
+app.get('/api/quiz/:courseId', async (req, res) => {
+    const quiz = await Quiz.findOne({ course: req.params.courseId });
+    res.json(quiz);
+});
 app.post('/api/quiz', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -549,13 +553,6 @@ app.delete('/api/quiz/:id', async (req, res) => {
 
     await Quiz.findByIdAndDelete(req.params.id);
     res.json({ success: true });
-});
-app.get('/api/quiz/:courseId', async (req, res) => {
-    const quiz = await Quiz.findOne({ course: req.params.courseId });
-    if (!quiz) {
-        return res.status(404).json({ questions: [] });
-    }
-    res.json(quiz);
 });
 app.delete('/api/quizzes/:courseId', async (req, res) => {
     try {
@@ -614,21 +611,7 @@ app.post('/api/certificate', async (req, res) => {
     doc.end();
 });
 
-//---Quiz APIs ---
 
-app.get('/api/quiz/:courseId', async (req,res)=>{
-    const quiz = await Quiz.findOne({ course: req.params.courseId });
-    res.json(quiz);
-});
-app.post('/api/quiz/submit', async (req, res) => {
-    const { courseId, percent } = req.body;
-
-    const quiz = await Quiz.findOne({ course: courseId });
-    if (!quiz) return res.json({ pass: false });
-
-    const pass = percent >= quiz.passPercent;
-    res.json({ pass });
-});
 
 // --- Testimonial APIs ---
 app.get('/api/testimonials', async (req, res) => {
