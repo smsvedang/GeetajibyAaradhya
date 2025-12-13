@@ -474,6 +474,44 @@ app.post('/api/quiz', async (req, res) => {
     }
 });
 
+const PDFDocument = require('pdfkit');
+
+app.post('/api/certificate', async (req, res) => {
+    const { name, courseTitle, lang } = req.body;
+
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=certificate-${Date.now()}.pdf`
+    );
+
+    doc.pipe(res);
+
+    doc.fontSize(26).text(
+        lang === 'hi'
+            ? 'प्रमाण पत्र'
+            : 'Certificate of Completion',
+        { align: 'center' }
+    );
+
+    doc.moveDown(2);
+
+    doc.fontSize(16).text(
+        lang === 'hi'
+            ? `यह प्रमाणित किया जाता है कि ${name} ने ${courseTitle} को सफलतापूर्वक पूर्ण किया है।`
+            : `This is to certify that ${name} has successfully completed the course "${courseTitle}".`,
+        { align: 'center' }
+    );
+
+    doc.moveDown(4);
+    doc.fontSize(12).text(`Date: ${new Date().toLocaleDateString()}`, {
+        align: 'right'
+    });
+
+    doc.end();
+});
+
 // --- Testimonial APIs ---
 app.get('/api/testimonials', async (req, res) => {
     try {

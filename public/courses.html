@@ -11,7 +11,25 @@
     <h2 id="course-title"></h2>
     <div id="shloka-container"></div>
 </div>
+<div id="quiz-section" style="display:none;">
+    <h2>Course Quiz</h2>
+    <form id="quiz-form"></form>
+    <button id="submit-quiz">Submit Quiz</button>
+</div>
 
+<div id="quiz-result"></div>
+
+<div id="certificate-section" style="display:none;">
+    <h2>Get Certificate</h2>
+    <input id="user-name" placeholder="Your Name">
+    <input id="user-mobile" placeholder="Mobile Number">
+    <input id="user-email" placeholder="Email">
+    <select id="cert-lang">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+    </select>
+    <button id="get-certificate">Generate Certificate</button>
+</div>
 <script>
 const courseId = new URLSearchParams(location.search).get('id');
 let completed = new Set();
@@ -41,6 +59,76 @@ async function loadCourse() {
 window.onYouTubeIframeAPIReady = function(){};
 
 loadCourse();
+let quizData = null;
+
+async function loadQuiz() {
+    const res = await fetch(`/api/quiz/${courseId}`);
+    quizData = await res.json();
+
+    if (!quizData || !quizData.questions?.length) return;
+
+    const form = document.getElementById('quiz-form');
+    quizData.questions.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.className = 'course-card';
+        div.innerHTML = `
+            <p><b>${i+1}. ${q.question}</b></p>
+            ${q.options.map((o,idx)=>`
+                <label>
+                    <input type="radio" name="q${i}" value="${idx}">
+                    ${o}
+                </label><br>`).join('')}
+        `;
+        form.appendChild(div);
+    });
+
+    document.getElementById('quiz-section').style.display = 'block';
+}
+
+document.getElementById('submit-quiz').onclick = () => {
+    let correct = 0;
+
+    quizData.questions.forEach((q,i)=>{
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && Number(selected.value) === q.correctIndex) {
+            correct++;
+        }
+    });
+
+    const percent = (correct / quizData.questions.length) * 100;
+    const resultBox = document.getElementById('quiz-result');
+
+    resultBox.innerHTML = `Score: ${percent.toFixed(2)}%`;
+
+    if (percent >= quizData.passPercentage) {
+        resultBox.innerHTML += `<p style="color:green;">Passed 🎉</p>`;
+        document.getElementById('certificate-section').style.display = 'block';
+    } else {
+        resultBox.innerHTML += `<p style="color:red;">Failed ❌</p>`;
+    }
+};
+document.getElementById('get-certificate').onclick = async () => {
+    const payload = {
+        name: document.getElementById('user-name').value,
+        mobile: document.getElementById('user-mobile').value,
+        email: document.getElementById('user-email').value,
+        lang: document.getElementById('cert-lang').value,
+        courseTitle: document.getElementById('course-title').textContent
+    };
+
+    const res = await fetch('/api/certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'certificate.pdf';
+    a.click();
+};
 </script>
 
 <script src="https://www.youtube.com/iframe_api"></script>

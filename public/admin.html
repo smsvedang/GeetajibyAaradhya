@@ -32,6 +32,7 @@
                 <button class="sidebar-button" data-tab="tab-artwork">Manage Artwork</button>
                 <button class="sidebar-button" data-tab="tab-courses">Manage Courses</button>
                 <button class="sidebar-button" data-tab="tab-quizzes">Manage Quizzes</button>
+                <button class="sidebar-button" data-tab="tab-certificates"> Generate Certificate</button>
                 <button class="sidebar-button" data-tab="tab-about">Site Settings (About)</button>
             </nav>
         </aside>
@@ -85,6 +86,8 @@
             <div id="tab-courses" class="content-page">
     <h1 class="page-header">Manage Courses</h1>
 
+<button id="show-course-form">➕ Add Course</button>
+<div id="course-form-wrapper" style="display:none;"></div>
     <form id="course-form">
         <input type="text" id="course-title" placeholder="Course Title" required>
         <textarea id="course-description" rows="3" placeholder="Course Description"></textarea>
@@ -99,6 +102,7 @@
 
         <button type="submit">Save Course</button>
     </form>
+    </div>
 
     <div class="admin-item-list" id="course-list"></div>
 </div>
@@ -120,6 +124,24 @@
     </form>
 </div>
 
+<div id="tab-certificates" class="content-page">
+    <h1 class="page-header">Generate Certificate (Manual)</h1>
+
+    <form id="admin-cert-form">
+        <input id="cert-name" placeholder="Student Name" required>
+
+        <select id="cert-course" required>
+            <option value="">Select Course</option>
+        </select>
+
+        <select id="cert-lang">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+        </select>
+
+        <button type="submit">Generate Certificate</button>
+    </form>
+</div>
 
             <div id="tab-shloka" class="content-page">
                 <h1 class="page-header">Manage Shlokas</h1>
@@ -715,8 +737,81 @@ courseForm?.addEventListener('submit', async (e) => {
     } else {
         alert(data.message || 'Failed to add course');
     }
+    document.getElementById('course-form-wrapper').style.display = 'none';
+    loadCoursesAdmin();
 });
 
+// ===== LOAD COURSES (ADMIN) =====
+async function loadCoursesAdmin() {
+    const list = document.getElementById('course-list');
+    if (!list) return;
+
+    list.innerHTML = 'Loading courses...';
+
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
+
+    if (!courses.length) {
+        list.innerHTML = '<p>No courses added yet.</p>';
+        return;
+    }
+
+    list.innerHTML = '';
+    courses.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'shloka-admin-item';
+        div.innerHTML = `
+            <p><strong>${c.title}</strong><br>
+            Adhyay ${c.adhyay} | Shlokas: ${c.shlokas.length}</p>
+            <div class="admin-buttons">
+                <button class="delete-button" data-id="${c._id}">Delete</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+loadCoursesAdmin();
+// ===== COURSE FORM TOGGLE =====
+document.getElementById('show-course-form')?.addEventListener('click', () => {
+    const box = document.getElementById('course-form-wrapper');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+});
+// ===== ADMIN CERTIFICATE =====
+async function loadCoursesForCertificate() {
+    const sel = document.getElementById('cert-course');
+    if (!sel) return;
+
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
+
+    courses.forEach(c => {
+        sel.innerHTML += `<option value="${c.title}">${c.title}</option>`;
+    });
+}
+
+document.getElementById('admin-cert-form')?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const payload = {
+        name: document.getElementById('cert-name').value,
+        courseTitle: document.getElementById('cert-course').value,
+        lang: document.getElementById('cert-lang').value
+    };
+
+    const res = await fetch('/api/certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'certificate.pdf';
+    a.click();
+});
+loadCoursesForCertificate();
     </script>
 </body>
 </html>
