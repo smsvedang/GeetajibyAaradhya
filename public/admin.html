@@ -80,6 +80,45 @@
                 <div class="admin-item-list" id="testimonial-list-approved"></div>
             </div>
 
+            <div id="tab-courses" class="content-page">
+    <h1 class="page-header">Manage Courses</h1>
+
+    <form id="course-form">
+        <input type="text" id="course-title" placeholder="Course Title" required>
+        <textarea id="course-description" rows="3" placeholder="Course Description"></textarea>
+
+        <label>Select Adhyay</label>
+        <select id="course-adhyay">
+            <option value="">Select Adhyay</option>
+        </select>
+
+        <label>Select Shlokas</label>
+        <div id="course-shloka-list"></div>
+
+        <button type="submit">Save Course</button>
+    </form>
+
+    <div class="admin-item-list" id="course-list"></div>
+</div>
+
+<div id="tab-quizzes" class="content-page">
+    <h1 class="page-header">Manage Quizzes</h1>
+
+    <form id="quiz-form">
+        <label>Select Course</label>
+        <select id="quiz-course"></select>
+
+        <input type="number" id="quiz-pass" value="50" placeholder="Passing Marks (%)">
+
+        <h3>Questions</h3>
+        <div id="quiz-questions"></div>
+
+        <button type="button" id="add-question">+ Add Question</button>
+        <button type="submit">Save Quiz</button>
+    </form>
+</div>
+
+
             <div id="tab-shloka" class="content-page">
                 <h1 class="page-header">Manage Shlokas</h1>
                 <h2 id="shloka-form-title">Add New Shloka</h2>
@@ -584,6 +623,52 @@
             if (response.ok) { loadArtwork(); } 
             else { alert('Failed to delete artwork.'); }
         });
+        // ===== COURSES SUPPORT =====
+async function loadAdhyayForCourses() {
+    const res = await fetch('/api/shlokas');
+    const shlokas = await res.json();
+    const adhyays = [...new Set(shlokas.map(s => s.adhyay))];
+    const sel = document.getElementById('course-adhyay');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Select Adhyay</option>';
+    adhyays.forEach(a => {
+        sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`;
+    });
+}
+
+document.getElementById('course-adhyay')?.addEventListener('change', async e => {
+    const box = document.getElementById('course-shloka-list');
+    box.innerHTML = '';
+    const res = await fetch('/api/shlokas');
+    const shlokas = await res.json();
+    shlokas.filter(s => s.adhyay == e.target.value).forEach(s => {
+        box.innerHTML += `
+            <label>
+                <input type="checkbox" value="${s._id}">
+                Shloka ${s.shloka}
+            </label><br>`;
+    });
+});
+
+// ===== QUIZ BUILDER =====
+document.getElementById('add-question')?.addEventListener('click', () => {
+    const d = document.createElement('div');
+    d.innerHTML = `
+        <input placeholder="Question">
+        <input placeholder="Option A">
+        <input placeholder="Option B">
+        <input placeholder="Option C">
+        <input placeholder="Option D">
+        <input placeholder="Correct Option Index (0-3)">
+        <hr>`;
+    document.getElementById('quiz-questions').appendChild(d);
+});
+
+// login ke baad adhyay load
+const originalLogin = loginForm.addEventListener;
+loginForm.addEventListener('submit', () => {
+    setTimeout(loadAdhyayForCourses, 500);
+});
     </script>
 </body>
 </html>
