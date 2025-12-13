@@ -1,6 +1,7 @@
 /* --- Aaradhya Geetaji - Final Server Code (All Likes Fixed) --- */
 const express = require('express');
 const mongoose = require('mongoose');
+const Progress = require('./models/Progress'); 
 const bodyParser = require('body-parser');
 const path = require('path');
 
@@ -468,28 +469,46 @@ app.post('/api/progress/save', async (req, res) => {
 });
 
 app.get('/api/progress/:mobile/:courseId', async (req, res) => {
-    const progress = await Progress.findOne({
-        mobile: req.params.mobile,
-        courseId: req.params.courseId
-    });
+    try {
+        const { mobile, courseId } = req.params;
 
-    res.json(progress || { completed: [] });
+        const progress = await Progress.findOne({
+            mobile,
+            courseId
+        }).lean();
+
+        return res.json(progress || { completed: [] });
+
+    } catch (err) {
+        console.error('Progress fetch error:', err);
+        return res.status(500).json({ completed: [] });
+    }
 });
 app.post('/api/progress/save', async (req, res) => {
-    const { mobile, courseId, completed } = req.body;
+    try {
+        const { mobile, courseId, completed } = req.body;
 
-    let progress = await Progress.findOne({ mobile, courseId });
+        let progress = await Progress.findOne({ mobile, courseId });
 
-    if (!progress) {
-        progress = new Progress({ mobile, courseId, completed });
-    } else {
-        progress.completed = [
-            ...new Set([...progress.completed, ...completed])
-        ];
+        if (!progress) {
+            progress = new Progress({
+                mobile,
+                courseId,
+                completed
+            });
+        } else {
+            progress.completed = [
+                ...new Set([...progress.completed, ...completed])
+            ];
+        }
+
+        await progress.save();
+        return res.json({ success: true });
+
+    } catch (err) {
+        console.error('Progress save error:', err);
+        return res.status(500).json({ success: false });
     }
-
-    await progress.save();
-    res.json({ success: true });
 });
 
 // --- Quiz APIs ---
