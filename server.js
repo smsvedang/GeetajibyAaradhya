@@ -446,11 +446,14 @@ app.post('/api/courses', async (req, res) => {
 app.delete('/api/courses/:id', async (req, res) => {
     try {
         await Course.findByIdAndDelete(req.params.id);
+
+        // Safety: related quiz bhi delete
         await Quiz.deleteOne({ course: req.params.id });
 
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ message: 'Delete failed' });
+        console.error(err);
+        res.status(500).json({ success: false });
     }
 });
 

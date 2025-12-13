@@ -208,6 +208,27 @@ async function generateCertificate() {
     window.open(URL.createObjectURL(blob));
 }
 
+function startQuiz() {
+    if (!currentCourse) {
+        alert('Course not loaded');
+        return;
+    }
+
+    // Quiz page ya section open
+    // Agar quiz same page par hai
+    document.getElementById('quiz-box').style.display = 'block';
+
+    // Agar alag page hai
+    // location.href = `/quiz.html?course=${currentCourse._id}`;
+}
+function startQuiz() {
+    if (completedShlokas.size !== currentCourse.shlokas.length) {
+        alert('Please complete all shlokas first');
+        return;
+    }
+
+    document.getElementById('quiz-box').style.display = 'block';
+}
 /***********************
  * NAVIGATION
  ***********************/
