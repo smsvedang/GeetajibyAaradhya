@@ -738,7 +738,7 @@ courseForm?.addEventListener('submit', async (e) => {
         alert(data.message || 'Failed to add course');
     }
     document.getElementById('course-form-wrapper').style.display = 'none';
-    loadCoursesAdmin();
+    //loadCoursesAdmin();
 });
 
 // ===== LOAD COURSES (ADMIN) =====
@@ -770,7 +770,7 @@ async function loadCoursesAdmin() {
         list.appendChild(div);
     });
 }
-//loadCoursesAdmin();
+loadCoursesAdmin();
 // ===== COURSE FORM TOGGLE =====
 document.getElementById('show-course-form')?.addEventListener('click', () => {
     const box = document.getElementById('course-form-wrapper');
