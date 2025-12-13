@@ -995,6 +995,7 @@ document.getElementById('quiz-form').addEventListener('submit', async e => {
         body: JSON.stringify({
             course: courseId,
             passPercent,      // ✅ VERY IMPORTANT
+            password: adminPassword,
             questions
         })
     });
