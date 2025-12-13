@@ -1,24 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Certificate</title>
+<title>Certificate of Completion</title>
 
 <style>
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: "Georgia", serif;
-    background: #f5f5f5;
+    background: #f3f3f3;
 }
 
 .certificate {
     width: 1000px;
     height: 700px;
     margin: 30px auto;
-    background: #fff;
-    border: 12px solid #c9a44c;
-    padding: 40px;
+    background: #fffdf6;
+    border: 14px solid #c9a44c;
+    padding: 50px;
     box-sizing: border-box;
     position: relative;
 }
@@ -26,61 +33,68 @@ body {
 .certificate::before {
     content: "";
     position: absolute;
-    inset: 15px;
-    border: 2px solid #e5d39a;
+    inset: 18px;
+    border: 2px solid #e6d39a;
 }
 
-.logo {
-    text-align: center;
-}
-
-.logo img {
-    height: 80px;
-}
-
+/* Headings */
 .title {
     text-align: center;
-    font-size: 42px;
-    margin-top: 20px;
+    font-size: 44px;
     font-weight: bold;
+    margin-top: 10px;
+    letter-spacing: 1px;
 }
 
 .subtitle {
     text-align: center;
     font-size: 18px;
-    margin-top: 10px;
+    margin-top: 12px;
+    color: #444;
 }
 
+/* Name */
 .name {
     text-align: center;
-    font-size: 36px;
-    margin: 40px 0;
+    font-size: 38px;
+    margin: 40px 0 30px;
     font-weight: bold;
-    color: #b38b00;
+    color: #9c7a00;
 }
 
+/* Content text */
 .text {
     text-align: center;
     font-size: 18px;
-    line-height: 1.7;
-    padding: 0 80px;
+    line-height: 1.9;
+    padding: 0 90px;
+    color: #333;
 }
 
+/* Footer */
 .footer {
     position: absolute;
-    bottom: 50px;
+    bottom: 55px;
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0 80px;
+    padding: 0 90px;
+    box-sizing: border-box;
 }
 
-.signature {
+.footer-box {
     text-align: center;
+    font-size: 16px;
 }
 
-.signature img {
-    height: 60px;
+.signatory {
+    font-weight: bold;
+    margin-top: 6px;
+}
+
+.course-name {
+    font-weight: bold;
+    color: #7a5c00;
 }
 </style>
 </head>
@@ -89,27 +103,25 @@ body {
 
 <div class="certificate">
 
-    <div class="logo">
-        <img src="/logo.png" alt="Logo">
-    </div>
-
     <div class="title">Certificate of Completion</div>
 
-    <div class="subtitle">This is to proudly certify that</div>
+    <div class="subtitle">
+        This certificate is proudly presented to
+    </div>
 
     <div class="name" id="cert-name"></div>
 
     <div class="text" id="cert-text"></div>
 
     <div class="footer">
-        <div class="signature">
-            <img src="/sign.png"><br>
-            <strong>Authorized Signatory</strong>
-        </div>
-
-        <div class="signature">
+        <div class="footer-box">
             <strong>Date</strong><br>
             <span id="cert-date"></span>
+        </div>
+
+        <div class="footer-box">
+            <strong>Issued By</strong><br>
+            <span class="signatory" id="cert-signatory"></span>
         </div>
     </div>
 
@@ -123,14 +135,38 @@ const course = params.get('course') || '';
 const lang = params.get('lang') || 'English';
 
 document.getElementById('cert-name').textContent = name;
-
-document.getElementById('cert-text').textContent =
-    lang === 'Hindi'
-    ? `यह प्रमाणित किया जाता है कि ${name} ने "${course}" पाठ्यक्रम सफलतापूर्वक पूर्ण किया है।`
-    : `This is to certify that ${name} has successfully completed the course "${course}".`;
-
 document.getElementById('cert-date').textContent =
     new Date().toLocaleDateString();
+
+document.getElementById('cert-signatory').textContent =
+    'By Warrior Aaradhya / Aaradhya Soni';
+
+const textEl = document.getElementById('cert-text');
+
+if (lang === 'Hindi') {
+    textEl.innerHTML = `
+        यह प्रमाणित किया जाता है कि <strong>${name}</strong> ने
+        <span class="course-name">"${course}"</span> पाठ्यक्रम को
+        पूर्ण निष्ठा, समर्पण एवं नियमित अभ्यास के साथ
+        सफलतापूर्वक पूर्ण किया है।<br><br>
+
+        यह प्रमाणपत्र उनके आध्यात्मिक अध्ययन, श्लोकों के अभ्यास
+        एवं आत्म-विकास के प्रति प्रतिबद्धता का प्रमाण है।
+        हम उनके उज्ज्वल भविष्य की कामना करते हैं।
+    `;
+} else {
+    textEl.innerHTML = `
+        This is to certify that <strong>${name}</strong> has
+        successfully completed the course
+        <span class="course-name">"${course}"</span>
+        with dedication, discipline, and sincere effort.<br><br>
+
+        This certificate acknowledges the learner’s commitment
+        towards spiritual learning, regular practice of shlokas,
+        and personal growth. We wish them continued success
+        and inner strength on their journey ahead.
+    `;
+}
 </script>
 
 </body>
