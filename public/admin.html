@@ -973,7 +973,7 @@ document.getElementById('quiz-form').addEventListener('submit', async e => {
                 inputs[3].value,
                 inputs[4].value
             ],
-            answer: Number(inputs[5].value)
+            correctIndex: Number(inputs[5].value)
         });
     });
 
@@ -982,7 +982,7 @@ document.getElementById('quiz-form').addEventListener('submit', async e => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             course: courseId,
-            passPercent,      // ✅ VERY IMPORTANT
+            passPercentage: passPercent,      // ✅ VERY IMPORTANT
             password: adminPassword,
             questions
         })
@@ -1016,7 +1016,7 @@ async function loadQuizzes() {
 
         div.innerHTML = `
             <p><strong>${q.course?.title || 'Unknown Course'}</strong>
-               (Pass: ${q.passingMarks}%)</p>
+               (Pass: ${q.passPercentage}%)</p>
             <div class="admin-buttons">
                 <button class="edit-button">Edit</button>
                 <button class="delete-button">Delete</button>
@@ -1026,7 +1026,7 @@ async function loadQuizzes() {
         /* EDIT */
         div.querySelector('.edit-button').onclick = () => {
             document.getElementById('quiz-course').value = q.course?._id;
-            document.getElementById('quiz-pass').value = q.passingMarks;
+            document.getElementById('quiz-pass').value = q.passPercentage;
             document.getElementById('quiz-questions').innerHTML = '';
 
             q.questions.forEach(ques => {
