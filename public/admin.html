@@ -671,6 +671,52 @@ const originalLogin = loginForm.addEventListener;
 loginForm.addEventListener('submit', () => {
     setTimeout(loadAdhyayForCourses, 500);
 });
+// ===== COURSE FORM SUBMIT FIX =====
+const courseForm = document.getElementById('course-form');
+
+courseForm?.addEventListener('submit', async (e) => {
+    e.preventDefault(); // ⛔ page reload STOP
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const selectedShlokas = [];
+    document
+        .querySelectorAll('#course-shloka-list input[type="checkbox"]:checked')
+        .forEach(cb => selectedShlokas.push(cb.value));
+
+    if (!selectedShlokas.length) {
+        alert('Please select at least one shloka');
+        return;
+    }
+
+    const payload = {
+        title: document.getElementById('course-title').value,
+        description: document.getElementById('course-description').value,
+        adhyay: document.getElementById('course-adhyay').value,
+        shlokas: selectedShlokas,
+        password: adminPassword
+    };
+
+    const res = await fetch('/api/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+        alert('Course added successfully');
+        courseForm.reset();
+        document.getElementById('course-shloka-list').innerHTML = '';
+    } else {
+        alert(data.message || 'Failed to add course');
+    }
+});
+
     </script>
 </body>
 </html>
