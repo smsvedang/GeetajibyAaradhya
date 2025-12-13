@@ -737,7 +737,13 @@ courseForm?.addEventListener('submit', async (e) => {
         alert(data.message || 'Failed to add course');
     }
     document.getElementById('course-form-wrapper').style.display = 'none';
-    loadCoursesAdmin();
+    sidebarButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (button.dataset.tab === 'tab-courses') {
+            loadCoursesAdmin();
+        }
+    });
+});
 });
 
 // ===== LOAD COURSES (ADMIN) =====
