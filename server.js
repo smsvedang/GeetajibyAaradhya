@@ -410,6 +410,12 @@ app.delete('/api/blog/:id', async (req, res) => {
 });
 
 // --- Course APIs ---
+app.get('/api/courses/:id', async (req, res) => {
+    const course = await Course
+        .findById(req.params.id)
+        .populate('shlokas');
+    res.json(course);
+});
 app.get('/api/courses', async (req, res) => {
     try {
         const courses = await Course.find().populate('shlokas');
