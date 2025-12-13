@@ -1,0 +1,135 @@
+/* ================= COURSES PAGE ================= */
+
+body {
+    background: #FFF8E1;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- HEADER ---------- */
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #FFFFFF;
+    border-bottom: 2px solid #FFECB3;
+}
+
+.course-header h1 {
+    margin: 0;
+    font-size: 22px;
+    color: #D84315;
+}
+
+.course-header .nav-buttons button {
+    margin-left: 10px;
+    padding: 8px 14px;
+    background: #FFF3E0;
+    border: 1px solid #FFB74D;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #D84315;
+}
+
+.course-header .nav-buttons button:hover {
+    background: #FFECB3;
+}
+
+/* ---------- LAYOUT ---------- */
+.course-container {
+    max-width: 1000px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+/* ---------- COURSE CARD ---------- */
+.course-card {
+    background: #FFFFFF;
+    border: 1px solid #FFECB3;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.course-card h2 {
+    margin-top: 0;
+    color: #E65100;
+}
+
+/* ---------- SHLOKA LIST ---------- */
+.shloka-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background: #FFFDF7;
+    border: 1px solid #FFE0B2;
+}
+
+.shloka-item.completed {
+    background: #E8F5E9;
+    border-color: #A5D6A7;
+}
+
+/* ---------- BUTTONS ---------- */
+.primary-btn {
+    background: #FF9800;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background: #F57C00;
+}
+
+.secondary-btn {
+    background: #FFF3E0;
+    border: 1px solid #FFB74D;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ---------- QUIZ ---------- */
+.quiz-box {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px dashed #FFB74D;
+    background: #FFFDF9;
+    border-radius: 10px;
+}
+
+.quiz-box h3 {
+    margin-top: 0;
+    color: #E65100;
+}
+
+/* ---------- CERTIFICATE ---------- */
+.certificate-box {
+    margin-top: 25px;
+    padding: 20px;
+    border: 2px solid #4CAF50;
+    background: #F1F8E9;
+    border-radius: 10px;
+    display: none;
+}
+
+.certificate-box h3 {
+    color: #2E7D32;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+    .course-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .course-header .nav-buttons {
+        margin-top: 10px;
+    }
+}

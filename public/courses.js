@@ -1,109 +1,106 @@
 let players = {};
 let completedShlokas = new Set();
 let currentCourse = null;
+let quizPassed = false;
 
-/* ===== LOAD COURSES ===== */
+/* LOAD COURSES */
 async function loadCourses() {
-    const res = await fetch('/api/courses');
-    const courses = await res.json();
+    const r = await fetch('/api/courses');
+    const courses = await r.json();
 
     const list = document.getElementById('course-list');
     list.innerHTML = '';
 
     courses.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'course-card';
-        div.innerHTML = `
-            <h3>${c.title}</h3>
-            <p>${c.description || ''}</p>
-            <button class="start-course-btn" onclick="openCourse('${c._id}')">
-                Start Course
-            </button>
-        `;
-        list.appendChild(div);
+        list.innerHTML += `
+            <div class="course-card">
+                <h3>${c.title}</h3>
+                <p>${c.description || ''}</p>
+                <button class="start-course-btn" onclick="openCourse('${c._id}')">
+                    Start Course
+                </button>
+            </div>`;
     });
 }
 
-/* ===== OPEN SINGLE COURSE ===== */
+/* OPEN COURSE */
 async function openCourse(id) {
     document.getElementById('course-list').style.display = 'none';
     document.getElementById('single-course').style.display = 'block';
 
-    const res = await fetch(`/api/courses/${id}`);
-    currentCourse = await res.json();
+    const r = await fetch(`/api/courses/${id}`);
+    currentCourse = await r.json();
 
     completedShlokas.clear();
+    quizPassed = false;
 
     document.getElementById('course-title').textContent = currentCourse.title;
-    document.getElementById('course-description').textContent =
-        currentCourse.description || '';
+    document.getElementById('header-title').textContent = currentCourse.title;
 
     const box = document.getElementById('course-shlokas');
     box.innerHTML = '';
 
     currentCourse.shlokas.forEach(s => {
-        const div = document.createElement('div');
-        div.className = 'shloka-item-card';
-        div.innerHTML = `
-            <div class="card-video-container">
+        box.innerHTML += `
+            <div class="shloka-item-card">
                 <div id="player-${s._id}"></div>
-            </div>
-            <div class="card-content">
-                <h3>Adhyay ${s.adhyay} – Shloka ${s.shloka}</h3>
-                <p class="shloka-text">${s.text || ''}</p>
-                <p id="status-${s._id}">⏳ Not Completed</p>
-            </div>
-        `;
-        box.appendChild(div);
+                <div class="card-content">
+                    <p>${s.text || ''}</p>
+                    <p id="status-${s._id}">⏳ Not completed</p>
+                </div>
+            </div>`;
     });
 
     setTimeout(initPlayers, 500);
 }
 
-/* ===== YOUTUBE PLAYERS ===== */
+/* YOUTUBE */
 function initPlayers() {
     currentCourse.shlokas.forEach(s => {
         players[s._id] = new YT.Player(`player-${s._id}`, {
             videoId: s.video_id,
             events: {
-                onStateChange: e => onVideoStateChange(e, s._id)
+                onStateChange: e => {
+                    if (e.data === YT.PlayerState.ENDED) {
+                        completedShlokas.add(s._id);
+                        document.getElementById(`status-${s._id}`).textContent = '✅ Completed';
+                        checkQuizUnlock();
+                    }
+                }
             }
         });
     });
 }
 
-function onVideoStateChange(event, shlokaId) {
-    if (event.data === YT.PlayerState.ENDED) {
-        completedShlokas.add(shlokaId);
-        document.getElementById(`status-${shlokaId}`).textContent =
-            '✅ Completed';
-
-        checkCompletion();
-    }
-}
-
-/* ===== CHECK COURSE COMPLETION ===== */
-function checkCompletion() {
+/* QUIZ UNLOCK */
+function checkQuizUnlock() {
     if (completedShlokas.size === currentCourse.shlokas.length) {
-        document.getElementById('completion-box').style.display = 'block';
+        document.getElementById('quiz-box').style.display = 'block';
     }
 }
 
-/* ===== CERTIFICATE ===== */
+/* SIMULATED QUIZ */
+const url = new URLSearchParams(location.search);
+if (url.get('quiz') === 'passed') {
+    document.getElementById('certificate-box').style.display = 'block';
+}
+
+
+/* CERTIFICATE */
 async function generateCertificate() {
     const name = document.getElementById('user-name').value;
     const email = document.getElementById('user-email').value;
     const mobile = document.getElementById('user-mobile').value;
     const lang = document.getElementById('cert-lang').value;
 
-    if (!name || !email || !mobile) {
-        alert('Please fill all details');
+    if (!quizPassed) {
+        alert('Complete quiz first');
         return;
     }
 
-    const res = await fetch('/api/certificate', {
+    const r = await fetch('/api/certificate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type':'application/json'},
         body: JSON.stringify({
             name,
             courseTitle: currentCourse.title,
@@ -111,17 +108,18 @@ async function generateCertificate() {
         })
     });
 
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    window.open(url);
+    const blob = await r.blob();
+    window.open(URL.createObjectURL(blob));
 }
 
-/* ===== BACK ===== */
+/* NAV */
 function goBack() {
     document.getElementById('single-course').style.display = 'none';
     document.getElementById('course-list').style.display = 'block';
-    document.getElementById('completion-box').style.display = 'none';
 }
 
-/* INIT */
+function goHome() {
+    location.href = '/';
+}
+
 loadCourses();

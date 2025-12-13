@@ -132,20 +132,38 @@
 </div>
 
 <div id="tab-quizzes" class="content-page">
+
     <h1 class="page-header">Manage Quizzes</h1>
 
     <form id="quiz-form">
-        <label>Select Course</label>
-        <select id="quiz-course"></select>
 
-        <input type="number" id="quiz-pass" value="50" placeholder="Passing Marks (%)">
+        <label>Select Course</label>
+        <select id="quiz-course" required></select>
+
+        <input type="number"
+               id="quiz-pass"
+               value="50"
+               placeholder="Passing Marks (%)"
+               required>
 
         <h3>Questions</h3>
         <div id="quiz-questions"></div>
 
-        <button type="button" id="add-question">+ Add Question</button>
-        <button type="submit">Save Quiz</button>
+        <button type="button"
+                id="add-question"
+                class="primary-btn">
+            ➕ Add Question
+        </button>
+
+        <br><br>
+
+        <button type="submit"
+                class="primary-btn">
+            💾 Save Quiz
+        </button>
+
     </form>
+
 </div>
 
             <div id="tab-certificates" class="content-page">
@@ -906,6 +924,103 @@ document.getElementById('print-certificate').onclick = () => {
     document.getElementById('certificate-preview').contentWindow.print();
 };
 loadCoursesForCertificate();
+
+/* ================= QUIZ MANAGEMENT ================= */
+
+// load courses into quiz dropdown
+async function loadCoursesForQuiz() {
+    const sel = document.getElementById('quiz-course');
+    if (!sel) return;
+
+    sel.innerHTML = '<option value="">Select Course</option>';
+
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
+
+    courses.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c._id;
+        opt.textContent = c.title;
+        sel.appendChild(opt);
+    });
+}
+
+// add question UI
+document.getElementById('add-question')?.addEventListener('click', () => {
+    const box = document.getElementById('quiz-questions');
+
+    const div = document.createElement('div');
+    div.className = 'shloka-admin-item';
+
+    div.innerHTML = `
+        <input placeholder="Question" required>
+        <input placeholder="Option A" required>
+        <input placeholder="Option B" required>
+        <input placeholder="Option C" required>
+        <input placeholder="Option D" required>
+        <input type="number"
+               placeholder="Correct option index (0-3)"
+               min="0" max="3" required>
+    `;
+
+    box.appendChild(div);
+});
+
+// save quiz
+document.getElementById('quiz-form')?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const questions = [];
+    document.querySelectorAll('#quiz-questions .shloka-admin-item')
+        .forEach(div => {
+            const i = div.querySelectorAll('input');
+            questions.push({
+                question: i[0].value,
+                options: [i[1].value, i[2].value, i[3].value, i[4].value],
+                correct: Number(i[5].value)
+            });
+        });
+
+    if (!questions.length) {
+        alert('Add at least one question');
+        return;
+    }
+
+    const payload = {
+        course: document.getElementById('quiz-course').value,
+        passingMarks: Number(document.getElementById('quiz-pass').value),
+        questions,
+        password: adminPassword
+    };
+
+    const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert('Quiz saved successfully');
+        document.getElementById('quiz-form').reset();
+        document.getElementById('quiz-questions').innerHTML = '';
+    } else {
+        alert('Failed to save quiz');
+    }
+});
+
+// load quiz courses when tab opens
+sidebarButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.dataset.tab === 'tab-quizzes') {
+            loadCoursesForQuiz();
+        }
+    });
+});
     </script>
 </body>
 </html>
