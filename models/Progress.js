@@ -5,14 +5,28 @@ const progressSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
     courseId: {
-        type: String,   // 🔥 STRING ONLY
+        type: String,   // keep string, that’s fine
         required: true
     },
+
     completed: {
         type: [String],
         default: []
+    },
+
+    // ✅ REQUIRED FOR QUIZ & CERTIFICATE
+    quizPassed: {
+        type: Boolean,
+        default: false
+    },
+
+    quizScore: {
+        type: Number,
+        default: 0
     }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Progress', progressSchema);
