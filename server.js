@@ -484,8 +484,10 @@ const PDFDocument = require('pdfkit');
 
 app.post('/api/certificate', async (req, res) => {
     const { name, courseTitle, lang } = req.body;
+    const PDFDocument = require('pdfkit');
 
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
         'Content-Disposition',
@@ -505,13 +507,21 @@ app.post('/api/certificate', async (req, res) => {
 
     doc.fontSize(16).text(
         lang === 'hi'
-            ? `यह प्रमाणित किया जाता है कि ${name} ने ${courseTitle} को सफलतापूर्वक पूर्ण किया है।`
-            : `This is to certify that ${name} has successfully completed the course "${courseTitle}".`,
+            ? `यह प्रमाणित किया जाता है कि ${name} ने "${courseTitle}" पाठ्यक्रम को सफलतापूर्वक पूर्ण किया है।`
+            : `This is to proudly certify that ${name} has successfully completed the course "${courseTitle}".`,
         { align: 'center' }
     );
 
     doc.moveDown(4);
-    doc.fontSize(12).text(`Date: ${new Date().toLocaleDateString()}`, {
+
+    doc.text(
+        lang === 'hi'
+            ? 'Aaradhya Soni'
+            : 'Aaradhya Soni',
+        { align: 'right' }
+    );
+
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, {
         align: 'right'
     });
 

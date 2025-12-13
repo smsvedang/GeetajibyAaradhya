@@ -8,66 +8,52 @@
     <!-- Main site CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <style>
-        /* Page specific safety (admin se isolate) */
-        body.courses-page {
-            background: #f5f6f8;
-        }
-
-        .courses-container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .course-card {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 6px solid #ff9800;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-        }
-
-        .course-card h2 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        .course-card p {
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .course-card a {
-            display: inline-block;
-            margin-top: 12px;
-            background: #ff9800;
-            color: #fff;
-            padding: 10px 18px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-
-        .course-card a:hover {
-            background: #e68900;
-        }
-    </style>
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body class="courses-page">
 
-    <h1 style="text-align:center; margin-top:30px;">
-        📘 Available Courses
-    </h1>
+<div class="container">
 
-    <div class="courses-container" id="courses-container">
-        <!-- Courses will load here -->
+    <h1 style="text-align:center; margin-bottom:30px;">
+        📘 Courses
+    </h1>
+    <div class="shloka-nav-links">
+                <a href="index.html" class="home-button">Home</a>
+            </div>
+
+    <!-- ===== COURSE LIST ===== -->
+    <div id="course-list"></div>
+
+    <!-- ===== SINGLE COURSE VIEW ===== -->
+    <div id="single-course" style="display:none;">
+        <button onclick="goBack()" class="start-course-btn">⬅ Back to Courses</button>
+
+        <h2 id="course-title"></h2>
+        <p id="course-description"></p>
+
+        <div id="course-shlokas"></div>
+
+        <!-- Completion Form -->
+        <div id="completion-box" class="course-complete-form" style="display:none;">
+            <h3>🎓 Course Completion</h3>
+
+            <input type="text" id="user-name" placeholder="Your Name" required>
+            <input type="email" id="user-email" placeholder="Email" required>
+            <input type="tel" id="user-mobile" placeholder="Mobile Number" required>
+
+            <select id="cert-lang">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+            </select>
+
+            <button onclick="generateCertificate()">Generate Certificate</button>
+        </div>
     </div>
 
-    <!-- JS -->
-    <script src="courses.js"></script>
+</div>
 
+<script src="courses.js"></script>
 </body>
 </html>

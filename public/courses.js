@@ -1,52 +1,127 @@
+let players = {};
+let completedShlokas = new Set();
+let currentCourse = null;
+
+/* ===== LOAD COURSES ===== */
 async function loadCourses() {
-    const container = document.getElementById('courses-container');
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
 
-    if (!container) {
-        console.error('courses-container not found');
-        return;
-    }
+    const list = document.getElementById('course-list');
+    list.innerHTML = '';
 
-    container.innerHTML = '<p>Loading courses...</p>';
+    courses.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'course-card';
+        div.innerHTML = `
+            <h3>${c.title}</h3>
+            <p>${c.description || ''}</p>
+            <button class="start-course-btn" onclick="openCourse('${c._id}')">
+                Start Course
+            </button>
+        `;
+        list.appendChild(div);
+    });
+}
 
-    try {
-        const res = await fetch('/api/courses');
+/* ===== OPEN SINGLE COURSE ===== */
+async function openCourse(id) {
+    document.getElementById('course-list').style.display = 'none';
+    document.getElementById('single-course').style.display = 'block';
 
-        if (!res.ok) {
-            throw new Error('API error');
-        }
+    const res = await fetch(`/api/courses/${id}`);
+    currentCourse = await res.json();
 
-        const courses = await res.json();
+    completedShlokas.clear();
 
-        if (!Array.isArray(courses) || courses.length === 0) {
-            container.innerHTML = '<p>No courses available yet.</p>';
-            return;
-        }
+    document.getElementById('course-title').textContent = currentCourse.title;
+    document.getElementById('course-description').textContent =
+        currentCourse.description || '';
 
-        container.innerHTML = '';
+    const box = document.getElementById('course-shlokas');
+    box.innerHTML = '';
 
-        courses.forEach(course => {
-            const div = document.createElement('div');
-            div.className = 'course-card';
+    currentCourse.shlokas.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'shloka-item-card';
+        div.innerHTML = `
+            <div class="card-video-container">
+                <div id="player-${s._id}"></div>
+            </div>
+            <div class="card-content">
+                <h3>Adhyay ${s.adhyay} – Shloka ${s.shloka}</h3>
+                <p class="shloka-text">${s.text || ''}</p>
+                <p id="status-${s._id}">⏳ Not Completed</p>
+            </div>
+        `;
+        box.appendChild(div);
+    });
 
-            div.innerHTML = `
-                <h2>${course.title}</h2>
-                <p>${course.description || ''}</p>
-                <p><strong>Adhyay:</strong> ${course.adhyay || '-'}</p>
-                <p><strong>Total Shlokas:</strong> ${course.shlokas?.length || 0}</p>
-                <a href="/course.html?id=${course._id}">
-                    Start Course
-                </a>
-            `;
+    setTimeout(initPlayers, 500);
+}
 
-            container.appendChild(div);
+/* ===== YOUTUBE PLAYERS ===== */
+function initPlayers() {
+    currentCourse.shlokas.forEach(s => {
+        players[s._id] = new YT.Player(`player-${s._id}`, {
+            videoId: s.video_id,
+            events: {
+                onStateChange: e => onVideoStateChange(e, s._id)
+            }
         });
+    });
+}
 
-    } catch (err) {
-        console.error(err);
-        container.innerHTML =
-            '<p style="color:red;">Failed to load courses. Please try again later.</p>';
+function onVideoStateChange(event, shlokaId) {
+    if (event.data === YT.PlayerState.ENDED) {
+        completedShlokas.add(shlokaId);
+        document.getElementById(`status-${shlokaId}`).textContent =
+            '✅ Completed';
+
+        checkCompletion();
     }
 }
 
-// Run on page load
+/* ===== CHECK COURSE COMPLETION ===== */
+function checkCompletion() {
+    if (completedShlokas.size === currentCourse.shlokas.length) {
+        document.getElementById('completion-box').style.display = 'block';
+    }
+}
+
+/* ===== CERTIFICATE ===== */
+async function generateCertificate() {
+    const name = document.getElementById('user-name').value;
+    const email = document.getElementById('user-email').value;
+    const mobile = document.getElementById('user-mobile').value;
+    const lang = document.getElementById('cert-lang').value;
+
+    if (!name || !email || !mobile) {
+        alert('Please fill all details');
+        return;
+    }
+
+    const res = await fetch('/api/certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            courseTitle: currentCourse.title,
+            lang
+        })
+    });
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
+}
+
+/* ===== BACK ===== */
+function goBack() {
+    document.getElementById('single-course').style.display = 'none';
+    document.getElementById('course-list').style.display = 'block';
+    document.getElementById('completion-box').style.display = 'none';
+}
+
+/* INIT */
 loadCourses();
