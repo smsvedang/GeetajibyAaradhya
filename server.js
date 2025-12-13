@@ -443,7 +443,49 @@ app.post('/api/courses', async (req, res) => {
     }
 });
 
+//---Progress APIs---
+app.post('/api/progress/save', async (req, res) => {
+    const { mobile, courseId, completed } = req.body;
+
+    await Progress.findOneAndUpdate(
+        { mobile, courseId },
+        { completed },
+        { upsert: true }
+    );
+
+    res.json({ success: true });
+});
+
+app.get('/api/progress/:mobile/:courseId', async (req, res) => {
+    const p = await Progress.findOne({
+        mobile: req.params.mobile,
+        courseId: req.params.courseId
+    });
+
+    res.json(p || { completed: [] });
+});
+
 // --- Quiz APIs ---
+app.get('/api/quiz', async (req, res) => {
+    const quizzes = await Quiz.find().populate('course');
+    res.json(quizzes);
+});
+app.put('/api/quiz/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    await Quiz.findByIdAndUpdate(req.params.id, req.body);
+    res.json({ success: true });
+});
+app.delete('/api/quiz/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    await Quiz.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+});
 app.get('/api/quiz/:courseId', async (req, res) => {
     try {
         const quiz = await Quiz.findOne({ course: req.params.courseId });

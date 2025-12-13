@@ -132,7 +132,8 @@
 </div>
 
 <div id="tab-quizzes" class="content-page">
-
+    <h3 style="margin-top:30px;">Existing Quizzes</h3>
+<div id="quiz-list" class="admin-item-list"></div>
     <h1 class="page-header">Manage Quizzes</h1>
 
     <form id="quiz-form">
@@ -1018,6 +1019,72 @@ sidebarButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         if (btn.dataset.tab === 'tab-quizzes') {
             loadCoursesForQuiz();
+        }
+    });
+});
+async function loadQuizzes() {
+    const res = await fetch('/api/quiz');
+    const quizzes = await res.json();
+
+    const list = document.getElementById('quiz-list');
+    list.innerHTML = '';
+
+    quizzes.forEach(q => {
+        const div = document.createElement('div');
+        div.className = 'shloka-admin-item';
+
+        div.innerHTML = `
+            <p><strong>${q.course?.title || 'Unknown Course'}</strong>
+               (Pass: ${q.passingMarks}%)</p>
+            <div class="admin-buttons">
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
+            </div>
+        `;
+
+        /* EDIT */
+        div.querySelector('.edit-button').onclick = () => {
+            document.getElementById('quiz-course').value = q.course?._id;
+            document.getElementById('quiz-pass').value = q.passingMarks;
+            document.getElementById('quiz-questions').innerHTML = '';
+
+            q.questions.forEach(ques => {
+                const box = document.createElement('div');
+                box.className = 'shloka-admin-item';
+                box.innerHTML = `
+                    <input value="${ques.question}">
+                    <input value="${ques.options[0]}">
+                    <input value="${ques.options[1]}">
+                    <input value="${ques.options[2]}">
+                    <input value="${ques.options[3]}">
+                    <input type="number" value="${ques.correct}">
+                `;
+                document.getElementById('quiz-questions').appendChild(box);
+            });
+        };
+
+        /* DELETE */
+        div.querySelector('.delete-button').onclick = async () => {
+            if (!confirm('Delete this quiz?')) return;
+
+            await fetch('/api/quiz/' + q._id, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword })
+            });
+
+            loadQuizzes();
+        };
+
+        list.appendChild(div);
+    });
+}
+
+/* tab open par load */
+sidebarButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.dataset.tab === 'tab-quizzes') {
+            loadQuizzes();
         }
     });
 });
