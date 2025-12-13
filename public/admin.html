@@ -1088,6 +1088,31 @@ sidebarButtons.forEach(btn => {
         }
     });
 });
+document.getElementById('course-list').onclick = async e => {
+    if (!e.target.classList.contains('delete-course')) return;
+
+    if (!confirm('Delete this course?')) return;
+
+    const id = e.target.dataset.id;
+
+    const res = await fetch(`/api/courses/${id}`, {
+        method: 'DELETE'
+    });
+
+    if (res.ok) loadCourses();
+};
+document.getElementById('quiz-course').onchange = e => {
+    document.getElementById('delete-quiz').onclick = async () => {
+        if (!confirm('Delete quiz?')) return;
+
+        await fetch(`/api/quizzes/${e.target.value}`, {
+            method: 'DELETE'
+        });
+
+        alert('Quiz deleted');
+    };
+};
+
     </script>
 </body>
 </html>

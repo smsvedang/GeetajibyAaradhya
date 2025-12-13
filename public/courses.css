@@ -122,6 +122,25 @@ body {
     color: #2E7D32;
 }
 
+/* RESPONSIVE YOUTUBE VIDEO */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 ratio */
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-wrapper iframe,
+.video-wrapper div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
     .course-header {
@@ -131,5 +150,8 @@ body {
 
     .course-header .nav-buttons {
         margin-top: 10px;
+    }
+    .shloka-item-card {
+        padding: 10px;
     }
 }

@@ -1,10 +1,15 @@
+/***********************
+ * GLOBAL STATE
+ ***********************/
 let players = {};
 let completedShlokas = new Set();
 let currentCourse = null;
 let quizPassed = false;
 let userMobile = localStorage.getItem('userMobile') || '';
 
-/* LOAD COURSES */
+/***********************
+ * LOAD COURSES LIST
+ ***********************/
 async function loadCourses() {
     const r = await fetch('/api/courses');
     const courses = await r.json();
@@ -17,14 +22,17 @@ async function loadCourses() {
             <div class="course-card">
                 <h3>${c.title}</h3>
                 <p>${c.description || ''}</p>
-                <button class="start-course-btn" onclick="openCourse('${c._id}')">
+                <button onclick="openCourse('${c._id}')">
                     Start Course
                 </button>
-            </div>`;
+            </div>
+        `;
     });
 }
 
-/* OPEN COURSE */
+/***********************
+ * OPEN SINGLE COURSE
+ ***********************/
 async function openCourse(id) {
     document.getElementById('course-list').style.display = 'none';
     document.getElementById('single-course').style.display = 'block';
@@ -34,7 +42,6 @@ async function openCourse(id) {
 
     completedShlokas.clear();
     quizPassed = false;
-    restoreProgress();
 
     document.getElementById('course-title').textContent = currentCourse.title;
     document.getElementById('header-title').textContent = currentCourse.title;
@@ -45,27 +52,47 @@ async function openCourse(id) {
     currentCourse.shlokas.forEach(s => {
         box.innerHTML += `
             <div class="shloka-item-card">
-                <div id="player-${s._id}"></div>
+                <div class="video-wrapper">
+                    <div id="player-${s._id}"></div>
+                </div>
                 <div class="card-content">
                     <p>${s.text || ''}</p>
                     <p id="status-${s._id}">⏳ Not completed</p>
                 </div>
-            </div>`;
+            </div>
+        `;
     });
 
-    setTimeout(initPlayers, 500);
+    setTimeout(() => {
+        initPlayers();
+        restoreProgress();   // ✅ ONLY AFTER course load
+    }, 300);
 }
 
-/* YOUTUBE */
+/***********************
+ * YOUTUBE PLAYERS
+ ***********************/
 function initPlayers() {
+    if (!window.YT || !YT.Player) return;
+
     currentCourse.shlokas.forEach(s => {
         players[s._id] = new YT.Player(`player-${s._id}`, {
             videoId: s.video_id,
+            width: '100%',
+            height: '100%',
+            playerVars: {
+                rel: 0,
+                modestbranding: 1
+            },
             events: {
                 onStateChange: e => {
                     if (e.data === YT.PlayerState.ENDED) {
                         completedShlokas.add(s._id);
-                        document.getElementById(`status-${s._id}`).textContent = '✅ Completed';
+
+                        const st = document.getElementById(`status-${s._id}`);
+                        if (st) st.textContent = '✅ Completed';
+
+                        saveProgress();
                         checkQuizUnlock();
                     }
                 }
@@ -74,20 +101,19 @@ function initPlayers() {
     });
 }
 
-/* QUIZ UNLOCK */
-function checkQuizUnlock() {
-    if (completedShlokas.size === currentCourse.shlokas.length) {
-        document.getElementById('quiz-box').style.display = 'block';
-    }
-}
-
-/* Save Progress After Quiz Pass */
-function saveProgress() {
-    // 🔒 Safety checks
+/***********************
+ * SAVE PROGRESS
+ ***********************/
+async function saveProgress() {
     if (!currentCourse || !currentCourse._id) return;
-    if (!userMobile) return;
 
-    fetch('/api/progress/save', {
+    if (!userMobile) {
+        userMobile = prompt('Enter mobile number');
+        if (!userMobile) return;
+        localStorage.setItem('userMobile', userMobile);
+    }
+
+    await fetch('/api/progress/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -98,7 +124,9 @@ function saveProgress() {
     });
 }
 
-/* Restore Progress */
+/***********************
+ * RESTORE PROGRESS
+ ***********************/
 async function restoreProgress() {
     if (!currentCourse || !currentCourse._id) return;
 
@@ -123,33 +151,45 @@ async function restoreProgress() {
         if (el) el.textContent = '✅ Completed';
     });
 
-    if (completedShlokas.size === currentCourse.shlokas.length) {
+    checkQuizUnlock();
+}
+
+/***********************
+ * QUIZ UNLOCK
+ ***********************/
+function checkQuizUnlock() {
+    if (
+        currentCourse &&
+        completedShlokas.size === currentCourse.shlokas.length
+    ) {
         document.getElementById('quiz-box').style.display = 'block';
     }
 }
 
-/* SIMULATED QUIZ */
-const url = new URLSearchParams(location.search);
-if (url.get('quiz') === 'passed') {
+/***********************
+ * SIMULATED QUIZ RESULT
+ ***********************/
+const params = new URLSearchParams(location.search);
+if (params.get('quiz') === 'passed') {
+    quizPassed = true;
     document.getElementById('certificate-box').style.display = 'block';
 }
 
-
-/* CERTIFICATE */
+/***********************
+ * CERTIFICATE
+ ***********************/
 async function generateCertificate() {
-    const name = document.getElementById('user-name').value;
-    const email = document.getElementById('user-email').value;
-    const mobile = document.getElementById('user-mobile').value;
-    const lang = document.getElementById('cert-lang').value;
-
     if (!quizPassed) {
-        alert('Complete quiz first');
+        alert('Please pass the quiz first');
         return;
     }
 
+    const name = document.getElementById('user-name').value;
+    const lang = document.getElementById('cert-lang').value;
+
     const r = await fetch('/api/certificate', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             name,
             courseTitle: currentCourse.title,
@@ -161,7 +201,9 @@ async function generateCertificate() {
     window.open(URL.createObjectURL(blob));
 }
 
-/* NAV */
+/***********************
+ * NAVIGATION
+ ***********************/
 function goBack() {
     document.getElementById('single-course').style.display = 'none';
     document.getElementById('course-list').style.display = 'block';
@@ -171,4 +213,7 @@ function goHome() {
     location.href = '/';
 }
 
+/***********************
+ * INIT
+ ***********************/
 loadCourses();

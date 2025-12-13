@@ -442,6 +442,17 @@ app.post('/api/courses', async (req, res) => {
         res.status(500).json({ message: 'Course save karne mein error' });
     }
 });
+app.delete('/api/courses/:id', async (req, res) => {
+    try {
+        await Course.findByIdAndDelete(req.params.id);
+        await Quiz.deleteOne({ course: req.params.id });
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Delete failed' });
+    }
+});
+
 
 //---Progress APIs---
 app.post('/api/progress/save', async (req, res) => {
@@ -492,6 +503,14 @@ app.get('/api/quiz/:courseId', async (req, res) => {
         res.json(quiz);
     } catch (err) {
         res.status(500).json({ message: 'Quiz laane mein error' });
+    }
+});
+app.delete('/api/quizzes/:courseId', async (req, res) => {
+    try {
+        await Quiz.deleteOne({ course: req.params.courseId });
+        res.json({ success: true });
+    } catch {
+        res.status(500).json({ message: 'Quiz delete failed' });
     }
 });
 app.post('/api/quiz', async (req, res) => {
