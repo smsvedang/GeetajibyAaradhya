@@ -34,6 +34,7 @@ async function openCourse(id) {
 
     completedShlokas.clear();
     quizPassed = false;
+    restoreProgress();
 
     document.getElementById('course-title').textContent = currentCourse.title;
     document.getElementById('header-title').textContent = currentCourse.title;
@@ -82,6 +83,8 @@ function checkQuizUnlock() {
 
 /* Save Progress After Quiz Pass */
 function saveProgress() {
+    // 🔒 Safety checks
+    if (!currentCourse || !currentCourse._id) return;
     if (!userMobile) return;
 
     fetch('/api/progress/save', {
@@ -94,30 +97,36 @@ function saveProgress() {
         })
     });
 }
-saveProgress();
 
 /* Restore Progress */
 async function restoreProgress() {
+    if (!currentCourse || !currentCourse._id) return;
+
     if (!userMobile) {
         userMobile = prompt('Enter mobile number');
+        if (!userMobile) return;
         localStorage.setItem('userMobile', userMobile);
     }
 
     const res = await fetch(
         `/api/progress/${userMobile}/${currentCourse._id}`
     );
+
+    if (!res.ok) return;
+
     const data = await res.json();
+    if (!data || !data.completed) return;
 
     data.completed.forEach(id => {
         completedShlokas.add(id);
-        document.getElementById(`status-${id}`).textContent = '✅ Completed';
+        const el = document.getElementById(`status-${id}`);
+        if (el) el.textContent = '✅ Completed';
     });
 
     if (completedShlokas.size === currentCourse.shlokas.length) {
         document.getElementById('quiz-box').style.display = 'block';
     }
 }
-restoreProgress();
 
 /* SIMULATED QUIZ */
 const url = new URLSearchParams(location.search);
