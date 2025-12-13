@@ -65,6 +65,27 @@ const testimonialSchema = new mongoose.Schema({
 });
 const Testimonial = mongoose.model('Testimonial', testimonialSchema);
 
+// --- 6. Course Model ---
+const courseSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String },
+    adhyay: { type: Number, required: true },
+    shlokas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shloka' }],
+    createdAt: { type: Date, default: Date.now }
+});
+const Course = mongoose.model('Course', courseSchema);
+
+// --- 7. Quiz Model ---
+const quizSchema = new mongoose.Schema({
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+    passPercentage: { type: Number, default: 50 },
+    questions: [{
+        question: String,
+        options: [String],
+        correctIndex: Number
+    }]
+});
+const Quiz = mongoose.model('Quiz', quizSchema);
 
 // --- API Routes ---
 
@@ -388,6 +409,70 @@ app.delete('/api/blog/:id', async (req, res) => {
     }
 });
 
+// --- Course APIs ---
+app.get('/api/courses', async (req, res) => {
+    try {
+        const courses = await Course.find().populate('shlokas');
+        res.json(courses);
+    } catch (err) {
+        res.status(500).json({ message: 'Courses laane mein error' });
+    }
+});
+app.post('/api/courses', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+
+    try {
+        const course = new Course({
+            title: req.body.title,
+            description: req.body.description,
+            adhyay: Number(req.body.adhyay),
+            shlokas: req.body.shlokas // array of shloka IDs
+        });
+        await course.save();
+        res.status(201).json(course);
+    } catch (err) {
+        res.status(500).json({ message: 'Course save karne mein error' });
+    }
+});
+
+// --- Quiz APIs ---
+app.get('/api/quiz/:courseId', async (req, res) => {
+    try {
+        const quiz = await Quiz.findOne({ course: req.params.courseId });
+        res.json(quiz);
+    } catch (err) {
+        res.status(500).json({ message: 'Quiz laane mein error' });
+    }
+});
+app.post('/api/quiz', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+
+    try {
+        const existing = await Quiz.findOne({ course: req.body.course });
+
+        if (existing) {
+            existing.questions = req.body.questions;
+            existing.passPercentage = req.body.passPercentage;
+            await existing.save();
+            return res.json({ success: true, message: 'Quiz updated' });
+        }
+
+        const quiz = new Quiz({
+            course: req.body.course,
+            passPercentage: req.body.passPercentage,
+            questions: req.body.questions
+        });
+        await quiz.save();
+        res.status(201).json({ success: true, message: 'Quiz created' });
+
+    } catch (err) {
+        res.status(500).json({ message: 'Quiz save error' });
+    }
+});
 
 // --- Testimonial APIs ---
 app.get('/api/testimonials', async (req, res) => {
