@@ -1,53 +1,56 @@
-/****************************
- * QUIZ.JS – FINAL VERSION
- ****************************/
+/************************
+ * GLOBAL
+ ************************/
+let quizData = null;
+let userMobile = localStorage.getItem('userMobile');
 
-/* ===== GLOBALS ===== */
-let quiz = null;
-let courseId = null;
-const userMobile = localStorage.getItem('userMobile');
-
-/* ===== INIT ===== */
+/************************
+ * GET COURSE ID
+ ************************/
 const params = new URLSearchParams(window.location.search);
-courseId = params.get('course');
+const courseId = params.get('courseId');
 
 if (!courseId) {
-    alert('Course ID missing');
+    alert('Course ID not found');
 }
 
-/* ===== LOAD QUIZ ===== */
+/************************
+ * LOAD QUIZ
+ ************************/
 async function loadQuiz() {
-    try {
-        const res = await fetch(`/api/quiz/${courseId}`);
-        quiz = await res.json();
+    const res = await fetch(`/api/quiz/${courseId}`);
 
-        if (!quiz || !quiz.questions || quiz.questions.length === 0) {
-            document.getElementById('quiz-form').innerHTML =
-                '<p>No quiz available for this course.</p>';
-            return;
-        }
-
-        renderQuiz();
-    } catch (err) {
-        console.error(err);
-        alert('Failed to load quiz');
+    if (!res.ok) {
+        alert('Quiz not found for this course');
+        return;
     }
+
+    quizData = await res.json();
+
+    if (!quizData || !quizData.questions || quizData.questions.length === 0) {
+        alert('Quiz questions missing');
+        return;
+    }
+
+    renderQuiz();
 }
 
-/* ===== RENDER QUIZ ===== */
+/************************
+ * RENDER QUIZ
+ ************************/
 function renderQuiz() {
-    const form = document.getElementById('quiz-form');
-    form.innerHTML = '';
+    const box = document.getElementById('quiz-questions');
+    box.innerHTML = '';
 
-    quiz.questions.forEach((q, i) => {
-        form.innerHTML += `
-            <div class="course-card">
-                <p><b>Q${i + 1}. ${q.question}</b></p>
+    quizData.questions.forEach((q, i) => {
+        box.innerHTML += `
+            <div class="quiz-question">
+                <p><b>Q${i + 1}.</b> ${q.question}</p>
 
-                ${q.options.map((o, idx) => `
+                ${q.options.map((opt, idx) => `
                     <label>
                         <input type="radio" name="q${i}" value="${idx}">
-                        ${o}
+                        ${opt}
                     </label><br>
                 `).join('')}
             </div>
@@ -55,42 +58,54 @@ function renderQuiz() {
     });
 }
 
-/* ===== SUBMIT QUIZ ===== */
+/************************
+ * SUBMIT QUIZ
+ ************************/
 async function submitQuiz() {
+    if (!quizData) {
+        alert('Quiz not loaded');
+        return;
+    }
+
     let score = 0;
 
-    quiz.questions.forEach((q, i) => {
+    quizData.questions.forEach((q, i) => {
         const selected = document.querySelector(
             `input[name="q${i}"]:checked`
         );
 
-        const chosen = selected ? Number(selected.value) : -1;
-        const correct = Number(q.correctIndex);
-
-        if (chosen === correct) score++;
+        if (selected && Number(selected.value) === q.correctIndex) {
+            score++;
+        }
     });
 
-    const total = quiz.questions.length;
-    const percent = Math.round((score / total) * 100);
-    const passPercentage = Number(quiz.passPercentage || 50);
+    const percent = Math.round(
+        (score / quizData.questions.length) * 100
+    );
 
-    if (percent >= passPercentage) {
-        await fetch('/api/quiz/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                mobile: userMobile,
-                courseId,
-                score: percent
-            })
-        });
-
-        alert('Quiz Passed 🎉');
-        window.location.href = `/courses.html?course=${courseId}`;
-    } else {
-        alert('Quiz Failed ❌');
+    if (percent < quizData.passingMarks) {
+        alert(`Failed ❌ You scored ${percent}%`);
+        return;
     }
+
+    // ✅ SAVE QUIZ PASS
+    await fetch('/api/quiz/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            mobile: userMobile,
+            courseId,
+            score: percent
+        })
+    });
+
+    alert(`Passed ✅ ${percent}%`);
+
+    // 🔥 IMPORTANT: go back to course page
+    window.location.href = `/courses.html?courseId=${courseId}`;
 }
 
-/* ===== START ===== */
+/************************
+ * INIT
+ ************************/
 loadQuiz();
