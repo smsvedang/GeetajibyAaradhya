@@ -515,6 +515,21 @@ app.post('/api/progress/save', async (req, res) => {
 });
 
 // --- Quiz APIs ---
+app.post('/api/quiz', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { course, passPercentage, questions } = req.body;
+
+    const quiz = await Quiz.findOneAndUpdate(
+        { course },
+        { course, passPercentage, questions },
+        { upsert: true, new: true }
+    );
+
+    res.json({ success: true, quiz });
+});
 app.get('/api/quiz', async (req, res) => {
     const quizzes = await Quiz.find().populate('course');
     res.json(quizzes);
@@ -548,33 +563,6 @@ app.delete('/api/quizzes/:courseId', async (req, res) => {
         res.json({ success: true });
     } catch {
         res.status(500).json({ message: 'Quiz delete failed' });
-    }
-});
-app.post('/api/quiz', async (req, res) => {
-    if (req.body.password !== process.env.ADMIN_PASSWORD) {
-        return res.status(401).json({ message: 'Password galat hai' });
-    }
-
-    try {
-        const existing = await Quiz.findOne({ course: req.body.course });
-
-        if (existing) {
-            existing.questions = req.body.questions;
-            existing.passPercentage = req.body.passPercentage;
-            await existing.save();
-            return res.json({ success: true, message: 'Quiz updated' });
-        }
-
-        const quiz = new Quiz({
-            course: req.body.course,
-            passPercentage: req.body.passPercentage,
-            questions: req.body.questions
-        });
-        await quiz.save();
-        res.status(201).json({ success: true, message: 'Quiz created' });
-
-    } catch (err) {
-        res.status(500).json({ message: 'Quiz save error' });
     }
 });
 
@@ -627,17 +615,7 @@ app.post('/api/certificate', async (req, res) => {
 });
 
 //---Quiz APIs ---
-app.post('/api/quiz', async (req, res) => {
-    const { course, passPercent, questions } = req.body;
 
-    await Quiz.findOneAndUpdate(
-        { course },
-        { course, passPercent, questions },
-        { upsert: true }
-    );
-
-    res.json({ success: true });
-});
 app.get('/api/quiz/:courseId', async (req,res)=>{
     const quiz = await Quiz.findOne({ course: req.params.courseId });
     res.json(quiz);

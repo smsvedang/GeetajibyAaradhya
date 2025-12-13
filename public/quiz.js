@@ -1,21 +1,49 @@
-const params = new URLSearchParams(location.search);
-const courseId = params.get('course');
-const passPercent = Number(quiz.passPercent || 50);
+/****************************
+ * QUIZ.JS – FINAL VERSION
+ ****************************/
 
-let quizData = [];
+/* ===== GLOBALS ===== */
+let quiz = null;
+let courseId = null;
 
+/* ===== INIT ===== */
+const params = new URLSearchParams(window.location.search);
+courseId = params.get('course');
+
+if (!courseId) {
+    alert('Course ID missing');
+}
+
+/* ===== LOAD QUIZ ===== */
 async function loadQuiz() {
-    const r = await fetch(`/api/quiz/${courseId}`);
-    quizData = await r.json();
+    try {
+        const res = await fetch(`/api/quiz/${courseId}`);
+        quiz = await res.json();
 
+        if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+            document.getElementById('quiz-form').innerHTML =
+                '<p>No quiz available for this course.</p>';
+            return;
+        }
+
+        renderQuiz();
+    } catch (err) {
+        console.error(err);
+        alert('Failed to load quiz');
+    }
+}
+
+/* ===== RENDER QUIZ ===== */
+function renderQuiz() {
     const form = document.getElementById('quiz-form');
     form.innerHTML = '';
 
-    quizData.questions.forEach((q, i) => {
+    quiz.questions.forEach((q, i) => {
         form.innerHTML += `
             <div class="course-card">
-                <p><b>Q${i+1}. ${q.question}</b></p>
-                ${q.options.map((o, idx)=>`
+                <p><b>Q${i + 1}. ${q.question}</b></p>
+
+                ${q.options.map((o, idx) => `
                     <label>
                         <input type="radio" name="q${i}" value="${idx}">
                         ${o}
@@ -26,10 +54,8 @@ async function loadQuiz() {
     });
 }
 
+/* ===== SUBMIT QUIZ ===== */
 async function submitQuiz() {
-    const res = await fetch(`/api/quiz/${courseId}`);
-    const quiz = await res.json();
-
     let score = 0;
 
     quiz.questions.forEach((q, i) => {
@@ -37,22 +63,29 @@ async function submitQuiz() {
             `input[name="q${i}"]:checked`
         );
 
-        if (selected && Number(selected.value) === Number(q.answer)) {
+        const chosen = selected ? Number(selected.value) : -1;
+        const correct = Number(q.answer);
+
+        if (chosen === correct) {
             score++;
         }
     });
 
-    const percent = (score / quiz.questions.length) * 100;
+    const total = quiz.questions.length;
+    const percent = Math.round((score / total) * 100);
 
-    if (percent >= quiz.passPercent) {
-        alert(`✅ Passed! Score: ${percent.toFixed(0)}%`);
+    // 🔐 SAFE PASS %
+    const passPercentage = Number(quiz.passPercentage || 50);
 
-        // Redirect back to course
+    if (percent >= passPercentage) {
+        alert(`✅ Passed! Score: ${percent}%`);
+
         window.location.href =
             `/courses.html?course=${courseId}&quiz=passed`;
     } else {
-        alert(`❌ Failed! Score: ${percent.toFixed(0)}%`);
+        alert(`❌ Failed! Score: ${percent}%`);
     }
 }
 
+/* ===== START ===== */
 loadQuiz();
