@@ -799,3 +799,79 @@ hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
         .testimonialSwiper .swiper-pagination-bullet-active {
           background: #D84315;
         }
+        /* ================= COURSES PAGE ================= */
+.courses-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.course-card {
+    background: #fff;
+    border: 1px solid #FFECB3;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.course-card h3 {
+    color: #D84315;
+    margin-top: 0;
+}
+
+.course-card p {
+    color: #5D4037;
+    line-height: 1.6;
+}
+
+.course-meta {
+    font-size: 0.9em;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.start-course-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #FF9800;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.start-course-btn:hover {
+    background: #F57C00;
+}
+
+/* ===== Course Completion Form ===== */
+.course-complete-form {
+    margin-top: 20px;
+    border-top: 1px solid #FFECB3;
+    padding-top: 15px;
+}
+
+.course-complete-form input,
+.course-complete-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.course-complete-form button {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.course-complete-form button:hover {
+    background: #43a047;
+}

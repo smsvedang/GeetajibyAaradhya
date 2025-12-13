@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Courses | Warrior Aaradhya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top-navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <a href="index.html" style="text-decoration:none;color:#D84315;">
+                Warrior Aaradhya
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="courses-container">
+    <h1 style="color:#D84315;">Bhagavad Gita Courses</h1>
+    <p>Complete shloka courses, attempt quiz and receive a certificate.</p>
+
+    <div id="courses-list">
+        <p>Loading courses...</p>
+    </div>
+</div>
+
+<script>
+async function loadCourses() {
+    const container = document.getElementById('courses-list');
+    container.innerHTML = '';
+
+    try {
+        const res = await fetch('/api/courses');
+        const courses = await res.json();
+
+        if (!courses.length) {
+            container.innerHTML = '<p>No courses available yet.</p>';
+            return;
+        }
+
+        courses.forEach(course => {
+            const div = document.createElement('div');
+            div.className = 'course-card';
+            div.innerHTML = `
+                <h3>${course.title}</h3>
+                <p class="course-meta">
+                    Adhyay: ${course.adhyay} |
+                    Shlokas: ${course.shlokas.length}
+                </p>
+                <p>${course.description || ''}</p>
+
+                <a href="course.html?id=${course._id}" class="start-course-btn">
+                    Start Course
+                </a>
+            `;
+            container.appendChild(div);
+        });
+
+    } catch (e) {
+        container.innerHTML = '<p>Failed to load courses.</p>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadCourses);
+</script>
+
+</body>
+</html>
