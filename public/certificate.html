@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Certificate</title>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Georgia", serif;
+    background: #f5f5f5;
+}
+
+.certificate {
+    width: 1000px;
+    height: 700px;
+    margin: 30px auto;
+    background: #fff;
+    border: 12px solid #c9a44c;
+    padding: 40px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.certificate::before {
+    content: "";
+    position: absolute;
+    inset: 15px;
+    border: 2px solid #e5d39a;
+}
+
+.logo {
+    text-align: center;
+}
+
+.logo img {
+    height: 80px;
+}
+
+.title {
+    text-align: center;
+    font-size: 42px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.name {
+    text-align: center;
+    font-size: 36px;
+    margin: 40px 0;
+    font-weight: bold;
+    color: #b38b00;
+}
+
+.text {
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 0 80px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 80px;
+}
+
+.signature {
+    text-align: center;
+}
+
+.signature img {
+    height: 60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="certificate">
+
+    <div class="logo">
+        <img src="/logo.png" alt="Logo">
+    </div>
+
+    <div class="title">Certificate of Completion</div>
+
+    <div class="subtitle">This is to proudly certify that</div>
+
+    <div class="name" id="cert-name"></div>
+
+    <div class="text" id="cert-text"></div>
+
+    <div class="footer">
+        <div class="signature">
+            <img src="/sign.png"><br>
+            <strong>Authorized Signatory</strong>
+        </div>
+
+        <div class="signature">
+            <strong>Date</strong><br>
+            <span id="cert-date"></span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+
+const name = params.get('name') || '';
+const course = params.get('course') || '';
+const lang = params.get('lang') || 'English';
+
+document.getElementById('cert-name').textContent = name;
+
+document.getElementById('cert-text').textContent =
+    lang === 'Hindi'
+    ? `यह प्रमाणित किया जाता है कि ${name} ने "${course}" पाठ्यक्रम सफलतापूर्वक पूर्ण किया है।`
+    : `This is to certify that ${name} has successfully completed the course "${course}".`;
+
+document.getElementById('cert-date').textContent =
+    new Date().toLocaleDateString();
+</script>
+
+</body>
+</html>

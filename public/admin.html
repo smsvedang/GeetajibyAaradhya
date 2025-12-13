@@ -148,24 +148,54 @@
     </form>
 </div>
 
-<div id="tab-certificates" class="content-page">
+            <div id="tab-certificates" class="content-page">
+
     <h1 class="page-header">Generate Certificate (Manual)</h1>
 
-    <form id="admin-cert-form">
-        <input id="cert-name" placeholder="Student Name" required>
+    <form id="certificate-form" class="certificate-form">
 
+        <input type="text"
+               id="cert-name"
+               placeholder="Student Name"
+               required>
+
+        <input type="email"
+               id="cert-email"
+               placeholder="Email (optional)">
+
+        <input type="text"
+               id="cert-mobile"
+               placeholder="Mobile Number">
+
+        <label>Select Course</label>
         <select id="cert-course" required>
             <option value="">Select Course</option>
         </select>
 
-        <select id="cert-lang">
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
+        <label>Language</label>
+        <select id="cert-language">
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
         </select>
 
-        <button type="submit">Generate Certificate</button>
+        <button type="submit" class="primary-btn">
+            Generate Certificate
+        </button>
+
     </form>
-</div>
+
+    <div id="certificate-preview-wrapper" style="display:none;">
+        <h2>Certificate Preview</h2>
+
+        <iframe id="certificate-preview"
+                style="width:100%; height:520px; border:1px solid #ddd;">
+        </iframe>
+
+        <button id="print-certificate" class="primary-btn">
+            Print / Download PDF
+        </button>
+    </div>
+    </div>
 
             <div id="tab-shloka" class="content-page">
                 <h1 class="page-header">Manage Shlokas</h1>
@@ -809,16 +839,44 @@ document.getElementById('show-course-form')?.addEventListener('click', () => {
     const box = document.getElementById('course-form-wrapper');
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
 });
+
+sidebarButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.dataset.tab === 'tab-certificates') {
+            loadCoursesForCertificate();
+        }
+    });
+});
+
+document.getElementById('certificate-form')
+.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const name = document.getElementById('cert-name').value;
+    const course = document.getElementById('cert-course').selectedOptions[0].text;
+    const lang = document.getElementById('cert-language').value;
+
+    const iframe = document.getElementById('certificate-preview');
+    iframe.src = `/certificate.html?name=${encodeURIComponent(name)}&course=${encodeURIComponent(course)}&lang=${lang}`;
+
+    document.getElementById('certificate-preview-wrapper').style.display = 'block';
+});
+
 // ===== ADMIN CERTIFICATE =====
 async function loadCoursesForCertificate() {
     const sel = document.getElementById('cert-course');
     if (!sel) return;
 
+    sel.innerHTML = '<option value="">Select Course</option>';
+
     const res = await fetch('/api/courses');
     const courses = await res.json();
 
     courses.forEach(c => {
-        sel.innerHTML += `<option value="${c.title}">${c.title}</option>`;
+        const opt = document.createElement('option');
+        opt.value = c._id;
+        opt.textContent = c.title;
+        sel.appendChild(opt);
     });
 }
 
@@ -844,6 +902,9 @@ document.getElementById('admin-cert-form')?.addEventListener('submit', async e =
     a.download = 'certificate.pdf';
     a.click();
 });
+document.getElementById('print-certificate').onclick = () => {
+    document.getElementById('certificate-preview').contentWindow.print();
+};
 loadCoursesForCertificate();
     </script>
 </body>
