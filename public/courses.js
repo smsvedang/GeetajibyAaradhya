@@ -134,6 +134,19 @@ async function saveProgress() {
 }
 
 /***********************
+ * START QUIZ
+ ***********************/
+function startQuiz() {
+    if (!currentCourse || !currentCourse._id) {
+        alert('Course not loaded');
+        return;
+    }
+
+    // redirect to quiz page
+    window.location.href = `/quiz.html?courseId=${currentCourse._id}`;
+}
+
+/***********************
  * RESTORE PROGRESS
  ***********************/
 async function restoreProgress() {

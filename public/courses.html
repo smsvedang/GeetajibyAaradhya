@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="courses.css">
 
+    <!-- YouTube API -->
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -31,11 +32,15 @@
 
         <div id="course-shlokas"></div>
 
-        <!-- QUIZ STATUS -->
+        <!-- QUIZ BOX -->
         <div id="quiz-box" class="quiz-box" style="display:none;">
             <h3>📝 Quiz</h3>
-            <p id="quiz-status">Complete quiz to unlock certificate</p>
-            <button id="quiz-btn" onclick="startQuiz()">Start Quiz</button>
+            <p id="quiz-status">Complete all shlokas to unlock quiz</p>
+
+            <!-- 🔥 FIXED BUTTON -->
+            <button id="quiz-btn" onclick="startQuiz()">
+                Start Quiz
+            </button>
         </div>
 
         <!-- CERTIFICATE -->
@@ -43,7 +48,7 @@
             <h3>🎓 Generate Certificate</h3>
 
             <input id="user-name" placeholder="Your Name">
-            <input id="user-email" placeholder="Email">
+            <input id="user-email" placeholder="Email (optional)">
             <input id="user-mobile" placeholder="Mobile">
 
             <select id="cert-lang">
@@ -51,12 +56,16 @@
                 <option value="hi">Hindi</option>
             </select>
 
-            <button onclick="generateCertificate()">Download Certificate</button>
+            <button onclick="generateCertificate()">
+                Download Certificate
+            </button>
         </div>
     </div>
 
 </div>
 
+<!-- MAIN LOGIC -->
 <script src="courses.js"></script>
+
 </body>
 </html>
