@@ -758,18 +758,6 @@ document.getElementById('course-adhyay')?.addEventListener('change', async e => 
 });
 
 // ===== QUIZ BUILDER =====
-document.getElementById('add-question')?.addEventListener('click', () => {
-    const d = document.createElement('div');
-    d.innerHTML = `
-        <input placeholder="Question">
-        <input placeholder="Option A">
-        <input placeholder="Option B">
-        <input placeholder="Option C">
-        <input placeholder="Option D">
-        <input placeholder="Correct Option Index (0-3)">
-        <hr>`;
-    document.getElementById('quiz-questions').appendChild(d);
-});
 
 // login ke baad adhyay load
 const originalLogin = loginForm.addEventListener;
@@ -1092,7 +1080,7 @@ document.getElementById('course-list').onclick = async e => {
         method: 'DELETE'
     });
 
-    if (res.ok) loadCourses();
+    if (res.ok) loadCoursesAdmin();
 };
 document.getElementById('quiz-course').onchange = e => {
     document.getElementById('delete-quiz').onclick = async () => {
