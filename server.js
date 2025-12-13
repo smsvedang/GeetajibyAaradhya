@@ -627,6 +627,17 @@ app.post('/api/certificate', async (req, res) => {
 });
 
 //---Quiz APIs ---
+app.post('/api/quiz', async (req, res) => {
+    const { course, passPercent, questions } = req.body;
+
+    await Quiz.findOneAndUpdate(
+        { course },
+        { course, passPercent, questions },
+        { upsert: true }
+    );
+
+    res.json({ success: true });
+});
 app.get('/api/quiz/:courseId', async (req,res)=>{
     const quiz = await Quiz.findOne({ course: req.params.courseId });
     res.json(quiz);

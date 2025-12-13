@@ -968,47 +968,39 @@ document.getElementById('add-question')?.addEventListener('click', () => {
 });
 
 // save quiz
-document.getElementById('quiz-form')?.addEventListener('submit', async e => {
+document.getElementById('quiz-form').addEventListener('submit', async e => {
     e.preventDefault();
 
-    if (!adminPassword) {
-        alert('Please login first');
-        return;
-    }
+    const courseId = document.getElementById('quiz-course').value;
+    const passPercent = Number(document.getElementById('quiz-pass').value) || 50;
 
     const questions = [];
-    document.querySelectorAll('#quiz-questions .shloka-admin-item')
-        .forEach(div => {
-            const i = div.querySelectorAll('input');
-            questions.push({
-                question: i[0].value,
-                options: [i[1].value, i[2].value, i[3].value, i[4].value],
-                correct: Number(i[5].value)
-            });
+    document.querySelectorAll('#quiz-questions > div').forEach(div => {
+        const inputs = div.querySelectorAll('input');
+        questions.push({
+            question: inputs[0].value,
+            options: [
+                inputs[1].value,
+                inputs[2].value,
+                inputs[3].value,
+                inputs[4].value
+            ],
+            answer: Number(inputs[5].value)
         });
-
-    if (!questions.length) {
-        alert('Add at least one question');
-        return;
-    }
-
-    const payload = {
-        course: document.getElementById('quiz-course').value,
-        passingMarks: Number(document.getElementById('quiz-pass').value),
-        questions,
-        password: adminPassword
-    };
+    });
 
     const res = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            course: courseId,
+            passPercent,      // ✅ VERY IMPORTANT
+            questions
+        })
     });
 
     if (res.ok) {
         alert('Quiz saved successfully');
-        document.getElementById('quiz-form').reset();
-        document.getElementById('quiz-questions').innerHTML = '';
     } else {
         alert('Failed to save quiz');
     }

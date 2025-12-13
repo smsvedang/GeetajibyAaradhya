@@ -1,5 +1,6 @@
 const params = new URLSearchParams(location.search);
 const courseId = params.get('course');
+const passPercent = Number(quiz.passPercent || 50);
 
 let quizData = [];
 
@@ -26,30 +27,31 @@ async function loadQuiz() {
 }
 
 async function submitQuiz() {
+    const res = await fetch(`/api/quiz/${courseId}`);
+    const quiz = await res.json();
+
     let score = 0;
 
-    quizData.questions.forEach((q, i) => {
-        const ans = document.querySelector(`input[name="q${i}"]:checked`);
-        if (ans && Number(ans.value) === q.correct) {
+    quiz.questions.forEach((q, i) => {
+        const selected = document.querySelector(
+            `input[name="q${i}"]:checked`
+        );
+
+        if (selected && Number(selected.value) === Number(q.answer)) {
             score++;
         }
     });
 
-    const percent = (score / quizData.questions.length) * 100;
+    const percent = (score / quiz.questions.length) * 100;
 
-    const r = await fetch('/api/quiz/submit', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ courseId, percent })
-    });
+    if (percent >= quiz.passPercent) {
+        alert(`✅ Passed! Score: ${percent.toFixed(0)}%`);
 
-    const res = await r.json();
-
-    if (res.pass) {
-        alert('Quiz Passed!');
-        window.location.href = `/courses.html?course=${courseId}&quiz=passed`;
+        // Redirect back to course
+        window.location.href =
+            `/courses.html?course=${courseId}&quiz=passed`;
     } else {
-        alert('Quiz Failed. Try again.');
+        alert(`❌ Failed! Score: ${percent.toFixed(0)}%`);
     }
 }
 
