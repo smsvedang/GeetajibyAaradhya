@@ -223,6 +223,26 @@ function startQuiz() {
     window.location.href = `/quiz.html?course=${currentCourse._id}`;
 }
 
+function generateCertificate() {
+    const name = document.getElementById('user-name').value;
+    const lang = document.getElementById('cert-lang').value;
+
+    if (!name) {
+        alert('Please enter your name');
+        return;
+    }
+
+    const url =
+        `/api/certificate` +
+        `?mobile=${userMobile}` +
+        `&courseId=${currentCourse._id}` +
+        `&name=${encodeURIComponent(name)}` +
+        `&courseTitle=${encodeURIComponent(currentCourse.title)}` +
+        `&lang=${lang}`;
+
+    window.open(url, '_blank');
+}
+
 /***********************
  * NAVIGATION
  ***********************/

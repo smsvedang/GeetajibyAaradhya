@@ -567,10 +567,16 @@ app.delete('/api/quizzes/:courseId', async (req, res) => {
 
 const PDFDocument = require('pdfkit');
 
-app.post('/api/certificate', async (req, res) => {
-    const { name, courseTitle, lang } = req.body;
-    const PDFDocument = require('pdfkit');
+app.get('/api/certificate', async (req, res) => {
+    const { mobile, courseId, name, courseTitle, lang } = req.query;
 
+    const progress = await Progress.findOne({ mobile, courseId });
+
+    if (!progress || !progress.quizPassed) {
+        return res.status(403).send('Please pass the quiz first');
+    }
+
+    const PDFDocument = require('pdfkit');
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -582,9 +588,7 @@ app.post('/api/certificate', async (req, res) => {
     doc.pipe(res);
 
     doc.fontSize(26).text(
-        lang === 'hi'
-            ? 'प्रमाण पत्र'
-            : 'Certificate of Completion',
+        lang === 'hi' ? 'प्रमाण पत्र' : 'Certificate of Completion',
         { align: 'center' }
     );
 
@@ -592,23 +596,15 @@ app.post('/api/certificate', async (req, res) => {
 
     doc.fontSize(16).text(
         lang === 'hi'
-            ? `यह प्रमाणित किया जाता है कि ${name} ने "${courseTitle}" पाठ्यक्रम को सफलतापूर्वक पूर्ण किया है।`
-            : `This is to proudly certify that ${name} has successfully completed the course "${courseTitle}".`,
+            ? `यह प्रमाणित किया जाता है कि ${name} ने "${courseTitle}" पाठ्यक्रम सफलतापूर्वक पूर्ण किया है।`
+            : `This is to certify that ${name} has successfully completed the course "${courseTitle}".`,
         { align: 'center' }
     );
 
     doc.moveDown(4);
 
-    doc.text(
-        lang === 'hi'
-            ? 'Aaradhya Soni'
-            : 'Aaradhya Soni',
-        { align: 'right' }
-    );
-
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, {
-        align: 'right'
-    });
+    doc.text('By Warrior Aaradhya', { align: 'right' });
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, { align: 'right' });
 
     doc.end();
 });
