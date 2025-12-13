@@ -468,12 +468,28 @@ app.post('/api/progress/save', async (req, res) => {
 });
 
 app.get('/api/progress/:mobile/:courseId', async (req, res) => {
-    const p = await Progress.findOne({
+    const progress = await Progress.findOne({
         mobile: req.params.mobile,
         courseId: req.params.courseId
     });
 
-    res.json(p || { completed: [] });
+    res.json(progress || { completed: [] });
+});
+app.post('/api/progress/save', async (req, res) => {
+    const { mobile, courseId, completed } = req.body;
+
+    let progress = await Progress.findOne({ mobile, courseId });
+
+    if (!progress) {
+        progress = new Progress({ mobile, courseId, completed });
+    } else {
+        progress.completed = [
+            ...new Set([...progress.completed, ...completed])
+        ];
+    }
+
+    await progress.save();
+    res.json({ success: true });
 });
 
 // --- Quiz APIs ---
