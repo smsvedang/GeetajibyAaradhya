@@ -63,9 +63,15 @@ async function openCourse(id) {
         `;
     });
 
+    // ✅ STEP-1: players
     setTimeout(() => {
         initPlayers();
-        restoreProgress();   // ✅ ONLY AFTER course load
+
+        // ✅ STEP-2: restore AFTER players
+        setTimeout(() => {
+            restoreProgress();
+        }, 200);
+
     }, 300);
 }
 
@@ -131,15 +137,13 @@ async function restoreProgress() {
     if (!currentCourse || !currentCourse._id) return;
 
     if (!userMobile) {
-        userMobile = prompt('Enter mobile number');
+        userMobile = localStorage.getItem('userMobile');
         if (!userMobile) return;
-        localStorage.setItem('userMobile', userMobile);
     }
 
     const res = await fetch(
         `/api/progress/${userMobile}/${currentCourse._id}`
     );
-
     if (!res.ok) return;
 
     const data = await res.json();
@@ -147,8 +151,11 @@ async function restoreProgress() {
 
     data.completed.forEach(id => {
         completedShlokas.add(id);
+
         const el = document.getElementById(`status-${id}`);
-        if (el) el.textContent = '✅ Completed';
+        if (el && !el.textContent.includes('Completed')) {
+            el.textContent = '✅ Completed';
+        }
     });
 
     checkQuizUnlock();
