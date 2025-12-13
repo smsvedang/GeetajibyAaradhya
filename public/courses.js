@@ -160,6 +160,10 @@ async function restoreProgress() {
 
     checkQuizUnlock();
 }
+if (data.quizPassed) {
+    quizPassed = true;
+    document.getElementById('certificate-box').style.display = 'block';
+}
 
 /***********************
  * QUIZ UNLOCK
@@ -174,56 +178,14 @@ function checkQuizUnlock() {
 }
 
 /***********************
- * SIMULATED QUIZ RESULT
- ***********************/
-const params = new URLSearchParams(location.search);
-if (params.get('quiz') === 'passed') {
-    quizPassed = true;
-    document.getElementById('certificate-box').style.display = 'block';
-}
-
-/***********************
  * CERTIFICATE
  ***********************/
-async function generateCertificate() {
+function generateCertificate() {
     if (!quizPassed) {
         alert('Please pass the quiz first');
         return;
     }
 
-    const name = document.getElementById('user-name').value;
-    const lang = document.getElementById('cert-lang').value;
-
-    const r = await fetch('/api/certificate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name,
-            courseTitle: currentCourse.title,
-            lang
-        })
-    });
-
-    const blob = await r.blob();
-    window.open(URL.createObjectURL(blob));
-}
-
-function startQuiz() {
-    if (!currentCourse) {
-        alert('Course not loaded');
-        return;
-    }
-
-    if (completedShlokas.size !== currentCourse.shlokas.length) {
-        alert('Please complete all shlokas before starting quiz');
-        return;
-    }
-
-    // ✅ Redirect to quiz.html with courseId
-    window.location.href = `/quiz.html?course=${currentCourse._id}`;
-}
-
-function generateCertificate() {
     const name = document.getElementById('user-name').value;
     const lang = document.getElementById('cert-lang').value;
 
