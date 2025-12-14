@@ -1,4 +1,7 @@
-/* --- Admin Panel Renovated Style --- */
+/* ===============================
+   ADMIN PANEL – CLEAN & FIXED
+   =============================== */
+
 :root {
     --primary-color: #FF9800;
     --dark-blue: #2c3e50;
@@ -12,34 +15,199 @@
     --blue: #007bff;
 }
 
+/* ===== BASE ===== */
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    background-color: var(--background-grey);
+    font-family: Arial, sans-serif;
+    background: var(--background-grey);
     color: var(--text-dark);
 }
 
-* { box-sizing: border-box; }
-
+/* ===== LAYOUT ===== */
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
 }
 
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 240px;
+    background: var(--dark-blue);
+    color: var(--text-light);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 20px;
+    font-size: 1.5em;
+    text-align: center;
+    background: var(--light-blue);
+    font-weight: bold;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-button {
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    text-align: left;
+    cursor: pointer;
+    font-size: 1em;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-button:hover {
+    background: var(--light-blue);
+}
+
+.sidebar-button.active {
+    background: var(--primary-color);
+    color: var(--white);
+    font-weight: bold;
+    border-left: 4px solid var(--white);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+    width: calc(100% - 240px);
+}
+
+/* ===== CONTENT PAGES ===== */
+.content-page {
+    display: none;
+}
+
+.content-page.active {
+    display: block;
+}
+
+.page-header {
+    font-size: 2em;
+    color: var(--dark-blue);
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* ===== FORMS ===== */
+form {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+input,
+textarea,
+select,
+button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+button[type="submit"],
+button.primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* ===== ADMIN LISTS (IMPORTANT FIX) ===== */
+.admin-item-list {
+    background: var(--white);
+    border-radius: 8px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Blog / Artwork / Shloka rows */
+.shloka-admin-item,
+.artwork-admin-item,
+.blog-admin-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.shloka-admin-item:last-child,
+.artwork-admin-item:last-child,
+.blog-admin-item:last-child {
+    border-bottom: none;
+}
+
+.artwork-admin-item img {
+    width: 80px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.admin-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-buttons button {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.edit-button { background: var(--blue); color: white; }
+.delete-button { background: var(--red); color: white; }
+.approve-button { background: var(--green); color: white; }
+.cancel-button { background: #6c757d; color: white; }
+
 /* ===== COURSES ===== */
 #course-shloka-list {
     max-height: 250px;
     overflow-y: auto;
-    border: 1px solid var(--border-color);
+    border: 1px solid #ddd;
     padding: 10px;
     border-radius: 6px;
     background: #fafafa;
-}
-
-#course-shloka-list label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 14px;
 }
 
 /* ===== QUIZ BUILDER ===== */
@@ -50,289 +218,46 @@ body {
     margin-bottom: 12px;
 }
 
-#quiz-questions input {
-    margin: 6px 0;
-}
-
 #add-question {
     background: #455a64;
-}
-/* ===== COURSE & QUIZ FORMS ===== */
-#tab-courses form,
-#tab-quizzes form {
-    margin-bottom: 30px;
-}
-
-
-/* --- Sidebar --- */
-.sidebar {
-    width: 240px;
-    background-color: var(--dark-blue);
-    color: var(--text-light);
-    position: fixed;
-    height: 100%;
-    overflow-y: auto;
-}
-
-.sidebar-header {
-    padding: 20px;
-    font-size: 1.5em;
-    text-align: center;
-    background-color: var(--light-blue);
-    font-weight: bold;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    padding-top: 15px;
-}
-
-.sidebar-button {
-    padding: 15px 20px;
-    color: var(--text-light);
-    background: transparent;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    font-size: 1em;
-    width: 100%;
-    transition: background-color 0.2s ease, padding-left 0.2s ease;
-    border-left: 4px solid transparent;
-}
-
-.sidebar-button:hover {
-    background-color: var(--light-blue);
-}
-
-.sidebar-button.active {
-    background-color: var(--primary-color);
-    color: var(--white);
-    font-weight: bold;
-    border-left: 4px solid var(--white);
-}
-
-/* --- Main Content --- */
-.main-content {
-    margin-left: 240px;
-    padding: 30px;
-    width: calc(100% - 240px);
-}
-
-.content-page {
-    display: none;
-}
-.content-page.active {
-    display: block;
-}
-
-.page-header {
-    font-size: 2em;
-    color: var(--dark-blue);
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-/* --- Dashboard Stat Cards --- */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-}
-.stat-card {
-    background-color: var(--white);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.stat-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 1em;
-    color: #7f8c8d;
-    text-transform: uppercase;
-}
-.stat-card .stat-number {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: var(--dark-blue);
-}
-.stat-card.pending {
-    background-color: #FFF8E1;
-    border: 1px solid var(--primary-color);
-}
-.stat-card.pending .stat-number {
-    color: var(--primary-color);
-}
-
-/* --- Forms --- */
-form {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-input, textarea, button {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    box-sizing: border-box; 
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 1em;
-}
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-button[type="submit"] {
-    background-color: var(--primary-color);
     color: white;
-    cursor: pointer;
-    border: none;
-    font-weight: bold;
-    font-size: 1.1em;
-}
-button[type="submit"]:hover {
-    opacity: 0.9;
 }
 
-/* --- Lists (Admin Items) --- */
-.admin-item-list {
-    background: var(--white);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.shloka-admin-item, .artwork-admin-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-.shloka-admin-item:last-child,
-.artwork-admin-item:last-child {
-    border-bottom: none;
-}
-.shloka-admin-item p, .artwork-admin-item p {
-    flex-grow: 1;
-    margin: 0;
-    font-weight: bold;
-}
-.artwork-admin-item img {
-    width: 80px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-right: 15px;
-}
-.admin-buttons {
-    display: flex;
-    gap: 10px;
-}
-.admin-buttons button {
-    width: auto;
-    padding: 8px 12px;
-    font-size: 0.9em;
-    margin-bottom: 0;
-}
-button.edit-button { background-color: var(--blue); color: white; }
-button.delete-button { background-color: var(--red); color: white; }
-button.approve-button { background-color: var(--green); color: white; }
-button.cancel-button { background-color: #6c757d; color: white; }
-
-/* ==== ADMIN FORM + LIST FIX ==== */
-
-.content-page form {
-    margin-bottom: 30px;
-}
-
-.admin-item-list {
-    margin-top: 30px;
-    padding-bottom: 40px;
-}
-
-/* Blog / Artwork / Shloka items spacing */
-.shloka-admin-item,
-.artwork-admin-item {
-    margin-bottom: 15px;
-}
-
-/* Prevent list hiding behind large textarea */
-textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-/* Ensure content stays in viewport */
-.main-content {
-    padding-bottom: 80px;
-}
-
-/* ===== FIX: Admin content showing at bottom ===== */
-
-.content-page {
-    min-height: auto;
-}
-
-.admin-item-list {
-    margin-top: 20px;
-    display: block;
-}
-
-/* Force lists to stay visible */
-#tab-blog .admin-item-list,
-#tab-artwork .admin-item-list,
-#tab-shloka .admin-item-list {
-    margin-top: 15px;
-}
-
-/* Prevent huge form pushing list down
-form {
-    max-height: 500px;
-    overflow-y: auto;
-}*/
-
-/* --- Mobile Responsive --- */
+/* ===== MOBILE ===== */
 @media (max-width: 768px) {
+
     .admin-wrapper {
         flex-direction: column;
     }
+
     .sidebar {
         position: static;
         width: 100%;
         height: auto;
     }
+
     .sidebar-nav {
         flex-direction: row;
         overflow-x: auto;
-        padding-top: 0;
     }
+
     .sidebar-button {
+        text-align: center;
         border-left: none;
         border-bottom: 4px solid transparent;
-        font-size: 0.9em;
-        padding: 15px 10px;
-        text-align: center;
     }
+
     .sidebar-button.active {
-        border-left: none;
         border-bottom: 4px solid var(--primary-color);
-        background: var(--light-blue);
     }
+
     .main-content {
         margin-left: 0;
-        padding: 15px;
         width: 100%;
+        padding: 15px;
     }
+
     .page-header {
         font-size: 1.5em;
-    }
-    .dashboard-stats {
-        grid-template-columns: 1fr;
     }
 }
