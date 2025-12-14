@@ -890,13 +890,6 @@ document.getElementById('show-course-form')?.addEventListener('click', () => {
     box.style.display = box.style.display === 'none' ? 'block' : 'none';
 });
 
-sidebarButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (btn.dataset.tab === 'tab-certificates') {
-            loadCoursesForCertificate();
-        }
-    });
-});
 
 document.getElementById('admin-certificate-form')
 ?.addEventListener('submit', e => {
