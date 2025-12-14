@@ -276,11 +276,12 @@ textarea {
 /* ===== FIX: Admin content showing at bottom ===== */
 
 .content-page {
-    min-height: calc(100vh - 60px);
+    min-height: auto;
 }
 
 .admin-item-list {
     margin-top: 20px;
+    display: block;
 }
 
 /* Force lists to stay visible */
@@ -290,11 +291,11 @@ textarea {
     margin-top: 15px;
 }
 
-/* Prevent huge form pushing list down */
+/* Prevent huge form pushing list down
 form {
     max-height: 500px;
     overflow-y: auto;
-}
+}*/
 
 /* --- Mobile Responsive --- */
 @media (max-width: 768px) {
