@@ -598,6 +598,11 @@ app.get('/api/certificate', async (req, res) => {
     }
 });
 
+//--- Course progress ---//
+app.get('/api/course-progress/:courseId', async (req, res) => {
+    const data = await Progress.find({ courseId: req.params.courseId });
+    res.json(data);
+});
 
 // --- Testimonial APIs ---
 app.get('/api/testimonials', async (req, res) => {

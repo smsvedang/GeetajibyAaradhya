@@ -175,6 +175,8 @@
     <form id="admin-certificate-form">
         <input id="cert-name" placeholder="Student Name" required>
         <input id="cert-mobile" placeholder="Mobile" required>
+        <input id="cert-email" placeholder="Email" required>
+
 
         <select id="cert-course"></select>
         <select id="cert-lang">
@@ -895,8 +897,8 @@ sidebarButtons.forEach(btn => {
     });
 });
 
-document.getElementById('certificate-form')
-.addEventListener('submit', e => {
+document.getElementById('admin-certificate-form')
+?.addEventListener('submit', e => {
     e.preventDefault();
 
     const name = document.getElementById('cert-name').value;
@@ -1150,11 +1152,6 @@ async function loadCertificates() {
         `;
     });
 }
-//--- Course progress ---//
-app.get('/api/course-progress/:courseId', async (req, res) => {
-    const data = await Progress.find({ courseId: req.params.courseId });
-    res.json(data);
-});
     </script>
 </body>
 </html>
