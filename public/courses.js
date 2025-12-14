@@ -163,16 +163,16 @@ async function restoreProgress() {
     checkQuizUnlock();
 
     // ✅ restore quiz pass status
-    if (data.quizPassed === true) {
+   if (data.quizPassed === true) {
     quizPassed = true;
 
-    document.getElementById('certificate-box').style.display = 'block';
+    const certBox = document.getElementById('certificate-box');
+    certBox.style.display = 'block';
 
-    const quizBtn = document.getElementById('start-quiz-btn');
-    if (quizBtn) {
-        quizBtn.disabled = true;
-        quizBtn.textContent = '✅ Quiz Passed';
-    }
+    certBox.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
 }
 }
 
@@ -211,7 +211,7 @@ function startQuiz() {
 }
 
 /***********************
- * CERTIFICATE (HTML ONLY)
+ * CERTIFICATE download
  ***********************/
 function generateCertificate() {
     if (!quizPassed) {
@@ -219,26 +219,30 @@ function generateCertificate() {
         return;
     }
 
-    const name = document.getElementById('user-name').value;
+    const name = document.getElementById('user-name').value.trim();
+    const mobile = document.getElementById('user-mobile').value.trim();
+    const email = document.getElementById('user-email').value.trim();
     const lang = document.getElementById('cert-lang').value;
 
-    if (!name) {
-        alert('Please enter your name');
+    if (!name || !mobile || !email) {
+        alert('Please fill Name, Mobile and Email');
         return;
     }
 
     const url =
-        `/certificate.html` +
+        `/api/certificate` +
         `?name=${encodeURIComponent(name)}` +
-        `&course=${encodeURIComponent(currentCourse.title)}` +
+        `&mobile=${encodeURIComponent(mobile)}` +
+        `&email=${encodeURIComponent(email)}` +
+        `&courseId=${currentCourse._id}` +
+        `&courseTitle=${encodeURIComponent(currentCourse.title)}` +
         `&lang=${lang}`;
 
     window.open(url, '_blank');
 
-    // ✅ UX Feedback
     document.getElementById('certificate-status').innerHTML = `
         <p style="color:green;font-weight:bold;margin-top:10px;">
-            ✅ Certificate generated successfully.
+            ✅ Certificate downloaded successfully
         </p>
     `;
 }
