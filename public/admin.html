@@ -334,6 +334,20 @@
     });
 });
 
+sidebarButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        sidebarButtons.forEach(btn => btn.classList.remove('active'));
+        contentPages.forEach(c => c.classList.remove('active'));
+
+        button.classList.add('active');
+        const page = document.getElementById(button.dataset.tab);
+        page.classList.add('active');
+
+        // 🔥 FIX: scroll to top
+        page.scrollIntoView({ behavior: 'instant', block: 'start' });
+    });
+});
+
         // --- Data Loading Functions ---
         async function loadAboutContent() {
             try {

@@ -273,6 +273,29 @@ textarea {
     padding-bottom: 80px;
 }
 
+/* ===== FIX: Admin content showing at bottom ===== */
+
+.content-page {
+    min-height: calc(100vh - 60px);
+}
+
+.admin-item-list {
+    margin-top: 20px;
+}
+
+/* Force lists to stay visible */
+#tab-blog .admin-item-list,
+#tab-artwork .admin-item-list,
+#tab-shloka .admin-item-list {
+    margin-top: 15px;
+}
+
+/* Prevent huge form pushing list down */
+form {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 /* --- Mobile Responsive --- */
 @media (max-width: 768px) {
     .admin-wrapper {
