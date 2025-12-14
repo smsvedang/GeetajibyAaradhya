@@ -245,6 +245,34 @@ button.delete-button { background-color: var(--red); color: white; }
 button.approve-button { background-color: var(--green); color: white; }
 button.cancel-button { background-color: #6c757d; color: white; }
 
+/* ==== ADMIN FORM + LIST FIX ==== */
+
+.content-page form {
+    margin-bottom: 30px;
+}
+
+.admin-item-list {
+    margin-top: 30px;
+    padding-bottom: 40px;
+}
+
+/* Blog / Artwork / Shloka items spacing */
+.shloka-admin-item,
+.artwork-admin-item {
+    margin-bottom: 15px;
+}
+
+/* Prevent list hiding behind large textarea */
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Ensure content stays in viewport */
+.main-content {
+    padding-bottom: 80px;
+}
+
 /* --- Mobile Responsive --- */
 @media (max-width: 768px) {
     .admin-wrapper {
