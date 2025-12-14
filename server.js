@@ -570,26 +570,31 @@ app.get('/api/certificate', async (req, res) => {
     try {
         const { name, email, mobile, courseTitle, lang } = req.query;
 
+        // ✅ safety check
         if (!name || !courseTitle) {
             return res.status(400).send('Missing data');
         }
 
-        // HTML certificate load
+        // ✅ IMPORTANT: course title ko freeze kar diya
+        const finalCourseTitle = courseTitle;
+
         const fs = require('fs');
         const path = require('path');
 
+        // load certificate HTML template
         let html = fs.readFileSync(
             path.join(__dirname, 'public/certificate.html'),
             'utf8'
         );
 
-        // inject values
+        // inject values into HTML
         html = html
             .replace('{{NAME}}', name)
-            .replace('{{COURSE}}', courseTitle)
+            .replace('{{COURSE}}', finalCourseTitle)   // ✅ FIX HERE
             .replace('{{EMAIL}}', email || '')
             .replace('{{LANG}}', lang || 'en');
 
+        // send rendered certificate
         res.send(html);
 
     } catch (err) {
