@@ -565,45 +565,6 @@ app.delete('/api/quizzes/:courseId', async (req, res) => {
     }
 });
 
-const puppeteer = require('puppeteer');
-
-app.get('/api/certificate', async (req, res) => {
-    const { mobile, email, courseId, name, lang } = req.query;
-
-    const progress = await Progress.findOne({ mobile, courseId });
-    if (!progress || !progress.quizPassed) {
-        return res.status(403).send('Please pass the quiz first');
-    }
-
-    const url =
-        `${process.env.BASE_URL}/certificate.html` +
-        `?name=${encodeURIComponent(name)}` +
-        `&course=${encodeURIComponent(progress.courseTitle || '')}` +
-        `&lang=${lang}`;
-
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle0' });
-
-    const pdf = await page.pdf({
-        format: 'A4',
-        printBackground: true
-    });
-
-    await browser.close();
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-        'Content-Disposition',
-        `attachment; filename=certificate-${Date.now()}.pdf`
-    );
-    res.send(pdf);
-});
-
 
 
 // --- Testimonial APIs ---

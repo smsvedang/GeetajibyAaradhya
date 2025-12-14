@@ -220,23 +220,19 @@ function generateCertificate() {
         return;
     }
 
-    const name = document.getElementById('user-name').value.trim();
-    const mobile = document.getElementById('user-mobile').value.trim();
-    const email = document.getElementById('user-email').value.trim();
+    const name = document.getElementById('user-name').value;
+    const email = document.getElementById('user-email').value;
     const lang = document.getElementById('cert-lang').value;
 
-    if (!name || !mobile || !email) {
-        alert('Please fill Name, Mobile and Email');
+    if (!name) {
+        alert('Enter name');
         return;
     }
 
     const url =
-        `/api/certificate` +
+        `/certificate.html` +
         `?name=${encodeURIComponent(name)}` +
-        `&mobile=${encodeURIComponent(mobile)}` +
-        `&email=${encodeURIComponent(email)}` +
-        `&courseId=${currentCourse._id}` +
-        `&courseTitle=${encodeURIComponent(currentCourse.title)}` +
+        `&course=${encodeURIComponent(currentCourse.title)}` +
         `&lang=${lang}`;
 
     window.open(url, '_blank');
