@@ -102,7 +102,7 @@ async function submitQuiz() {
     alert(`Passed ✅ ${percent}%`);
 
     // 🔥 IMPORTANT: go back to course page
-    window.location.href = `/courses.html?courseId=${courseId}`;
+    window.location.href = `/courses.html?courseId=${courseId}&quiz=passed`;
 }
 
 /************************

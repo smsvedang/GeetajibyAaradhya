@@ -32,7 +32,7 @@
                 <button class="sidebar-button" data-tab="tab-artwork">Manage Artwork</button>
                 <button class="sidebar-button" data-tab="tab-courses">Manage Courses</button>
                 <button class="sidebar-button" data-tab="tab-quizzes">Manage Quizzes</button>
-                <button class="sidebar-button" data-tab="tab-certificates"> Generate Certificate</button>
+                <button class="sidebar-button" data-tab="tab-certificates"> Manage Certificate</button>
                 <button class="sidebar-button" data-tab="tab-about">Site Settings (About)</button>
             </nav>
         </aside>
@@ -128,7 +128,8 @@
 
     <!-- COURSE LIST -->
     <div class="admin-item-list" id="course-list"></div>
-
+<h3>Enrolled / In Progress Users</h3>
+<div id="course-users"></div>
 </div>
 
 <div id="tab-quizzes" class="content-page">
@@ -168,40 +169,25 @@
 </div>
 
             <div id="tab-certificates" class="content-page">
+    <h1 class="page-header">Manage Certificates</h1>
 
-    <h1 class="page-header">Generate Certificate (Manual)</h1>
+    <h3>Generate New Certificate</h3>
+    <form id="admin-certificate-form">
+        <input id="cert-name" placeholder="Student Name" required>
+        <input id="cert-mobile" placeholder="Mobile" required>
 
-    <form id="certificate-form" class="certificate-form">
-
-        <input type="text"
-               id="cert-name"
-               placeholder="Student Name"
-               required>
-
-        <input type="email"
-               id="cert-email"
-               placeholder="Email (optional)">
-
-        <input type="text"
-               id="cert-mobile"
-               placeholder="Mobile Number">
-
-        <label>Select Course</label>
-        <select id="cert-course" required>
-            <option value="">Select Course</option>
+        <select id="cert-course"></select>
+        <select id="cert-lang">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
         </select>
 
-        <label>Language</label>
-        <select id="cert-language">
-            <option value="Hindi">Hindi</option>
-            <option value="English">English</option>
-        </select>
-
-        <button type="submit" class="primary-btn">
-            Generate Certificate
-        </button>
-
+        <button type="submit">Generate Certificate</button>
     </form>
+
+    <h3 style="margin-top:30px;">Certificate History</h3>
+    <div class="admin-item-list" id="certificate-list"></div>
+</div>
 
     <div id="certificate-preview-wrapper" style="display:none;">
         <h2>Certificate Preview</h2>
@@ -757,6 +743,24 @@ document.getElementById('course-adhyay')?.addEventListener('change', async e => 
     });
 });
 
+async function loadCourseUsers(courseId) {
+    const r = await fetch(`/api/course-progress/${courseId}`);
+    const users = await r.json();
+
+    const box = document.getElementById('course-users');
+    box.innerHTML = '';
+
+    users.forEach(u => {
+        box.innerHTML += `
+            <div class="user-row">
+                ${u.mobile} |
+                Shlokas: ${u.completed.length} |
+                Quiz: ${u.quizPassed ? '✅' : '❌'}
+            </div>
+        `;
+    });
+}
+
 // ===== QUIZ BUILDER =====
 
 // login ke baad adhyay load
@@ -1094,6 +1098,27 @@ document.getElementById('quiz-course').onchange = e => {
     };
 };
 
+async function loadCertificates() {
+    const r = await fetch('/api/certificates');
+    const list = await r.json();
+
+    const box = document.getElementById('certificate-list');
+    box.innerHTML = '';
+
+    list.forEach(c => {
+        box.innerHTML += `
+            <div class="admin-item">
+                <b>${c.name}</b> – ${c.courseTitle}<br>
+                ${c.mobile} | ${c.language.toUpperCase()}
+            </div>
+        `;
+    });
+}
+//--- Course progress ---//
+app.get('/api/course-progress/:courseId', async (req, res) => {
+    const data = await Progress.find({ courseId: req.params.courseId });
+    res.json(data);
+});
     </script>
 </body>
 </html>

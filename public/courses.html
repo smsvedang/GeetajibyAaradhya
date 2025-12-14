@@ -20,6 +20,10 @@
     <h1 id="header-title">Courses</h1>
 </header>
 
+<div class="progress-wrapper">
+    <div id="progress-bar"></div>
+</div>
+
 <div class="container">
 
     <!-- COURSE LIST -->
@@ -45,22 +49,21 @@
 
         <!-- CERTIFICATE -->
         <div id="certificate-box" class="certificate-box" style="display:none;">
-            <h3>🎓 Generate Certificate</h3>
+    <h3>🎉 Congratulations! Course Completed</h3>
 
-            <input id="user-name" placeholder="Your Name">
-            <input id="user-email" placeholder="Email (optional)">
-            <input id="user-mobile" placeholder="Mobile">
+    <input type="text" id="user-name" placeholder="Enter your name">
+    
+    <select id="cert-lang">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+    </select>
 
-            <select id="cert-lang">
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-            </select>
+    <button onclick="generateCertificate()">
+        Download Certificate
+    </button>
 
-            <button onclick="generateCertificate()">
-                Download Certificate
-            </button>
-        </div>
-    </div>
+    <div id="certificate-status"></div>
+</div>
 
 </div>
 

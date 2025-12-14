@@ -6,6 +6,9 @@ let completedShlokas = new Set();
 let currentCourse = null;
 let quizPassed = false;
 let userMobile = localStorage.getItem('userMobile') || '';
+const params = new URLSearchParams(window.location.search);
+const autoCourseId = params.get('courseId');
+const quizStatus = params.get('quiz');
 
 /***********************
  * LOAD COURSES LIST
@@ -28,6 +31,18 @@ async function loadCourses() {
             </div>
         `;
     });
+}
+
+if (autoCourseId) {
+    openCourse(autoCourseId);
+
+    if (quizStatus === 'passed') {
+        setTimeout(() => {
+            document.getElementById('certificate-box').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }, 800);
+    }
 }
 
 /***********************
@@ -149,9 +164,16 @@ async function restoreProgress() {
 
     // ✅ restore quiz pass status
     if (data.quizPassed === true) {
-        quizPassed = true;
-        document.getElementById('certificate-box').style.display = 'block';
+    quizPassed = true;
+
+    document.getElementById('certificate-box').style.display = 'block';
+
+    const quizBtn = document.getElementById('start-quiz-btn');
+    if (quizBtn) {
+        quizBtn.disabled = true;
+        quizBtn.textContent = '✅ Quiz Passed';
     }
+}
 }
 
 /***********************
@@ -164,6 +186,16 @@ function checkQuizUnlock() {
     ) {
         document.getElementById('quiz-box').style.display = 'block';
     }
+}
+
+/***********************
+ * Progress Bar Update
+ ***********************/
+function updateProgressBar() {
+    const percent = Math.round(
+        (completedShlokas.size / currentCourse.shlokas.length) * 100
+    );
+    document.getElementById('progress-bar').style.width = percent + '%';
 }
 
 /***********************
@@ -202,6 +234,13 @@ function generateCertificate() {
         `&lang=${lang}`;
 
     window.open(url, '_blank');
+
+    // ✅ UX Feedback
+    document.getElementById('certificate-status').innerHTML = `
+        <p style="color:green;font-weight:bold;margin-top:10px;">
+            ✅ Certificate generated successfully.
+        </p>
+    `;
 }
 
 /***********************
