@@ -37,6 +37,10 @@ body {
     border: 2px solid #e6d39a;
 }
 
+.download-box {
+        display: none;
+}
+
 /* Headings */
 .title {
     text-align: center;
@@ -96,6 +100,21 @@ body {
     font-weight: bold;
     color: #7a5c00;
 }
+
+.download-box {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.download-box button {
+    padding: 10px 24px;
+    font-size: 16px;
+    background: #c9a23f;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
 </style>
 </head>
 
@@ -126,12 +145,14 @@ body {
     </div>
 
 </div>
-<button onclick="window.print()">Download Certificate</button>
+ <div class="download-box">
+      <button onclick="window.print()">⬇ Download Certificate</button>
+   </div>
 <script>
 const params = new URLSearchParams(location.search);
 
 const name = params.get('name') || '';
-const course = params.get('course') || '';
+const course = params.get('courseTitle') || params.get('course') ||'';
 const lang = params.get('lang') || 'English';
 
 document.getElementById('cert-name').textContent = name;
