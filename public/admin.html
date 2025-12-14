@@ -298,7 +298,8 @@
     const name = document.getElementById('cert-name').value;
     const email = document.getElementById('cert-email').value;
     const mobile = document.getElementById('cert-mobile').value;
-    const courseTitle = document.getElementById('cert-course').value;
+    const courseSelect = document.getElementById('cert-course');
+    const courseTitle = courseSelect.options[courseSelect.selectedIndex].text;
     const lang = document.getElementById('cert-lang').value;
 
     const url =
