@@ -565,6 +565,38 @@ app.delete('/api/quizzes/:courseId', async (req, res) => {
     }
 });
 
+//---Certificate APIs---
+app.get('/api/certificate', async (req, res) => {
+    try {
+        const { name, email, mobile, courseTitle, lang } = req.query;
+
+        if (!name || !courseTitle) {
+            return res.status(400).send('Missing data');
+        }
+
+        // HTML certificate load
+        const fs = require('fs');
+        const path = require('path');
+
+        let html = fs.readFileSync(
+            path.join(__dirname, 'public/certificate.html'),
+            'utf8'
+        );
+
+        // inject values
+        html = html
+            .replace('{{NAME}}', name)
+            .replace('{{COURSE}}', courseTitle)
+            .replace('{{EMAIL}}', email || '')
+            .replace('{{LANG}}', lang || 'en');
+
+        res.send(html);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Certificate error');
+    }
+});
 
 
 // --- Testimonial APIs ---
