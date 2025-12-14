@@ -312,39 +312,53 @@
     window.open(url, '_blank');
 }
 
-        // --- Tab Switching Code ---
-        const sidebarButtons = document.querySelectorAll('.sidebar-button');
-        const contentPages = document.querySelectorAll('.content-page');
-        sidebarButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                sidebarButtons.forEach(btn => btn.classList.remove('active'));
-                contentPages.forEach(c => c.classList.remove('active'));
-                button.classList.add('active');
-                document.getElementById(button.dataset.tab).classList.add('active');
-            });
-        });
-       sidebarButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        if (button.dataset.tab === 'tab-courses') {
-            loadCoursesAdmin();
-        }
-        if (button.dataset.tab === 'tab-certificates') {
-            loadCoursesForCertificate();
-        }
-    });
-});
+        /* ================= TAB SWITCHING (FIXED) ================= */
 
 sidebarButtons.forEach(button => {
     button.addEventListener('click', () => {
-        sidebarButtons.forEach(btn => btn.classList.remove('active'));
-        contentPages.forEach(c => c.classList.remove('active'));
 
+        // active reset
+        sidebarButtons.forEach(b => b.classList.remove('active'));
+        contentPages.forEach(p => p.classList.remove('active'));
+
+        // activate current
         button.classList.add('active');
         const page = document.getElementById(button.dataset.tab);
+        if (!page) return;
+
         page.classList.add('active');
 
-        // 🔥 FIX: scroll to top
-        page.scrollIntoView({ behavior: 'instant', block: 'start' });
+        // 🔒 FORCE TOP (NO JUMP)
+        window.scrollTo({ top: 0, behavior: 'instant' });
+
+        /* ---- TAB SPECIFIC LOADERS ---- */
+        switch (button.dataset.tab) {
+            case 'tab-shloka':
+                loadShlokasAdmin();
+                break;
+
+            case 'tab-blog':
+                loadBlogPosts();
+                break;
+
+            case 'tab-artwork':
+                loadArtwork();
+                break;
+
+            case 'tab-courses':
+                loadCoursesAdmin();
+                break;
+
+            case 'tab-quizzes':
+                loadCoursesForQuiz();
+                loadQuizzes();
+                break;
+
+            case 'tab-certificates':
+                loadCoursesForCertificate();
+                loadCertificates?.();
+                break;
+        }
     });
 });
 
