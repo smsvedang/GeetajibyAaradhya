@@ -163,16 +163,17 @@ async function restoreProgress() {
     checkQuizUnlock();
 
     // ✅ restore quiz pass status
-   if (data.quizPassed === true) {
+   if (data.quizPassed) {
     quizPassed = true;
 
-    const certBox = document.getElementById('certificate-box');
-    certBox.style.display = 'block';
+    document.getElementById('certificate-box').style.display = 'block';
+    document.getElementById('certificate-box')
+        .scrollIntoView({ behavior: 'smooth' });
 
-    certBox.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-    });
+    document.getElementById('start-quiz-btn').disabled = true;
+
+    document.getElementById('certificate-box').innerHTML =
+        `<h3>🎉 Congratulations! Course Completed</h3>`;
 }
 }
 

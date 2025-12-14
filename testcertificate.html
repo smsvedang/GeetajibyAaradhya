@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: #fffaf0;
+            border: 12px solid #c9a34d;
+            padding: 60px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 36px;
+        }
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #8d6e63;
+        }
+        .text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Certificate of Completion</h1>
+
+<p class="text">This certificate is proudly presented to</p>
+
+<div class="name">{{NAME}}</div>
+
+<p class="text">
+    for successfully completing the course<br>
+    <b>{{COURSE}}</b>
+</p>
+
+<div class="footer">
+    <div>Date: {{DATE}}</div>
+    <div><b>Issued By</b><br>Aaradhya Soni</div>
+</div>
+
+</body>
+</html>

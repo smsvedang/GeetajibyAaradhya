@@ -761,6 +761,24 @@ async function loadCourseUsers(courseId) {
     });
 }
 
+document.getElementById('admin-certificate-form')
+?.addEventListener('submit', async (e) => {
+    e.preventDefault();   // ⛔ reload STOP
+
+    const name = document.getElementById('cert-name').value;
+    const mobile = document.getElementById('cert-mobile').value;
+    const courseId = document.getElementById('cert-course').value;
+    const lang = document.getElementById('cert-lang').value;
+
+    const url =
+        `/api/certificate` +
+        `?name=${encodeURIComponent(name)}` +
+        `&mobile=${mobile}` +
+        `&courseId=${courseId}` +
+        `&lang=${lang}`;
+
+    window.open(url, '_blank');
+});
 // ===== QUIZ BUILDER =====
 
 // login ke baad adhyay load
