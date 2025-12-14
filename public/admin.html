@@ -323,13 +323,51 @@
                 document.getElementById(button.dataset.tab).classList.add('active');
             });
         });
-        sidebarButtons.forEach(button => {
+       sidebarButtons.forEach(button => {
     button.addEventListener('click', () => {
-        if (button.dataset.tab === 'tab-courses') {
-            loadCoursesAdmin();
-        }
-        if (button.dataset.tab === 'tab-certificates') {
-            loadCoursesForCertificate();
+
+        // active class handling
+        sidebarButtons.forEach(btn => btn.classList.remove('active'));
+        contentPages.forEach(c => c.classList.remove('active'));
+
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+
+        // 🔥 TAB BASED DATA LOAD
+        switch (button.dataset.tab) {
+            case 'tab-shloka':
+                loadShlokasAdmin();
+                break;
+
+            case 'tab-blog':
+                loadBlogPosts();
+                break;
+
+            case 'tab-artwork':
+                loadArtwork();
+                break;
+
+            case 'tab-testimonials':
+                loadTestimonials();
+                break;
+
+            case 'tab-courses':
+                loadCoursesAdmin();
+                break;
+
+            case 'tab-quizzes':
+                loadCoursesForQuiz();
+                loadQuizzes();
+                break;
+
+            case 'tab-certificates':
+                loadCoursesForCertificate();
+                loadCertificates();
+                break;
+
+            case 'tab-about':
+                loadAboutContent();
+                break;
         }
     });
 });
