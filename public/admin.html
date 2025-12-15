@@ -515,23 +515,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCertificates() {
-        const box = document.getElementById('certificate-list');
-        if (!box) return;
+    const box = document.getElementById('certificate-list');
+    if (!box) return;
 
+    try {
         const r = await fetch('/api/certificates');
-        const list = await r.json();
+
+        if (!r.ok) {
+            box.innerHTML = '<p>No certificates found.</p>';
+            return;
+        }
+
+        const data = await r.json();
+
+        if (!Array.isArray(data)) {
+            box.innerHTML = '<p>Certificate data error.</p>';
+            console.error('Expected array, got:', data);
+            return;
+        }
 
         box.innerHTML = '';
-        list.forEach(c => {
+        data.forEach(c => {
             box.innerHTML += `
                 <div class="admin-item">
-                    <b>${c.name}</b> – ${c.courseTitle}
+                    <b>${c.name}</b> – ${c.courseTitle}<br>
+                    ${c.mobile || ''} | ${(c.language || '').toUpperCase()}
                 </div>
             `;
         });
+
+    } catch (err) {
+        console.error(err);
+        box.innerHTML = '<p>Failed to load certificates.</p>';
+    }
+}
+
     }
 
-});
+);
 </script>
 </body>
 </html>
