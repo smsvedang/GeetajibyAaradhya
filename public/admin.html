@@ -191,6 +191,7 @@ loadCoursesAdmin?.();
 loadCertificates?.();
 loadQuizzes?.();
 loadAboutContent();
+loadCoursesForCertificate();
 });
 
 /* TAB SWITCH + DATA LOAD */
@@ -368,6 +369,54 @@ async function loadCertificates() {
         `;
     });
 }
+
+/* ================= CERTIFICATE COURSES LOAD ================= */
+async function loadCoursesForCertificate() {
+    try {
+        const res = await fetch('/api/courses');
+        const courses = await res.json();
+
+        const sel = document.getElementById('cert-course');
+        sel.innerHTML = '<option value="">Select Course</option>';
+
+        courses.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c._id;
+            opt.textContent = c.title;
+            sel.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Failed to load courses for certificate', err);
+    }
+}
+
+/* ================= CERTIFICATE GENERATE ================= */
+window.generateCertificate = function () {
+
+    const name   = document.getElementById('cert-name').value;
+    const mobile = document.getElementById('cert-mobile').value;
+    const email  = document.getElementById('cert-email').value;
+
+    const courseSelect = document.getElementById('cert-course');
+    const courseTitle  = courseSelect.selectedOptions[0]?.text;
+
+    const lang = document.getElementById('cert-lang').value;
+
+    if (!name || !courseTitle) {
+        alert('Please fill name and select course');
+        return;
+    }
+
+    const url =
+        `/api/certificate?name=${encodeURIComponent(name)}` +
+        `&mobile=${mobile}` +
+        `&email=${encodeURIComponent(email)}` +
+        `&courseTitle=${encodeURIComponent(courseTitle)}` +
+        `&lang=${lang}`;
+
+    window.open(url, '_blank');
+};
+
 
 /* ================= ABOUT LOAD ================= */
 async function loadAboutContent() {
