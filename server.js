@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Progress = require('./models/Progress'); 
 const bodyParser = require('body-parser');
 const path = require('path');
+const Certificate = require('./models/Certificate');
 
 const app = express();
 
@@ -607,10 +608,10 @@ app.get('/api/certificate', async (req, res) => {
 app.get('/api/certificates', async (req, res) => {
     try {
         const certificates = await Certificate.find().sort({ createdAt: -1 });
-        res.json(certificates);
+        res.json(Array.isArray(certificates) ? certificates : []);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Failed to load certificates' });
+        console.error('CERTIFICATE LOAD ERROR:', err);
+        res.status(500).json([]);
     }
 });
 

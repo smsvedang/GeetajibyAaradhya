@@ -7,7 +7,7 @@ const certificateSchema = new mongoose.Schema({
     courseId: String,
     courseTitle: String,
     language: String,
-    certificateId: String,
+    certificateId: String
 }, { timestamps: true });
 
 module.exports = mongoose.model('Certificate', certificateSchema);
