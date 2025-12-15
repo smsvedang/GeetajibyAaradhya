@@ -213,6 +213,7 @@ sidebarButtons.forEach(btn => {
         if (tab === 'tab-courses') loadCoursesAdmin?.();
         if (tab === 'tab-certificates') loadCertificates?.();
         if (tab === 'tab-quizzes') loadQuizzes?.();
+        if (tab === 'tab-about') loadAboutContent();
     };
 });
 
@@ -366,6 +367,19 @@ async function loadCertificates() {
             </div>
         `;
     });
+}
+
+/* ================= ABOUT LOAD ================= */
+async function loadAboutContent() {
+    try {
+        const res = await fetch('/api/about');
+        const data = await res.json();
+
+        document.getElementById('about-text-input').value = data.content || '';
+        document.getElementById('about-image-url').value = data.imageUrl || '';
+    } catch (err) {
+        console.error('Failed to load about content', err);
+    }
 }
 
 
