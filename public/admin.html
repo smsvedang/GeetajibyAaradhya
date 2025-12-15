@@ -58,6 +58,12 @@
         <!-- TESTIMONIALS -->
         <div id="tab-testimonials" class="content-page">
             <h1>Manage Testimonials</h1>
+            <form id="testimonial-form">
+    <input type="hidden" id="testimonial-id">
+    <input id="testimonial-author" placeholder="Author Name" required>
+    <textarea id="testimonial-quote" placeholder="Testimonial text" required></textarea>
+    <button type="submit">Add Testimonial</button>
+</form>
             <div id="testimonial-list-pending"></div>
             <div id="testimonial-list-approved"></div>
         </div>
@@ -581,13 +587,92 @@ async function loadAboutContent() {
 
 
 /* TESTIMONIALS */
-async function loadTestimonials(){
-    const r=await fetch('/api/testimonials/all');
-    const list=await r.json();
-    document.getElementById('testimonial-list-pending').innerHTML=
-        list.filter(t=>t.status==='pending').map(t=>`<div>${t.author}</div>`).join('');
-}
+/* ================= TESTIMONIALS ================= */
 
+const testimonialForm = document.getElementById('testimonial-form');
+
+testimonialForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const author = document.getElementById('testimonial-author').value;
+    const quote  = document.getElementById('testimonial-quote').value;
+
+    const res = await fetch('/api/testimonials/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            author,
+            quote,
+            password: adminPassword
+        })
+    });
+
+    if (res.ok) {
+        alert('Testimonial added');
+        testimonialForm.reset();
+        loadTestimonials();
+    } else {
+        alert('Failed to add testimonial');
+    }
+});
+
+async function loadTestimonials() {
+    const r = await fetch('/api/testimonials/all');
+    const list = await r.json();
+
+    const pendingBox  = document.getElementById('testimonial-list-pending');
+    const approvedBox = document.getElementById('testimonial-list-approved');
+
+    pendingBox.innerHTML = '<h3>Pending</h3>';
+    approvedBox.innerHTML = '<h3>Approved</h3>';
+
+    list.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'shloka-admin-item';
+        div.innerHTML = `
+            <b>${t.author}</b>
+            <p>${t.quote}</p>
+            <div class="admin-buttons"></div>
+        `;
+
+        const btnBox = div.querySelector('.admin-buttons');
+
+        if (t.status === 'pending') {
+            btnBox.innerHTML = `
+                <button class="approve-button">Approve</button>
+                <button class="delete-button">Delete</button>
+            `;
+
+            btnBox.querySelector('.approve-button').onclick = async () => {
+                await fetch('/api/testimonials/approve/' + t._id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword })
+                });
+                loadTestimonials();
+            };
+
+        } else {
+            btnBox.innerHTML = `
+                <button class="delete-button">Delete</button>
+            `;
+        }
+
+        btnBox.querySelector('.delete-button').onclick = async () => {
+            if (!confirm('Delete this testimonial?')) return;
+
+            await fetch('/api/testimonials/' + t._id, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword })
+            });
+
+            loadTestimonials();
+        };
+
+        (t.status === 'pending' ? pendingBox : approvedBox).appendChild(div);
+    });
+}
 });
 </script>
 </body>
