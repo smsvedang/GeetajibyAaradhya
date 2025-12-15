@@ -183,27 +183,56 @@ loginForm.addEventListener('submit', async e => {
     adminDashboard.style.display='flex';
 
     loadDashboard();
-    loadTestimonials();
+loadTestimonials();
+loadShlokasAdmin();
+loadBlogPosts();
+loadArtwork();
+loadCoursesAdmin?.();
+loadCertificates?.();
+loadQuizzes?.();
 });
 
-/* TAB SWITCH */
-sidebarButtons.forEach(btn=>{
-    btn.onclick=()=>{
-        sidebarButtons.forEach(b=>b.classList.remove('active'));
-        pages.forEach(p=>p.classList.remove('active'));
+/* TAB SWITCH + DATA LOAD */
+sidebarButtons.forEach(btn => {
+    btn.onclick = () => {
+
+        sidebarButtons.forEach(b => b.classList.remove('active'));
+        pages.forEach(p => p.classList.remove('active'));
+
         btn.classList.add('active');
-        document.getElementById(btn.dataset.tab).classList.add('active');
+        const tab = btn.dataset.tab;
+        document.getElementById(tab).classList.add('active');
+
+        // 🔥 YAHI MAIN FIX HAI
+        if (tab === 'tab-dashboard') loadDashboard();
+        if (tab === 'tab-testimonials') loadTestimonials();
+        if (tab === 'tab-shloka') loadShlokasAdmin();
+        if (tab === 'tab-blog') loadBlogPosts();
+        if (tab === 'tab-artwork') loadArtwork();
+        if (tab === 'tab-courses') loadCoursesAdmin?.();
+        if (tab === 'tab-certificates') loadCertificates?.();
+        if (tab === 'tab-quizzes') loadQuizzes?.();
     };
 });
 
 /* DASHBOARD */
-async function loadDashboard(){
-    const s = await fetch('/api/shlokas').then(r=>r.json());
-    const b = await fetch('/api/blog').then(r=>r.json());
-    const a = await fetch('/api/artwork').then(r=>r.json());
-    document.getElementById('stat-shlokas').textContent = s.length;
-    document.getElementById('stat-blog').textContent = b.length;
-    document.getElementById('stat-artwork').textContent = a.length;
+async function loadDashboard() {
+
+    const shlokas = await fetch('/api/shlokas').then(r => r.json());
+    const blogs   = await fetch('/api/blog').then(r => r.json());
+    const artwork = await fetch('/api/artwork').then(r => r.json());
+    const testi   = await fetch('/api/testimonials/all').then(r => r.json());
+
+    let likes = 0;
+    shlokas.forEach(s => likes += (s.likes || 0));
+
+    document.getElementById('stat-shlokas').textContent = shlokas.length;
+    document.getElementById('stat-likes').textContent  = likes;
+    document.getElementById('stat-blog').textContent   = blogs.length;
+    document.getElementById('stat-artwork').textContent= artwork.length;
+
+    const pending = testi.filter(t => t.status === 'pending').length;
+    document.getElementById('stat-pending').textContent = pending;
 }
 
 /* SHLOKAS */
