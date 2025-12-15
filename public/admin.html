@@ -400,6 +400,86 @@ async function loadQuizzes() {
     });
 }
 
+/* ================= ADD QUIZ QUESTION ================= */
+document.getElementById('add-question').onclick = () => {
+
+    const box = document.getElementById('quiz-questions');
+
+    const div = document.createElement('div');
+    div.className = 'shloka-admin-item';
+
+    div.innerHTML = `
+        <input placeholder="Question" required>
+        <input placeholder="Option A" required>
+        <input placeholder="Option B" required>
+        <input placeholder="Option C" required>
+        <input placeholder="Option D" required>
+        <input type="number" placeholder="Correct option (0-3)" min="0" max="3" required>
+        <hr>
+    `;
+
+    box.appendChild(div);
+};
+
+/* ================= SAVE QUIZ ================= */
+document.getElementById('quiz-save').onclick = async () => {
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const courseId = document.getElementById('quiz-course').value;
+    const passPercentage = Number(document.getElementById('quiz-pass').value) || 50;
+
+    if (!courseId) {
+        alert('Please select a course');
+        return;
+    }
+
+    const questions = [];
+
+    document.querySelectorAll('#quiz-questions > div').forEach(div => {
+        const inputs = div.querySelectorAll('input');
+
+        questions.push({
+            question: inputs[0].value,
+            options: [
+                inputs[1].value,
+                inputs[2].value,
+                inputs[3].value,
+                inputs[4].value
+            ],
+            correctIndex: Number(inputs[5].value)
+        });
+    });
+
+    if (!questions.length) {
+        alert('Add at least one question');
+        return;
+    }
+
+    const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            course: courseId,
+            passPercentage,
+            questions,
+            password: adminPassword
+        })
+    });
+
+    if (res.ok) {
+        alert('Quiz saved successfully');
+        document.getElementById('quiz-questions').innerHTML = '';
+        loadQuizzes();
+    } else {
+        alert('Failed to save quiz');
+    }
+};
+
+/* ================= CERTIFICATE LOAD ================= */
 async function loadCertificates() {
     const res = await fetch('/api/certificates');
     const list = await res.json();
