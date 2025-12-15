@@ -116,6 +116,7 @@
                     <select id="course-adhyay"></select>
                     <div id="course-shloka-list"></div>
                     <button type="submit">Save</button>
+                    <input type="hidden" id="course-id">
                 </form>
             </div>
             <div id="course-list"></div>
@@ -321,6 +322,7 @@ async function deleteArtwork(id) {
     loadArtwork();
 }
 
+/* ================= LOAD COURSES (ADMIN) ================= */
 async function loadCoursesAdmin() {
     const res = await fetch('/api/courses');
     const courses = await res.json();
@@ -329,12 +331,56 @@ async function loadCoursesAdmin() {
     box.innerHTML = '';
 
     courses.forEach(c => {
-        box.innerHTML += `
-            <div class="shloka-admin-item">
-                <b>${c.title}</b> (Adhyay ${c.adhyay})
-                <button class="delete-button" onclick="deleteCourse('${c._id}')">Delete</button>
+        const div = document.createElement('div');
+        div.className = 'shloka-admin-item';
+
+        div.innerHTML = `
+            <div>
+                <b>${c.title}</b><br>
+                Adhyay ${c.adhyay} | Shlokas: ${c.shlokas.length}
+            </div>
+            <div class="admin-buttons">
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
             </div>
         `;
+
+        /* EDIT */
+        div.querySelector('.edit-button').onclick = () => {
+            document.getElementById('course-id').value = c._id;
+            document.getElementById('course-title').value = c.title;
+            document.getElementById('course-description').value = c.description || '';
+            document.getElementById('course-adhyay').value = c.adhyay;
+
+            // load shlokas for adhyay
+            document.getElementById('course-shloka-list').innerHTML = '';
+            fetch('/api/shlokas')
+                .then(r => r.json())
+                .then(shlokas => {
+                    shlokas
+                        .filter(s => s.adhyay == c.adhyay)
+                        .forEach(s => {
+                            const checked = c.shlokas.includes(s._id) ? 'checked' : '';
+                            document.getElementById('course-shloka-list').innerHTML += `
+                                <label>
+                                    <input type="checkbox" value="${s._id}" ${checked}>
+                                    Shloka ${s.shloka}
+                                </label><br>
+                            `;
+                        });
+                });
+
+            document.getElementById('course-form-wrapper').style.display = 'block';
+        };
+
+        /* DELETE */
+        div.querySelector('.delete-button').onclick = async () => {
+            if (!confirm('Delete this course?')) return;
+            await fetch('/api/courses/' + c._id, { method: 'DELETE' });
+            loadCoursesAdmin();
+        };
+
+        box.appendChild(div);
     });
 }
 
@@ -342,6 +388,66 @@ async function deleteCourse(id) {
     await fetch('/api/courses/' + id, { method: 'DELETE' });
     loadCoursesAdmin();
 }
+
+/* ================= COURSE FORM TOGGLE ================= */
+document.getElementById('show-course-form').onclick = () => {
+    const box = document.getElementById('course-form-wrapper');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+};
+
+/* ================= SAVE / UPDATE COURSE ================= */
+const courseForm = document.getElementById('course-form');
+
+courseForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const courseId = document.getElementById('course-id').value;
+
+    const selectedShlokas = [];
+    document
+        .querySelectorAll('#course-shloka-list input[type="checkbox"]:checked')
+        .forEach(cb => selectedShlokas.push(cb.value));
+
+    if (!selectedShlokas.length) {
+        alert('Select at least one shloka');
+        return;
+    }
+
+    const payload = {
+        title: document.getElementById('course-title').value,
+        description: document.getElementById('course-description').value,
+        adhyay: document.getElementById('course-adhyay').value,
+        shlokas: selectedShlokas,
+        password: adminPassword
+    };
+
+    const url = courseId
+        ? `/api/courses/${courseId}`
+        : `/api/courses`;
+
+    const method = courseId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert(courseId ? 'Course updated' : 'Course added');
+        courseForm.reset();
+        document.getElementById('course-id').value = '';
+        document.getElementById('course-form-wrapper').style.display = 'none';
+        loadCoursesAdmin();
+    } else {
+        alert('Failed to save course');
+    }
+});
 
 /* ================= QUIZ LIST LOAD ================= */
 async function loadQuizzes() {
