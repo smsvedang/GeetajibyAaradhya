@@ -603,6 +603,17 @@ app.get('/api/certificate', async (req, res) => {
     }
 });
 
+// ================= CERTIFICATES LIST (ADMIN) =================
+app.get('/api/certificates', async (req, res) => {
+    try {
+        const certificates = await Certificate.find().sort({ createdAt: -1 });
+        res.json(certificates);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to load certificates' });
+    }
+});
+
 //--- Course progress ---//
 app.get('/api/course-progress/:courseId', async (req, res) => {
     const data = await Progress.find({ courseId: req.params.courseId });
