@@ -192,6 +192,7 @@ loadCertificates?.();
 loadQuizzes?.();
 loadAboutContent();
 loadCoursesForCertificate();
+loadCoursesForQuiz();
 });
 
 /* TAB SWITCH + DATA LOAD */
@@ -213,7 +214,7 @@ sidebarButtons.forEach(btn => {
         if (tab === 'tab-artwork') loadArtwork();
         if (tab === 'tab-courses') loadCoursesAdmin?.();
         if (tab === 'tab-certificates') loadCertificates?.();
-        if (tab === 'tab-quizzes') loadQuizzes?.();
+        if (tab === 'tab-quizzes') {loadCoursesForQuiz();loadQuizzes();}   
         if (tab === 'tab-about') loadAboutContent();
     };
 });
@@ -336,6 +337,7 @@ async function deleteCourse(id) {
     loadCoursesAdmin();
 }
 
+/* ================= QUIZ LIST LOAD ================= */
 async function loadQuizzes() {
     const res = await fetch('/api/quiz');
     const quizzes = await res.json();
@@ -344,12 +346,57 @@ async function loadQuizzes() {
     box.innerHTML = '';
 
     quizzes.forEach(q => {
-        box.innerHTML += `
-            <div class="shloka-admin-item">
-                <b>${q.course?.title || 'Unknown Course'}</b>
-                (Pass: ${q.passPercentage}%)
+        const div = document.createElement('div');
+        div.className = 'shloka-admin-item';
+
+        div.innerHTML = `
+            <div>
+                <b>${q.course?.title || 'Unknown Course'}</b><br>
+                Pass: ${q.passPercentage}%
+            </div>
+            <div class="admin-buttons">
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
             </div>
         `;
+
+        /* EDIT */
+        div.querySelector('.edit-button').onclick = () => {
+            document.getElementById('quiz-course').value = q.course?._id;
+            document.getElementById('quiz-pass').value = q.passPercentage;
+
+            const boxQ = document.getElementById('quiz-questions');
+            boxQ.innerHTML = '';
+
+            q.questions.forEach(ques => {
+                const d = document.createElement('div');
+                d.className = 'shloka-admin-item';
+                d.innerHTML = `
+                    <input value="${ques.question}">
+                    <input value="${ques.options[0]}">
+                    <input value="${ques.options[1]}">
+                    <input value="${ques.options[2]}">
+                    <input value="${ques.options[3]}">
+                    <input type="number" value="${ques.correctIndex}">
+                `;
+                boxQ.appendChild(d);
+            });
+        };
+
+        /* DELETE */
+        div.querySelector('.delete-button').onclick = async () => {
+            if (!confirm('Delete this quiz?')) return;
+
+            await fetch('/api/quiz/' + q._id, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword })
+            });
+
+            loadQuizzes();
+        };
+
+        box.appendChild(div);
     });
 }
 
@@ -417,6 +464,27 @@ window.generateCertificate = function () {
     window.open(url, '_blank');
 };
 
+/* ================= QUIZ COURSE LOAD ================= */
+async function loadCoursesForQuiz() {
+    try {
+        const res = await fetch('/api/courses');
+        const courses = await res.json();
+
+        const sel = document.getElementById('quiz-course');
+        if (!sel) return;
+
+        sel.innerHTML = '<option value="">Select Course</option>';
+
+        courses.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c._id;
+            opt.textContent = c.title;
+            sel.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Failed to load quiz courses', err);
+    }
+}
 
 /* ================= ABOUT LOAD ================= */
 async function loadAboutContent() {
