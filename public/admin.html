@@ -440,18 +440,6 @@ async function loadTestimonials(){
         list.filter(t=>t.status==='pending').map(t=>`<div>${t.author}</div>`).join('');
 }
 
-/* CERTIFICATE (onclick as requested) */
-window.generateCertificate=function(){
-    const name=cert-name.value;
-    const mobile=cert-mobile.value;
-    const email=cert-email.value;
-    const course=cert-course.selectedOptions[0].text;
-    const lang=cert-lang.value;
-
-    const url=`/api/certificate?name=${encodeURIComponent(name)}&mobile=${mobile}&email=${email}&courseTitle=${encodeURIComponent(course)}&lang=${lang}`;
-    window.open(url,'_blank');
-};
-
 });
 </script>
 </body>
