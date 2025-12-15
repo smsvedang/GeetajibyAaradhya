@@ -436,6 +436,54 @@ document.addEventListener('DOMContentLoaded', () => {
             list.map(c => `<div>${c.name} – ${c.courseTitle}</div>`).join('');
     }
 
+    /* ================= TESTIMONIALS ================= */
+async function loadTestimonials() {
+    try {
+        const r = await fetch('/api/testimonials/all');
+        const testimonials = await r.json();
+
+        const pendingBox = document.getElementById('testimonial-list-pending');
+        const approvedBox = document.getElementById('testimonial-list-approved');
+
+        if (!pendingBox || !approvedBox) return;
+
+        pendingBox.innerHTML = '';
+        approvedBox.innerHTML = '';
+
+        let pendingCount = 0;
+
+        testimonials.forEach(t => {
+            const div = document.createElement('div');
+            div.className = 'shloka-admin-item';
+
+            if (t.status === 'pending') {
+                pendingCount++;
+                div.innerHTML = `
+                    <b>${t.author}</b>
+                    <div class="admin-buttons">
+                        <button class="approve-button" data-id="${t._id}">Approve</button>
+                        <button class="delete-button" data-id="${t._id}">Delete</button>
+                    </div>
+                `;
+                pendingBox.appendChild(div);
+            } else {
+                div.innerHTML = `
+                    <b>${t.author}</b>
+                    <div class="admin-buttons">
+                        <button class="delete-button" data-id="${t._id}">Delete</button>
+                    </div>
+                `;
+                approvedBox.appendChild(div);
+            }
+        });
+
+        document.getElementById('stat-pending').textContent = pendingCount;
+
+    } catch (err) {
+        console.error('Failed to load testimonials', err);
+    }
+}
+
     /* ================= QUIZ ================= */
     async function loadCoursesForQuiz() {
         const r = await fetch('/api/courses');
