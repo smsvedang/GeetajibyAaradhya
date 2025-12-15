@@ -261,922 +261,277 @@
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        // --- Element Selectors ---
-        const loginSection = document.getElementById('login-section');
-        const adminDashboard = document.getElementById('admin-dashboard');
-        const loginForm = document.getElementById('login-form');
-        const shlokaForm = document.getElementById('shloka-form');
-        const shlokaFormTitle = document.getElementById('shloka-form-title');
-        const shlokaSubmitButton = document.getElementById('shloka-submit-button');
-        const shlokaCancelButton = document.getElementById('shloka-cancel-edit');
-        const shlokaIdInput = document.getElementById('shloka-id');
-        const shlokaListContainer = document.getElementById('shloka-list-admin');
-        const aboutForm = document.getElementById('about-form');
-        const aboutTextInput = document.getElementById('about-text-input');
-        const aboutImageUrlInput = document.getElementById('about-image-url');
-        const artworkForm = document.getElementById('artwork-form');
-        const artworkListContainer = document.getElementById('artwork-list');
-        const blogForm = document.getElementById('blog-form');
-        const blogFormTitle = document.getElementById('blog-form-title');
-        const blogSubmitButton = document.getElementById('blog-submit-button');
-        const blogCancelButton = document.getElementById('blog-cancel-edit');
-        const blogIdInput = document.getElementById('blog-id');
-        const blogListContainer = document.getElementById('blog-list-admin');
-        const testimonialForm = document.getElementById('testimonial-form');
-        const testimonialFormTitle = document.getElementById('testimonial-form-title');
-        const testimonialSubmitButton = document.getElementById('testimonial-submit-button');
-        const testimonialCancelButton = document.getElementById('testimonial-cancel-edit');
-        const testimonialIdInput = document.getElementById('testimonial-id');
-        const testimonialListPending = document.getElementById('testimonial-list-pending');
-        const testimonialListApproved = document.getElementById('testimonial-list-approved');
-        const sidebarButtons = document.querySelectorAll('.sidebar-button');
-        const contentPages = document.querySelectorAll('.content-page');
+     <script>
+document.addEventListener('DOMContentLoaded', () => {
 
-        let adminPassword = '';
+    /* ================= BASIC SELECTORS ================= */
 
-        //--- Certificate Download ---
-        function generateCertificateAdmin() {
-    const name = document.getElementById('cert-name').value;
-    const email = document.getElementById('cert-email').value;
-    const mobile = document.getElementById('cert-mobile').value;
-    const courseSelect = document.getElementById('cert-course');
-    const courseTitle = courseSelect.options[courseSelect.selectedIndex].text;
-    const lang = document.getElementById('cert-lang').value;
+    const loginSection = document.getElementById('login-section');
+    const adminDashboard = document.getElementById('admin-dashboard');
+    const loginForm = document.getElementById('login-form');
 
-    const url =
-        `/api/certificate?name=${encodeURIComponent(name)}` +
-        `&email=${encodeURIComponent(email)}` +
-        `&mobile=${mobile}` +
-        `&courseTitle=${encodeURIComponent(courseTitle)}` +
-        `&lang=${lang}`;
+    const sidebarButtons = document.querySelectorAll('.sidebar-button');
+    const contentPages = document.querySelectorAll('.content-page');
 
-    window.open(url, '_blank');
-}
+    const shlokaListContainer = document.getElementById('shloka-list-admin');
+    const artworkListContainer = document.getElementById('artwork-list');
+    const blogListContainer = document.getElementById('blog-list-admin');
+    const testimonialListPending = document.getElementById('testimonial-list-pending');
+    const testimonialListApproved = document.getElementById('testimonial-list-approved');
 
-        /* ================= TAB SWITCHING (FIXED) ================= */
+    let adminPassword = '';
 
-sidebarButtons.forEach(button => {
-    button.addEventListener('click', () => {
+    /* ================= TAB SWITCHING (ONLY ONE PLACE) ================= */
 
-        // active reset
+    function activateTab(tabId) {
         sidebarButtons.forEach(b => b.classList.remove('active'));
         contentPages.forEach(p => p.classList.remove('active'));
 
-        // activate current
-        button.classList.add('active');
-        const page = document.getElementById(button.dataset.tab);
-        if (!page) return;
+        const btn = document.querySelector(`.sidebar-button[data-tab="${tabId}"]`);
+        const page = document.getElementById(tabId);
 
+        if (!btn || !page) return;
+
+        btn.classList.add('active');
         page.classList.add('active');
 
-        // 🔒 FORCE TOP (NO JUMP)
         window.scrollTo({ top: 0, behavior: 'instant' });
 
-        /* ---- TAB SPECIFIC LOADERS ---- */
-        switch (button.dataset.tab) {
-            case 'tab-shloka':
-                loadShlokasAdmin();
-                break;
-
-            case 'tab-blog':
-                loadBlogPosts();
-                break;
-
-            case 'tab-artwork':
-                loadArtwork();
-                break;
-
-            case 'tab-courses':
-                loadCoursesAdmin();
-                break;
-
-            case 'tab-quizzes':
-                loadCoursesForQuiz();
-                loadQuizzes();
-                break;
-
-            case 'tab-certificates':
-                loadCoursesForCertificate();
-                loadCertificates?.();
-                break;
+        switch (tabId) {
+            case 'tab-shloka': loadShlokasAdmin(); break;
+            case 'tab-artwork': loadArtwork(); break;
+            case 'tab-blog': loadBlogPosts(); break;
+            case 'tab-testimonials': loadTestimonials(); break;
+            case 'tab-courses': loadCoursesAdmin(); break;
+            case 'tab-quizzes': loadCoursesForQuiz(); loadQuizzes(); break;
+            case 'tab-certificates': loadCoursesForCertificate(); loadCertificates(); break;
         }
+    }
+
+    sidebarButtons.forEach(btn => {
+        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
     });
-});
 
-        // --- Data Loading Functions ---
-        async function loadAboutContent() {
-            try {
-                const response = await fetch('/api/about');
-                const data = await response.json();
-                if (data) {
-                    if (data.content) aboutTextInput.value = data.content;
-                    if (data.imageUrl) aboutImageUrlInput.value = data.imageUrl;
-                }
-            } catch (err) { console.error('Failed to load about text'); }
-        }
-        
-        async function loadArtwork() {
-            try {
-                const response = await fetch('/api/artwork');
-                const artworks = await response.json();
-                artworkListContainer.innerHTML = ''; 
-                artworks.forEach(artwork => {
-                    const item = document.createElement('div');
-                    item.className = 'artwork-admin-item';
-                    item.innerHTML = `
-                        <img src="${artwork.imageUrl}" alt="${artwork.title}">
-                        <p>${artwork.title}</p>
-                        <div class="admin-buttons">
-                            <button class="delete-button" data-id="${artwork._id}">Delete</button>
-                        </div>
-                    `;
-                    artworkListContainer.appendChild(item);
-                });
-                document.getElementById('stat-artwork').textContent = artworks.length;
-            } catch (err) { console.error('Failed to load artwork'); }
-        }
+    /* ================= LOGIN ================= */
 
-        // [NAYA] loadShlokasAdmin function updated
-        async function loadShlokasAdmin() {
-            try {
-                const response = await fetch('/api/shlokas');
-                const shlokas = await response.json();
-                shlokaListContainer.innerHTML = ''; // List ko saaf karo
-                
-                let totalLikes = 0; // Likes count shuru karo
+    loginForm.addEventListener('submit', async e => {
+        e.preventDefault();
 
-                shlokas.forEach(shloka => {
-                    totalLikes += shloka.likes || 0;
+        const password = document.getElementById('password').value;
 
-                    // Shlok item banao (ab grouping nahi hai)
-                    const item = document.createElement('div');
-                    item.className = 'shloka-admin-item';
-                    item.innerHTML = `
-                        <p><strong>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</strong> (Likes: ${shloka.likes || 0})</p>
-                        <div class="admin-buttons">
-                            <button class="edit-button" data-id="${shloka._id}">Edit</button>
-                            <button class="delete-button" data-id="${shloka._id}">Delete</button>
-                        </div>
-                    `;
-                    item.querySelector('.edit-button').dataset.shloka = JSON.stringify(shloka);
-                    shlokaListContainer.appendChild(item); // Seedha list mein daalo
-                });
-                
-                // Dashboard update
-                document.getElementById('stat-shlokas').textContent = shlokas.length;
-                document.getElementById('stat-likes').textContent = totalLikes; // Likes ko update karo
-
-            } catch (err) { console.error('Failed to load shlokas for admin'); }
-        }
-        
-        async function loadBlogPosts() {
-            try {
-                const response = await fetch('/api/blog');
-                const posts = await response.json();
-                blogListContainer.innerHTML = ''; 
-                posts.forEach(post => {
-                    const item = document.createElement('div');
-                    item.className = 'shloka-admin-item';
-                    item.innerHTML = `
-                        <p><strong>${post.title}</strong></p>
-                        <div class="admin-buttons">
-                            <button class="edit-button" data-id="${post._id}">Edit</button>
-                            <button class="delete-button" data-id="${post._id}">Delete</button>
-                        </div>
-                    `;
-                    item.querySelector('.edit-button').dataset.post = JSON.stringify(post);
-                    blogListContainer.appendChild(item);
-                });
-                document.getElementById('stat-blog').textContent = posts.length;
-            } catch (err) { console.error('Failed to load blog posts'); }
-        }
-
-        async function loadTestimonials() {
-            try {
-                const response = await fetch('/api/testimonials/all'); 
-                const testimonials = await response.json();
-                testimonialListPending.innerHTML = '';
-                testimonialListApproved.innerHTML = '';
-                let pendingCount = 0;
-
-                testimonials.forEach(testimonial => {
-                    const item = document.createElement('div');
-                    item.className = 'shloka-admin-item';
-                    if (testimonial.status === 'pending') {
-                        pendingCount++;
-                        item.innerHTML = `
-                            <p><strong>${testimonial.author}</strong></p>
-                            <div class="admin-buttons">
-                                <button class="approve-button" data-id="${testimonial._id}">Approve</button>
-                                <button class="delete-button" data-id="${testimonial._id}">Delete</button>
-                            </div>
-                        `;
-                        testimonialListPending.appendChild(item);
-                    } else {
-                        item.innerHTML = `
-                            <p><strong>${testimonial.author}</strong></p>
-                            <div class="admin-buttons">
-                                <button class="edit-button" data-id="${testimonial._id}">Edit</button>
-                                <button class="delete-button" data-id="${testimonial._id}">Delete</button>
-                            </div>
-                        `;
-                        item.querySelector('.edit-button').dataset.testimonial = JSON.stringify(testimonial);
-                        testimonialListApproved.appendChild(item);
-                    }
-                });
-                if (pendingCount === 0) {
-                     testimonialListPending.innerHTML = '<p style="padding: 15px;">No pending requests.</p>';
-                }
-                document.getElementById('stat-pending').textContent = pendingCount;
-            } catch (err) { console.error('Failed to load testimonials'); }
-        }
-
-        // --- Event Listeners ---
-        
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = document.getElementById('password').value;
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: password })
-            });
-            try {
-                const data = await response.json();
-                if (data.success) {
-                    adminPassword = password;
-                    loginSection.style.display = 'none';
-                    adminDashboard.style.display = 'flex';
-                    loadAboutContent();
-                    loadArtwork();
-                    loadShlokasAdmin();
-                    loadBlogPosts();
-                    loadTestimonials();
-                } else {
-                    alert(data.message || 'Login failed!');
-                }
-            } catch (err) { alert('Login failed. Check console.'); }
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
         });
 
-        shlokaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login first.');
-            const shlokaId = shlokaIdInput.value;
-            const isEditMode = !!shlokaId;
-            const url = isEditMode ? `/api/shlokas/${shlokaId}` : '/api/shlokas';
-            const method = isEditMode ? 'PUT' : 'POST';
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    adhyay: document.getElementById('adhyay').value,
-                    shloka: document.getElementById('shloka').value,
-                    text: document.getElementById('text').value,
-                    video_url: document.getElementById('video_url').value,
-                    password: adminPassword 
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert(isEditMode ? 'Shloka updated!' : 'Shloka added!');
-                resetShlokaForm();
-                loadShlokasAdmin();
+        const data = await res.json();
+
+        if (!data.success) {
+            alert('Login failed');
+            return;
+        }
+
+        adminPassword = password;
+        loginSection.style.display = 'none';
+        adminDashboard.style.display = 'flex';
+
+        activateTab('tab-dashboard');
+        loadShlokasAdmin();
+        loadArtwork();
+        loadBlogPosts();
+        loadTestimonials();
+    });
+
+    /* ================= SHLOKAS ================= */
+
+    async function loadShlokasAdmin() {
+        if (!shlokaListContainer) return;
+
+        const r = await fetch('/api/shlokas');
+        const shlokas = await r.json();
+
+        shlokaListContainer.innerHTML = '';
+        let likes = 0;
+
+        shlokas.forEach(s => {
+            likes += s.likes || 0;
+            shlokaListContainer.innerHTML += `
+                <div class="shloka-admin-item">
+                    <p><b>Adhyay ${s.adhyay}, Shloka ${s.shloka}</b> (Likes: ${s.likes || 0})</p>
+                    <div class="admin-buttons">
+                        <button class="delete-button" data-id="${s._id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('stat-shlokas').textContent = shlokas.length;
+        document.getElementById('stat-likes').textContent = likes;
+    }
+
+    /* ================= ARTWORK ================= */
+
+    async function loadArtwork() {
+        if (!artworkListContainer) return;
+
+        const r = await fetch('/api/artwork');
+        const list = await r.json();
+
+        artworkListContainer.innerHTML = '';
+        list.forEach(a => {
+            artworkListContainer.innerHTML += `
+                <div class="artwork-admin-item">
+                    <img src="${a.imageUrl}">
+                    <p>${a.title}</p>
+                    <div class="admin-buttons">
+                        <button class="delete-button" data-id="${a._id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('stat-artwork').textContent = list.length;
+    }
+
+    /* ================= BLOG ================= */
+
+    async function loadBlogPosts() {
+        if (!blogListContainer) return;
+
+        const r = await fetch('/api/blog');
+        const posts = await r.json();
+
+        blogListContainer.innerHTML = '';
+        posts.forEach(p => {
+            blogListContainer.innerHTML += `
+                <div class="shloka-admin-item">
+                    <p><b>${p.title}</b></p>
+                    <div class="admin-buttons">
+                        <button class="delete-button" data-id="${p._id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('stat-blog').textContent = posts.length;
+    }
+
+    /* ================= TESTIMONIALS ================= */
+
+    async function loadTestimonials() {
+        const r = await fetch('/api/testimonials/all');
+        const list = await r.json();
+
+        testimonialListPending.innerHTML = '';
+        testimonialListApproved.innerHTML = '';
+
+        let pending = 0;
+
+        list.forEach(t => {
+            const div = document.createElement('div');
+            div.className = 'shloka-admin-item';
+
+            if (t.status === 'pending') {
+                pending++;
+                div.innerHTML = `<p>${t.author}</p>`;
+                testimonialListPending.appendChild(div);
             } else {
-                alert(data.message || 'Failed to save shloka.');
-            }
-        });
-        
-        blogForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login first.');
-            const blogId = blogIdInput.value;
-            const isEditMode = !!blogId;
-            const url = isEditMode ? `/api/blog/${blogId}` : '/api/blog';
-            const method = isEditMode ? 'PUT' : 'POST';
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: document.getElementById('blog-title').value,
-                    content: document.getElementById('blog-content').value,
-                    password: adminPassword 
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert(isEditMode ? 'Post updated!' : 'Post added!');
-                resetBlogForm();
-                loadBlogPosts();
-            } else {
-                alert(data.message || 'Failed to save post.');
+                div.innerHTML = `<p>${t.author}</p>`;
+                testimonialListApproved.appendChild(div);
             }
         });
 
-        testimonialForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login first.');
-            const testimonialId = testimonialIdInput.value;
-            const isEditMode = !!testimonialId;
-            const url = isEditMode ? `/api/testimonials/${testimonialId}` : '/api/testimonials/admin';
-            const method = isEditMode ? 'PUT' : 'POST';
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    author: document.getElementById('testimonial-author').value,
-                    quote: document.getElementById('testimonial-quote').value,
-                    password: adminPassword 
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert(isEditMode ? 'Testimonial updated!' : 'Testimonial added and approved!');
-                resetTestimonialForm();
-                loadTestimonials();
-            } else {
-                alert(data.message || 'Failed to save testimonial.');
-            }
-        });
-
-        // --- Reset Form Functions ---
-        function resetShlokaForm() {
-            shlokaForm.reset();
-            shlokaIdInput.value = '';
-            shlokaFormTitle.textContent = 'Add New Shloka';
-            shlokaSubmitButton.textContent = 'Add Shloka';
-            shlokaCancelButton.style.display = 'none';
-        }
-        shlokaCancelButton.addEventListener('click', resetShlokaForm);
-        function resetBlogForm() {
-            blogForm.reset();
-            blogIdInput.value = '';
-            blogFormTitle.textContent = 'Add New Blog Post';
-            blogSubmitButton.textContent = 'Add Post';
-            blogCancelButton.style.display = 'none';
-        }
-        blogCancelButton.addEventListener('click', resetBlogForm);
-        function resetTestimonialForm() {
-            testimonialForm.reset();
-            testimonialIdInput.value = '';
-            testimonialFormTitle.textContent = 'Add New Testimonial';
-            testimonialSubmitButton.textContent = 'Add Testimonial';
-            testimonialCancelButton.style.display = 'none';
-        }
-        testimonialCancelButton.addEventListener('click', resetTestimonialForm);
-
-        // --- List Click Listeners (Delete/Edit) ---
-        shlokaListContainer.addEventListener('click', async (e) => {
-            if (!adminPassword) return alert('Please login first.');
-            const target = e.target;
-            const id = target.dataset.id;
-            if (target.classList.contains('delete-button')) {
-                if (!confirm('Are you sure?')) return;
-                const response = await fetch(`/api/shlokas/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                if (response.ok) { loadShlokasAdmin(); } 
-                else { alert('Failed to delete.'); }
-            }
-            if (target.classList.contains('edit-button')) {
-                const shlokaData = JSON.parse(target.dataset.shloka);
-                shlokaIdInput.value = shlokaData._id;
-                document.getElementById('adhyay').value = shlokaData.adhyay;
-                document.getElementById('shloka').value = shlokaData.shloka;
-                document.getElementById('text').value = shlokaData.text || '';
-                document.getElementById('video_url').value = shlokaData.video_id; 
-                shlokaFormTitle.textContent = 'Edit Shloka';
-                shlokaSubmitButton.textContent = 'Update Shloka';
-                shlokaCancelButton.style.display = 'inline-block';
-                shlokaForm.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-
-        blogListContainer.addEventListener('click', async (e) => {
-            if (!adminPassword) return alert('Please login first.');
-            const target = e.target;
-            const id = target.dataset.id;
-            if (target.classList.contains('delete-button')) {
-                if (!confirm('Are you sure?')) return;
-                const response = await fetch(`/api/blog/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                if (response.ok) { loadBlogPosts(); } 
-                else { alert('Failed to delete.'); }
-            }
-            if (target.classList.contains('edit-button')) {
-                const postData = JSON.parse(target.dataset.post);
-                blogIdInput.value = postData._id;
-                document.getElementById('blog-title').value = postData.title;
-                document.getElementById('blog-content').value = postData.content;
-                blogFormTitle.textContent = 'Edit Blog Post';
-                blogSubmitButton.textContent = 'Update Post';
-                blogCancelButton.style.display = 'inline-block';
-                blogForm.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-
-        [testimonialListPending, testimonialListApproved].forEach(container => {
-            container.addEventListener('click', async (e) => {
-                if (!adminPassword) return alert('Please login first.');
-                const target = e.target;
-                const id = target.dataset.id;
-                if (target.classList.contains('approve-button')) {
-                    if (!confirm('Are you sure?')) return;
-                    const response = await fetch(`/api/testimonials/approve/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: adminPassword })
-                    });
-                    if (response.ok) { loadTestimonials(); } 
-                    else { alert('Failed to approve.'); }
-                }
-                if (target.classList.contains('delete-button')) {
-                    if (!confirm('Are you sure?')) return;
-                    const response = await fetch(`/api/testimonials/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: adminPassword })
-                    });
-                    if (response.ok) { loadTestimonials(); } 
-                    else { alert('Failed to delete.'); }
-                }
-                if (target.classList.contains('edit-button')) {
-                    const testimonialData = JSON.parse(target.dataset.testimonial);
-                    testimonialIdInput.value = testimonialData._id;
-                    document.getElementById('testimonial-author').value = testimonialData.author;
-                    document.getElementById('testimonial-quote').value = testimonialData.quote;
-                    testimonialFormTitle.textContent = 'Edit Testimonial';
-                    testimonialSubmitButton.textContent = 'Update Testimonial';
-                    testimonialCancelButton.style.display = 'inline-block';
-                    testimonialForm.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // --- Other Form Handlers ---
-        aboutForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login first.');
-            const response = await fetch('/api/about', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    newText: aboutTextInput.value,
-                    newImageUrl: aboutImageUrlInput.value,
-                    password: adminPassword 
-                })
-            });
-            if (response.ok) { alert('About section saved!'); } 
-            else { alert('Failed to save.'); }
-        });
-
-        artworkForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login first.');
-            const response = await fetch('/api/artwork', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: document.getElementById('artwork-title').value,
-                    imageUrl: document.getElementById('artwork-url').value,
-                    password: adminPassword 
-                })
-            });
-            if (response.ok) {
-                alert('Artwork added!');
-                artworkForm.reset();
-                loadArtwork(); 
-            } else { alert('Failed to add artwork.'); }
-        });
-
-        artworkListContainer.addEventListener('click', async (e) => {
-            if (!e.target.classList.contains('delete-button')) return;
-            if (!adminPassword) return alert('Please login first.');
-            const id = e.target.dataset.id;
-            if (!confirm('Are you sure?')) return;
-            const response = await fetch(`/api/artwork/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: adminPassword })
-            });
-            if (response.ok) { loadArtwork(); } 
-            else { alert('Failed to delete artwork.'); }
-        });
-        // ===== COURSES SUPPORT =====
-async function loadAdhyayForCourses() {
-    const res = await fetch('/api/shlokas');
-    const shlokas = await res.json();
-    const adhyays = [...new Set(shlokas.map(s => s.adhyay))];
-    const sel = document.getElementById('course-adhyay');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Select Adhyay</option>';
-    adhyays.forEach(a => {
-        sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`;
-    });
-}
-
-document.getElementById('course-adhyay')?.addEventListener('change', async e => {
-    const box = document.getElementById('course-shloka-list');
-    box.innerHTML = '';
-    const res = await fetch('/api/shlokas');
-    const shlokas = await res.json();
-    shlokas.filter(s => s.adhyay == e.target.value).forEach(s => {
-        box.innerHTML += `
-            <label>
-                <input type="checkbox" value="${s._id}">
-                Shloka ${s.shloka}
-            </label><br>`;
-    });
-});
-
-async function loadCourseUsers(courseId) {
-    const r = await fetch(`/api/course-progress/${courseId}`);
-    const users = await r.json();
-
-    const box = document.getElementById('course-users');
-    box.innerHTML = '';
-
-    users.forEach(u => {
-        box.innerHTML += `
-            <div class="user-row">
-                ${u.mobile} |
-                Shlokas: ${u.completed.length} |
-                Quiz: ${u.quizPassed ? '✅' : '❌'}
-            </div>
-        `;
-    });
-}
-
-document.getElementById('admin-certificate-form')
-?.addEventListener('submit', async (e) => {
-    e.preventDefault();   // ⛔ reload STOP
-
-    const name = document.getElementById('cert-name').value;
-    const mobile = document.getElementById('cert-mobile').value;
-    const courseId = document.getElementById('cert-course').value;
-    const lang = document.getElementById('cert-lang').value;
-
-    const url =
-        `/api/certificate` +
-        `?name=${encodeURIComponent(name)}` +
-        `&mobile=${mobile}` +
-        `&courseId=${courseId}` +
-        `&lang=${lang}`;
-
-    window.open(url, '_blank');
-});
-// ===== QUIZ BUILDER =====
-
-// login ke baad adhyay load
-const originalLogin = loginForm.addEventListener;
-loginForm.addEventListener('submit', () => {
-    setTimeout(loadAdhyayForCourses, 500);
-});
-// ===== COURSE FORM SUBMIT FIX =====
-const courseForm = document.getElementById('course-form');
-
-courseForm?.addEventListener('submit', async (e) => {
-    e.preventDefault(); // ⛔ page reload STOP
-
-    if (!adminPassword) {
-        alert('Please login first');
-        return;
+        document.getElementById('stat-pending').textContent = pending;
     }
 
-    const selectedShlokas = [];
-    document
-        .querySelectorAll('#course-shloka-list input[type="checkbox"]:checked')
-        .forEach(cb => selectedShlokas.push(cb.value));
+    /* ================= COURSES ================= */
 
-    if (!selectedShlokas.length) {
-        alert('Please select at least one shloka');
-        return;
-    }
+    async function loadCoursesAdmin() {
+        const box = document.getElementById('course-list');
+        if (!box) return;
 
-    const payload = {
-        title: document.getElementById('course-title').value,
-        description: document.getElementById('course-description').value,
-        adhyay: document.getElementById('course-adhyay').value,
-        shlokas: selectedShlokas,
-        password: adminPassword
-    };
+        const r = await fetch('/api/courses');
+        const list = await r.json();
 
-    const res = await fetch('/api/courses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-        alert('Course added successfully');
-        courseForm.reset();
-        document.getElementById('course-shloka-list').innerHTML = '';
-    } else {
-        alert(data.message || 'Failed to add course');
-    }
-    document.getElementById('course-form-wrapper').style.display = 'none';
-});
-
-// ===== LOAD COURSES (ADMIN) =====
-async function loadCoursesAdmin() {
-    const list = document.getElementById('course-list');
-    if (!list) return;
-
-    list.innerHTML = 'Loading courses...';
-
-    const res = await fetch('/api/courses');
-    const courses = await res.json();
-
-    if (!courses.length) {
-        list.innerHTML = '<p>No courses added yet.</p>';
-        return;
-    }
-
-    list.innerHTML = '';
-    courses.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'shloka-admin-item';
-        div.innerHTML = `
-            <p><strong>${c.title}</strong><br>
-            Adhyay ${c.adhyay} | Shlokas: ${c.shlokas.length}</p>
-            <div class="admin-buttons">
-                <button class="delete-course" data-id="${c._id}">🗑 Delete</button>
-            </div>
-        `;
-        list.appendChild(div);
-    });
-}
-loadCoursesAdmin();
-// ===== COURSE FORM TOGGLE =====
-document.getElementById('show-course-form')?.addEventListener('click', () => {
-    const box = document.getElementById('course-form-wrapper');
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-});
-
-
-document.getElementById('admin-certificate-form')
-?.addEventListener('submit', e => {
-    e.preventDefault();
-
-    const name = document.getElementById('cert-name').value;
-    const course = document.getElementById('cert-course').selectedOptions[0].text;
-    const lang = document.getElementById('cert-language').value;
-
-    const iframe = document.getElementById('certificate-preview');
-    iframe.src = `/certificate.html?name=${encodeURIComponent(name)}&course=${encodeURIComponent(course)}&lang=${lang}`;
-
-    document.getElementById('certificate-preview-wrapper').style.display = 'block';
-});
-
-// ===== ADMIN CERTIFICATE =====
-async function loadCoursesForCertificate() {
-    const sel = document.getElementById('cert-course');
-    if (!sel) return;
-
-    sel.innerHTML = '<option value="">Select Course</option>';
-
-    const res = await fetch('/api/courses');
-    const courses = await res.json();
-
-    courses.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c._id;
-        opt.textContent = c.title;
-        sel.appendChild(opt);
-    });
-}
-
-document.getElementById('admin-cert-form')?.addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const payload = {
-        name: document.getElementById('cert-name').value,
-        courseTitle: document.getElementById('cert-course').value,
-        lang: document.getElementById('cert-lang').value
-    };
-
-    const res = await fetch('/api/certificate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'certificate.pdf';
-    a.click();
-});
-document.getElementById('print-certificate').onclick = () => {
-    document.getElementById('certificate-preview').contentWindow.print();
-};
-
-/* ================= QUIZ MANAGEMENT ================= */
-
-// load courses into quiz dropdown
-async function loadCoursesForQuiz() {
-    const sel = document.getElementById('quiz-course');
-    if (!sel) return;
-
-    sel.innerHTML = '<option value="">Select Course</option>';
-
-    const res = await fetch('/api/courses');
-    const courses = await res.json();
-
-    courses.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c._id;
-        opt.textContent = c.title;
-        sel.appendChild(opt);
-    });
-}
-
-// add question UI
-document.getElementById('add-question')?.addEventListener('click', () => {
-    const box = document.getElementById('quiz-questions');
-
-    const div = document.createElement('div');
-    div.className = 'shloka-admin-item';
-
-    div.innerHTML = `
-        <input placeholder="Question" required>
-        <input placeholder="Option A" required>
-        <input placeholder="Option B" required>
-        <input placeholder="Option C" required>
-        <input placeholder="Option D" required>
-        <input type="number"
-               placeholder="Correct option index (0-3)"
-               min="0" max="3" required>
-    `;
-
-    box.appendChild(div);
-});
-
-// save quiz
-document.getElementById('quiz-form').addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const courseId = document.getElementById('quiz-course').value;
-    const passPercent = Number(document.getElementById('quiz-pass').value) || 50;
-
-    const questions = [];
-    document.querySelectorAll('#quiz-questions > div').forEach(div => {
-        const inputs = div.querySelectorAll('input');
-        questions.push({
-            question: inputs[0].value,
-            options: [
-                inputs[1].value,
-                inputs[2].value,
-                inputs[3].value,
-                inputs[4].value
-            ],
-            correctIndex: Number(inputs[5].value)
+        box.innerHTML = '';
+        list.forEach(c => {
+            box.innerHTML += `
+                <div class="shloka-admin-item">
+                    <p><b>${c.title}</b><br>Adhyay ${c.adhyay}</p>
+                    <div class="admin-buttons">
+                        <button class="delete-course" data-id="${c._id}">🗑 Delete</button>
+                    </div>
+                </div>
+            `;
         });
-    });
-
-    const res = await fetch('/api/quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            course: courseId,
-            passPercentage: passPercent,      // ✅ VERY IMPORTANT
-            password: adminPassword,
-            questions
-        })
-    });
-
-    if (res.ok) {
-        alert('Quiz saved successfully');
-    } else {
-        alert('Failed to save quiz');
     }
-});
 
-// load quiz courses when tab opens
-sidebarButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (btn.dataset.tab === 'tab-quizzes') {
-            loadCoursesForQuiz();
-        }
-    });
-});
-async function loadQuizzes() {
-    const res = await fetch('/api/quiz');
-    const quizzes = await res.json();
+    /* ================= QUIZ ================= */
 
-    const list = document.getElementById('quiz-list');
-    list.innerHTML = '';
+    async function loadCoursesForQuiz() {
+        const sel = document.getElementById('quiz-course');
+        if (!sel) return;
 
-    quizzes.forEach(q => {
-        const div = document.createElement('div');
-        div.className = 'shloka-admin-item';
+        const r = await fetch('/api/courses');
+        const list = await r.json();
 
-        div.innerHTML = `
-            <p><strong>${q.course?.title || 'Unknown Course'}</strong>
-               (Pass: ${q.passPercentage}%)</p>
-            <div class="admin-buttons">
-                <button class="edit-button">Edit</button>
-                <button class="delete-button">Delete</button>
-            </div>
-        `;
-
-        /* EDIT */
-        div.querySelector('.edit-button').onclick = () => {
-            document.getElementById('quiz-course').value = q.course?._id;
-            document.getElementById('quiz-pass').value = q.passPercentage;
-            document.getElementById('quiz-questions').innerHTML = '';
-
-            q.questions.forEach(ques => {
-                const box = document.createElement('div');
-                box.className = 'shloka-admin-item';
-                box.innerHTML = `
-                    <input value="${ques.question}">
-                    <input value="${ques.options[0]}">
-                    <input value="${ques.options[1]}">
-                    <input value="${ques.options[2]}">
-                    <input value="${ques.options[3]}">
-                    <input type="number" value="${ques.correct}">
-                `;
-                document.getElementById('quiz-questions').appendChild(box);
-            });
-        };
-
-        /* DELETE */
-        div.querySelector('.delete-button').onclick = async () => {
-            if (!confirm('Delete this quiz?')) return;
-
-            await fetch('/api/quiz/' + q._id, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: adminPassword })
-            });
-
-            loadQuizzes();
-        };
-
-        list.appendChild(div);
-    });
-}
-
-/* tab open par load */
-sidebarButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (btn.dataset.tab === 'tab-quizzes') {
-            loadQuizzes();
-        }
-    });
-});
-document.getElementById('course-list').onclick = async e => {
-    if (!e.target.classList.contains('delete-course')) return;
-
-    if (!confirm('Delete this course?')) return;
-
-    const id = e.target.dataset.id;
-
-    const res = await fetch(`/api/courses/${id}`, {
-        method: 'DELETE'
-    });
-
-    if (res.ok) loadCoursesAdmin();
-};
-document.getElementById('quiz-course').onchange = e => {
-    document.getElementById('delete-quiz').onclick = async () => {
-        if (!confirm('Delete quiz?')) return;
-
-        await fetch(`/api/quizzes/${e.target.value}`, {
-            method: 'DELETE'
+        sel.innerHTML = '<option value="">Select Course</option>';
+        list.forEach(c => {
+            sel.innerHTML += `<option value="${c._id}">${c.title}</option>`;
         });
+    }
 
-        alert('Quiz deleted');
-    };
-};
+    async function loadQuizzes() {
+        const box = document.getElementById('quiz-list');
+        if (!box) return;
 
-async function loadCertificates() {
-    const r = await fetch('/api/certificates');
-    const list = await r.json();
+        const r = await fetch('/api/quiz');
+        const list = await r.json();
 
-    const box = document.getElementById('certificate-list');
-    box.innerHTML = '';
+        box.innerHTML = '';
+        list.forEach(q => {
+            box.innerHTML += `
+                <div class="shloka-admin-item">
+                    <p><b>${q.course?.title || 'Unknown'}</b> (Pass: ${q.passPercentage}%)</p>
+                </div>
+            `;
+        });
+    }
 
-    list.forEach(c => {
-        box.innerHTML += `
-            <div class="admin-item">
-                <b>${c.name}</b> – ${c.courseTitle}<br>
-                ${c.mobile} | ${c.language.toUpperCase()}
-            </div>
-        `;
-    });
-}
+    /* ================= CERTIFICATES ================= */
+
+    async function loadCoursesForCertificate() {
+        const sel = document.getElementById('cert-course');
+        if (!sel) return;
+
+        const r = await fetch('/api/courses');
+        const list = await r.json();
+
+        sel.innerHTML = '<option value="">Select Course</option>';
+        list.forEach(c => {
+            sel.innerHTML += `<option value="${c._id}">${c.title}</option>`;
+        });
+    }
+
+    async function loadCertificates() {
+        const box = document.getElementById('certificate-list');
+        if (!box) return;
+
+        const r = await fetch('/api/certificates');
+        const list = await r.json();
+
+        box.innerHTML = '';
+        list.forEach(c => {
+            box.innerHTML += `
+                <div class="admin-item">
+                    <b>${c.name}</b> – ${c.courseTitle}
+                </div>
+            `;
+        });
+    }
+
 });
-    </script>
+</script>
 </body>
 </html>
