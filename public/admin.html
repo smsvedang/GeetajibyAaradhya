@@ -190,6 +190,7 @@ loadArtwork();
 loadCoursesAdmin?.();
 loadCertificates?.();
 loadQuizzes?.();
+loadAboutContent();
 });
 
 /* TAB SWITCH + DATA LOAD */
@@ -256,6 +257,117 @@ window.deleteShloka=async id=>{
     });
     loadShlokasAdmin();
 };
+async function loadBlogPosts() {
+    const res = await fetch('/api/blog');
+    const posts = await res.json();
+
+    const box = document.getElementById('blog-list-admin');
+    box.innerHTML = '';
+
+    posts.forEach(p => {
+        box.innerHTML += `
+            <div class="shloka-admin-item">
+                <b>${p.title}</b>
+                <div class="admin-buttons">
+                    <button class="delete-button" onclick="deleteBlog('${p._id}')">Delete</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+async function deleteBlog(id) {
+    await fetch('/api/blog/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
+    loadBlogPosts();
+}
+
+async function loadArtwork() {
+    const res = await fetch('/api/artwork');
+    const items = await res.json();
+
+    const box = document.getElementById('artwork-list');
+    box.innerHTML = '';
+
+    items.forEach(a => {
+        box.innerHTML += `
+            <div class="artwork-admin-item">
+                <img src="${a.imageUrl}">
+                <b>${a.title}</b>
+                <button class="delete-button" onclick="deleteArtwork('${a._id}')">Delete</button>
+            </div>
+        `;
+    });
+}
+
+async function deleteArtwork(id) {
+    await fetch('/api/artwork/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
+    loadArtwork();
+}
+
+async function loadCoursesAdmin() {
+    const res = await fetch('/api/courses');
+    const courses = await res.json();
+
+    const box = document.getElementById('course-list');
+    box.innerHTML = '';
+
+    courses.forEach(c => {
+        box.innerHTML += `
+            <div class="shloka-admin-item">
+                <b>${c.title}</b> (Adhyay ${c.adhyay})
+                <button class="delete-button" onclick="deleteCourse('${c._id}')">Delete</button>
+            </div>
+        `;
+    });
+}
+
+async function deleteCourse(id) {
+    await fetch('/api/courses/' + id, { method: 'DELETE' });
+    loadCoursesAdmin();
+}
+
+async function loadQuizzes() {
+    const res = await fetch('/api/quiz');
+    const quizzes = await res.json();
+
+    const box = document.getElementById('quiz-list');
+    box.innerHTML = '';
+
+    quizzes.forEach(q => {
+        box.innerHTML += `
+            <div class="shloka-admin-item">
+                <b>${q.course?.title || 'Unknown Course'}</b>
+                (Pass: ${q.passPercentage}%)
+            </div>
+        `;
+    });
+}
+
+async function loadCertificates() {
+    const res = await fetch('/api/certificates');
+    const list = await res.json();
+
+    const box = document.getElementById('certificate-list');
+    box.innerHTML = '';
+
+    list.forEach(c => {
+        box.innerHTML += `
+            <div class="shloka-admin-item">
+                <b>${c.name}</b> – ${c.courseTitle}
+                <br>${c.mobile}
+            </div>
+        `;
+    });
+}
+
 
 /* TESTIMONIALS */
 async function loadTestimonials(){
