@@ -1,4 +1,5 @@
 /* --- Aaradhya Geetaji - Final Server Code (All Likes Fixed) --- */
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const Progress = require('./models/Progress'); 
@@ -748,9 +749,6 @@ app.put('/api/certificates/approve/:id', async (req, res) => {
     res.json({ success: true });
 });
 
-//---function downloadCertificate(id) {
-//    window.open('/api/certificate/download/' + id, '_blank');
-//}
 
 
 // --- Server Start ---
