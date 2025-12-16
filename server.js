@@ -571,45 +571,40 @@ app.get('/api/certificate', async (req, res) => {
     try {
         const { name, email, mobile, courseTitle, lang } = req.query;
 
-        // ✅ safety check
         if (!name || !courseTitle) {
             return res.status(400).send('Missing data');
         }
 
-        // ✅ IMPORTANT: course title ko freeze kar diya
-        const finalCourseTitle = courseTitle;
-
         const fs = require('fs');
         const path = require('path');
 
-        // load certificate HTML template
         let html = fs.readFileSync(
             path.join(__dirname, 'public/certificate.html'),
             'utf8'
         );
 
-        // inject values into HTML
         html = html
             .replace('{{NAME}}', name)
-            .replace('{{COURSE}}', finalCourseTitle)   // ✅ FIX HERE
+            .replace('{{COURSE}}', courseTitle)
             .replace('{{EMAIL}}', email || '')
             .replace('{{LANG}}', lang || 'en');
 
-        // send rendered certificate
+        // ✅ 1️⃣ FIRST: SAVE TO DATABASE
+        await Certificate.create({
+            name,
+            email,
+            mobile,
+            courseTitle,
+            language: lang
+        });
+
+        // ✅ 2️⃣ THEN: SEND RESPONSE
         res.send(html);
 
     } catch (err) {
-        console.error(err);
+        console.error('Certificate error:', err);
         res.status(500).send('Certificate error');
     }
-    // SAVE HISTORY
-await Certificate.create({
-    name,
-    email,
-    mobile,
-    courseTitle,
-    language: lang
-});
 });
 
 // ================= CERTIFICATES LIST (ADMIN) =================
