@@ -170,7 +170,7 @@ async function restoreProgress() {
     document.getElementById('certificate-box')
         .scrollIntoView({ behavior: 'smooth' });
 
-    document.getElementById('start-quiz-btn').disabled = true;
+    document.getElementById('quiz-btn').disabled = true;
 
     document.getElementById('certificate-box').innerHTML =
         `<h3>🎉 Congratulations! Course Completed</h3>`;
