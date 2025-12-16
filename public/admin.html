@@ -741,7 +741,7 @@ async function loadCertificates() {
     });
 }
 
-async function approveCertificate(id) {
+window.approveCertificate = async function (id) {
     await fetch('/api/certificates/approve/' + id, {
         method: 'PUT'
     });
