@@ -166,15 +166,24 @@ async function restoreProgress() {
    if (data.quizPassed) {
     quizPassed = true;
 
-    document.getElementById('certificate-box').style.display = 'block';
-    document.getElementById('certificate-box')
-        .scrollIntoView({ behavior: 'smooth' });
+    const certBox = document.getElementById('certificate-box');
+    certBox.style.display = 'block';
 
-    document.getElementById('quiz-btn').disabled = true;
+    // quiz dobara start na ho
+    const quizBtn = document.getElementById('quiz-btn');
+    if (quizBtn) quizBtn.disabled = true;
 
-    document.getElementById('certificate-box').innerHTML =
-        `<h3>🎉 Congratulations! Course Completed</h3>
-       <h3> You will receive your certificate on WhatsApp & Email within 24 hours.</h3>`;
+    // ⚠️ IMPORTANT: form ko overwrite NA karein
+    certBox.scrollIntoView({ behavior: 'smooth' });
+    const courseKey = `cert_submitted_${courseId}`;
+if (localStorage.getItem(courseKey)) {
+    document.getElementById('certificate-box').innerHTML = `
+        <p style="color:green;font-weight:bold">
+            ✅ Your certificate request has already been submitted.<br>
+            You will receive it on WhatsApp & Email within 24 hours.
+        </p>
+    `;
+}
 }
 }
 
@@ -216,8 +225,17 @@ function startQuiz() {
  * CERTIFICATE download
  ***********************/
 async function submitCertificateDetails() {
-    if (!quizPassed) {
-        alert('Please pass the quiz first');
+
+    const courseKey = `cert_submitted_${courseId}`;
+
+    // ⛔ already submitted
+    if (localStorage.getItem(courseKey)) {
+        document.getElementById('certificate-box').innerHTML = `
+            <p style="color:green;font-weight:bold">
+                ✅ Your certificate request has already been submitted.<br>
+                You will receive it on WhatsApp & Email within 24 hours.
+            </p>
+        `;
         return;
     }
 
@@ -231,7 +249,7 @@ async function submitCertificateDetails() {
         return;
     }
 
-    await fetch('/api/certificate/request', {
+    const res = await fetch('/api/certificate/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -242,6 +260,25 @@ async function submitCertificateDetails() {
             language: lang
         })
     });
+
+    if (res.status === 409) {
+        localStorage.setItem(courseKey, 'true');
+        document.getElementById('certificate-box').innerHTML = `
+            <p style="color:green;font-weight:bold">
+                ✅ Your certificate request was already submitted.<br>
+                You will receive it on WhatsApp & Email within 24 hours.
+            </p>
+        `;
+        return;
+    }
+
+    if (!res.ok) {
+        alert('Something went wrong. Please try later.');
+        return;
+    }
+
+    // ✅ success
+    localStorage.setItem(courseKey, 'true');
 
     document.getElementById('certificate-box').innerHTML = `
         <p style="color:green;font-weight:bold">

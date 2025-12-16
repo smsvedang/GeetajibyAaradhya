@@ -17,4 +17,9 @@ const CertificateSchema = new mongoose.Schema({
     }
 });
 
+CertificateSchema.index(
+    { mobile: 1, courseTitle: 1 },
+    { unique: true }
+);
+
 module.exports = mongoose.model('Certificate', CertificateSchema);

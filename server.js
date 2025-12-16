@@ -608,18 +608,35 @@ app.get('/api/certificate', async (req, res) => {
 });
 
 app.post('/api/certificate/request', async (req, res) => {
-    const { name, email, mobile, courseTitle, language } = req.body;
+    try {
+        const { name, email, mobile, courseTitle, language } = req.body;
 
-    await Certificate.create({
-        name,
-        email,
-        mobile,
-        courseTitle,
-        language,
-        status: 'pending'
-    });
+        const exists = await Certificate.findOne({ mobile, courseTitle });
+        if (exists) {
+            return res.status(409).json({
+                success: false,
+                message: 'Certificate request already submitted'
+            });
+        }
 
-    res.json({ success: true });
+        await Certificate.create({
+            name,
+            email,
+            mobile,
+            courseTitle,
+            language,
+            status: 'pending'
+        });
+
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to submit certificate request'
+        });
+    }
 });
 
 // ================= CERTIFICATES LIST (ADMIN) =================
