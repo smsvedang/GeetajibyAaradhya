@@ -719,11 +719,12 @@ async function loadCertificates() {
         div.className = 'shloka-admin-item';
 
         div.innerHTML = `
-            <b>${c.name}</b><br>
-            ${c.courseTitle}<br>
-            ${c.mobile}
-            <div class="admin-buttons"></div>
-        `;
+    <b>${c.name}</b><br>
+    <small><b>Course:</b> ${c.courseTitle}</small><br>
+    <small><b>Mobile:</b> ${c.mobile}</small><br>
+    <small><b>Email:</b> ${c.email || '—'}</small>
+    <div class="admin-buttons"></div>
+    `;
 
         const btns = div.querySelector('.admin-buttons');
 
