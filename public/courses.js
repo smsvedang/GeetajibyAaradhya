@@ -175,7 +175,7 @@ async function restoreProgress() {
 
     // ⚠️ IMPORTANT: form ko overwrite NA karein
     certBox.scrollIntoView({ behavior: 'smooth' });
-    const courseKey = `cert_submitted_${courseId}`;
+    const courseKey = `cert_submitted_${currentCourse._id}`;
 if (localStorage.getItem(courseKey)) {
     document.getElementById('certificate-box').innerHTML = `
         <p style="color:green;font-weight:bold">
@@ -226,7 +226,7 @@ function startQuiz() {
  ***********************/
 async function submitCertificateDetails() {
 
-    const courseKey = `cert_submitted_${courseId}`;
+    const courseKey = `cert_submitted_${currentCourse._id}`;
 
     // ⛔ already submitted
     if (localStorage.getItem(courseKey)) {
