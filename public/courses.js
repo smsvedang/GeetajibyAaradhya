@@ -173,7 +173,8 @@ async function restoreProgress() {
     document.getElementById('quiz-btn').disabled = true;
 
     document.getElementById('certificate-box').innerHTML =
-        `<h3>🎉 Congratulations! Course Completed</h3>`;
+        `<h3>🎉 Congratulations! Course Completed</h3>`
+       `<h3> You will receive your certificate on WhatsApp & Email within 24 hours.</h3>`;
 }
 }
 
