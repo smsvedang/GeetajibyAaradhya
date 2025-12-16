@@ -607,6 +607,21 @@ app.get('/api/certificate', async (req, res) => {
     }
 });
 
+app.post('/api/certificate/request', async (req, res) => {
+    const { name, email, mobile, courseTitle, language } = req.body;
+
+    await Certificate.create({
+        name,
+        email,
+        mobile,
+        courseTitle,
+        language,
+        status: 'pending'
+    });
+
+    res.json({ success: true });
+});
+
 // ================= CERTIFICATES LIST (ADMIN) =================
 // GET ALL CERTIFICATES
 app.get('/api/certificates', async (req, res) => {
@@ -725,6 +740,17 @@ app.delete('/api/testimonials/:id', async (req, res) => {
         res.status(500).json({ message: 'Testimonial delete karne mein error' });
     }
 });
+
+app.put('/api/certificates/approve/:id', async (req, res) => {
+    await Certificate.findByIdAndUpdate(req.params.id, {
+        status: 'approved'
+    });
+    res.json({ success: true });
+});
+
+//---function downloadCertificate(id) {
+//    window.open('/api/certificate/download/' + id, '_blank');
+//}
 
 
 // --- Server Start ---

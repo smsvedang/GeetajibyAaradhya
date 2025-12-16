@@ -52,6 +52,7 @@
                 <div class="stat-card"><h3>Total Likes</h3><span id="stat-likes">0</span></div>
                 <div class="stat-card"><h3>Blog Posts</h3><span id="stat-blog">0</span></div>
                 <div class="stat-card"><h3>Artworks</h3><span id="stat-artwork">0</span></div>
+                <div class="stat-card"><h3>Pending Certificates</h3><span id="stat-certificates">0</span></div>
             </div>
         </div>
 
@@ -233,6 +234,7 @@ async function loadDashboard() {
     const blogs   = await fetch('/api/blog').then(r => r.json());
     const artwork = await fetch('/api/artwork').then(r => r.json());
     const testi   = await fetch('/api/testimonials/all').then(r => r.json());
+    const certs = await fetch('/api/certificates').then(r => r.json());
 
     let likes = 0;
     shlokas.forEach(s => likes += (s.likes || 0));
@@ -244,6 +246,7 @@ async function loadDashboard() {
 
     const pending = testi.filter(t => t.status === 'pending').length;
     document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-certificates').textContent = certs.filter(c => c.status === 'pending').length;
 }
 
 /* SHLOKAS */
@@ -702,59 +705,52 @@ async function loadCertificates() {
     const res = await fetch('/api/certificates');
     const list = await res.json();
 
-    const box = document.getElementById('certificate-list');
-    box.innerHTML = '';
+    const pendingBox = document.getElementById('certificate-pending');
+    const approvedBox = document.getElementById('certificate-approved');
 
-    if (!list.length) {
-        box.innerHTML = '<p>No certificates generated yet.</p>';
-        return;
-    }
+    pendingBox.innerHTML = '<h3>Pending</h3>';
+    approvedBox.innerHTML = '<h3>Approved</h3>';
 
     list.forEach(c => {
         const div = document.createElement('div');
         div.className = 'shloka-admin-item';
 
-        const date = new Date(c.createdAt).toLocaleString();
-
         div.innerHTML = `
-            <div>
-                <b>${c.name}</b><br>
-                ${c.courseTitle}<br>
-                ${c.mobile} | ${c.language.toUpperCase()}<br>
-                <small>${date}</small>
-            </div>
-            <div class="admin-buttons">
-                <button class="download-button">Download</button>
-                <button class="delete-button">Delete</button>
-            </div>
+            <b>${c.name}</b><br>
+            ${c.courseTitle}<br>
+            ${c.mobile}
+            <div class="admin-buttons"></div>
         `;
 
-        /* DOWNLOAD */
-        div.querySelector('.download-button').onclick = () => {
-            const url =
-                `/api/certificate?name=${encodeURIComponent(c.name)}` +
-                `&mobile=${c.mobile}` +
-                `&email=${encodeURIComponent(c.email || '')}` +
-                `&courseTitle=${encodeURIComponent(c.courseTitle)}` +
-                `&lang=${c.language}`;
+        const btns = div.querySelector('.admin-buttons');
 
-            window.open(url, '_blank');
-        };
-
-        /* DELETE */
-        div.querySelector('.delete-button').onclick = async () => {
-            if (!confirm('Delete this certificate record?')) return;
-
-            await fetch('/api/certificates/' + c._id, {
-                method: 'DELETE'
-            });
-
-            loadCertificates();
-        };
-
-        box.appendChild(div);
+        if (c.status === 'pending') {
+            btns.innerHTML = `
+                <button onclick="approveCertificate('${c._id}')">Approve</button>
+                <button onclick="deleteCertificate('${c._id}')">Delete</button>
+            `;
+            pendingBox.appendChild(div);
+        } else {
+            btns.innerHTML = `
+                <button onclick="downloadCertificate('${c._id}')">Download</button>
+                <button onclick="deleteCertificate('${c._id}')">Delete</button>
+            `;
+            approvedBox.appendChild(div);
+        }
     });
 }
+
+async function approveCertificate(id) {
+    await fetch('/api/certificates/approve/' + id, {
+        method: 'PUT'
+    });
+    loadCertificates();
+}
+
+function downloadCertificate(id) {
+    window.open('/api/certificate/download/' + id, '_blank');
+}
+
 
 /* ================= CERTIFICATE COURSES LOAD ================= */
 async function loadCoursesForCertificate() {

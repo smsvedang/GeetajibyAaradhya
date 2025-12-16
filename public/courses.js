@@ -214,32 +214,38 @@ function startQuiz() {
 /***********************
  * CERTIFICATE download
  ***********************/
-function generateCertificate() {
+async function submitCertificateDetails() {
     if (!quizPassed) {
         alert('Please pass the quiz first');
         return;
     }
 
     const name = document.getElementById('user-name').value;
+    const mobile = document.getElementById('user-mobile').value;
     const email = document.getElementById('user-email').value;
     const lang = document.getElementById('cert-lang').value;
 
-    if (!name) {
-        alert('Enter name');
+    if (!name || !mobile) {
+        alert('Please fill required details');
         return;
     }
 
-    const url =
-        `/certificate.html` +
-        `?name=${encodeURIComponent(name)}` +
-        `&course=${encodeURIComponent(currentCourse.title)}` +
-        `&lang=${lang}`;
+    await fetch('/api/certificate/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            mobile,
+            email,
+            courseTitle: currentCourse.title,
+            language: lang
+        })
+    });
 
-    window.open(url, '_blank');
-
-    document.getElementById('certificate-status').innerHTML = `
-        <p style="color:green;font-weight:bold;margin-top:10px;">
-            ✅ Certificate downloaded successfully
+    document.getElementById('certificate-box').innerHTML = `
+        <p style="color:green;font-weight:bold">
+            ✅ Your details have been submitted successfully.<br>
+            You will receive your certificate on WhatsApp & Email within 24 hours.
         </p>
     `;
 }
