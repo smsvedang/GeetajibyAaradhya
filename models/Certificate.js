@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
-const certificateSchema = new mongoose.Schema({
+const CertificateSchema = new mongoose.Schema({
     name: String,
     email: String,
     mobile: String,
-    courseId: String,
     courseTitle: String,
     language: String,
-    certificateId: String
-}, { timestamps: true });
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
-module.exports = mongoose.model('Certificate', certificateSchema);
+module.exports = mongoose.model('Certificate', CertificateSchema);

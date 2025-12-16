@@ -602,9 +602,29 @@ app.get('/api/certificate', async (req, res) => {
         console.error(err);
         res.status(500).send('Certificate error');
     }
+    // SAVE HISTORY
+await Certificate.create({
+    name,
+    email,
+    mobile,
+    courseTitle,
+    language: lang
+});
 });
 
 // ================= CERTIFICATES LIST (ADMIN) =================
+// GET ALL CERTIFICATES
+app.get('/api/certificates', async (req, res) => {
+    const list = await Certificate.find().sort({ createdAt: -1 });
+    res.json(list);
+});
+
+// DELETE CERTIFICATE
+app.delete('/api/certificates/:id', async (req, res) => {
+    await Certificate.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+});
+
 app.get('/api/certificates', async (req, res) => {
     try {
         const certificates = await Certificate.find().sort({ createdAt: -1 });
