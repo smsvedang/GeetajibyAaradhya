@@ -706,6 +706,8 @@ async function loadCertificates() {
     const res = await fetch('/api/certificates');
     const list = await res.json();
 
+        window._certificateCache = list;
+
     const pendingBox = document.getElementById('certificate-pending');
     const approvedBox = document.getElementById('certificate-approved');
 
@@ -749,8 +751,26 @@ window.approveCertificate = async function (id) {
 }
 
 window.downloadCertificate = function (id) {
-    window.open('/api/certificate/download/' + id, '_blank');
+
+    // list already loaded hai, usi se certificate uthao
+    const cert = window._certificateCache.find(c => c._id === id);
+
+    if (!cert) {
+        alert('Certificate data not found');
+        return;
+    }
+
+    const url =
+        `/api/certificate` +
+        `?name=${encodeURIComponent(cert.name)}` +
+        `&mobile=${encodeURIComponent(cert.mobile)}` +
+        `&email=${encodeURIComponent(cert.email || '')}` +
+        `&courseTitle=${encodeURIComponent(cert.courseTitle)}` +
+        `&lang=${cert.language || 'en'}`;
+
+    window.open(url, '_blank');
 };
+
 
 window.deleteCertificate = async function (id) {
     if (!confirm('Delete this certificate?')) return;
