@@ -748,9 +748,19 @@ window.approveCertificate = async function (id) {
     loadCertificates();
 }
 
-function downloadCertificate(id) {
+window.downloadCertificate = function (id) {
     window.open('/api/certificate/download/' + id, '_blank');
-}
+};
+
+window.deleteCertificate = async function (id) {
+    if (!confirm('Delete this certificate?')) return;
+
+    await fetch('/api/certificates/' + id, {
+        method: 'DELETE'
+    });
+
+    loadCertificates();
+};
 
 
 /* ================= CERTIFICATE COURSES LOAD ================= */
