@@ -219,7 +219,7 @@ sidebarButtons.forEach(btn => {
         if (tab === 'tab-shloka') loadShlokasAdmin();
         if (tab === 'tab-blog') loadBlogPosts();
         if (tab === 'tab-artwork') loadArtwork();
-        if (tab === 'tab-courses') loadCoursesAdmin?.();
+        if (tab === 'tab-courses') {loadCoursesAdmin();loadAdhyayForCourses();}
         if (tab === 'tab-certificates') loadCertificates?.();
         if (tab === 'tab-quizzes') {loadCoursesForQuiz();loadQuizzes();}   
         if (tab === 'tab-about') loadAboutContent();
@@ -388,6 +388,112 @@ async function deleteCourse(id) {
     await fetch('/api/courses/' + id, { method: 'DELETE' });
     loadCoursesAdmin();
 }
+
+/* ================= LOAD ADHYAY FOR COURSES ================= */
+async function loadAdhyayForCourses() {
+    const res = await fetch('/api/shlokas');
+    const shlokas = await res.json();
+
+    const adhyays = [...new Set(shlokas.map(s => s.adhyay))];
+
+    const sel = document.getElementById('course-adhyay');
+    sel.innerHTML = '<option value="">Select Adhyay</option>';
+
+    adhyays.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = 'Adhyay ' + a;
+        sel.appendChild(opt);
+    });
+}
+
+/* ================= LOAD SHLOKAS FOR SELECTED ADHYAY ================= */
+document.getElementById('course-adhyay').onchange = async e => {
+    const adhyay = e.target.value;
+    const box = document.getElementById('course-shloka-list');
+    box.innerHTML = '';
+
+    if (!adhyay) return;
+
+    const res = await fetch('/api/shlokas');
+    const shlokas = await res.json();
+
+    shlokas
+        .filter(s => s.adhyay == adhyay)
+        .forEach(s => {
+            box.innerHTML += `
+                <label>
+                    <input type="checkbox" value="${s._id}">
+                    Shloka ${s.shloka}
+                </label><br>
+            `;
+        });
+};
+
+/* ================= ADD / UPDATE SHLOKA ================= */ 
+const shlokaForm = document.getElementById('shloka-form');
+
+shlokaForm.addEventListener('submit', async e => {
+    e.preventDefault();   // ⛔ PAGE RELOAD STOP
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const shlokaId = document.getElementById('shloka-id').value;
+
+    const payload = {
+        adhyay: document.getElementById('adhyay').value,
+        shloka: document.getElementById('shloka').value,
+        text: document.getElementById('text').value,
+        video_url: document.getElementById('video_url').value,
+        password: adminPassword
+    };
+
+    const url = shlokaId
+        ? `/api/shlokas/${shlokaId}`
+        : `/api/shlokas`;
+
+    const method = shlokaId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert(shlokaId ? 'Shloka updated' : 'Shloka added');
+        shlokaForm.reset();
+        document.getElementById('shloka-id').value = '';
+        loadShlokasAdmin();
+    } else {
+        alert('Failed to save shloka');
+    }
+});
+
+/* ================= SHLOKA EDIT BUTTON ================= */
+document.getElementById('shloka-list-admin')
+.addEventListener('click', e => {
+
+    if (!e.target.classList.contains('edit-button')) return;
+
+    const shloka = JSON.parse(e.target.dataset.shloka);
+
+    // hidden id set
+    document.getElementById('shloka-id').value = shloka._id;
+
+    // form fields fill
+    document.getElementById('adhyay').value = shloka.adhyay;
+    document.getElementById('shloka').value = shloka.shloka;
+    document.getElementById('text').value = shloka.text || '';
+    document.getElementById('video_url').value = shloka.video_url || '';
+
+    // UX improvement
+    document.getElementById('shloka-submit-button').innerText = 'Update Shloka';
+    shlokaForm.scrollIntoView({ behavior: 'smooth' });
+});
 
 /* ================= COURSE FORM TOGGLE ================= */
 document.getElementById('show-course-form').onclick = () => {
