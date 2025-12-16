@@ -45,16 +45,49 @@
 
         <!-- DASHBOARD -->
         <div id="tab-dashboard" class="content-page active">
-            <h1>Dashboard</h1>
-            <div class="dashboard-stats">
-                <div class="stat-card"><h3>Pending Testimonials</h3><span id="stat-pending">0</span></div>
-                <div class="stat-card"><h3>Total Shlokas</h3><span id="stat-shlokas">0</span></div>
-                <div class="stat-card"><h3>Total Likes</h3><span id="stat-likes">0</span></div>
-                <div class="stat-card"><h3>Blog Posts</h3><span id="stat-blog">0</span></div>
-                <div class="stat-card"><h3>Artworks</h3><span id="stat-artwork">0</span></div>
-                <div class="stat-card"><h3>Pending Certificates</h3><span id="stat-certificates">0</span></div>
-            </div>
+    <h1>Dashboard Overview</h1>
+
+    <!-- SUMMARY CARDS -->
+    <div class="dashboard-stats">
+        <div class="stat-card"><h3>Total Shlokas</h3><span id="stat-shlokas" class="stat-number">0</span></div>
+        <div class="stat-card"><h3>Total Likes</h3><span id="stat-likes" class="stat-number">0</span></div>
+        <div class="stat-card"><h3>Courses</h3><span id="stat-courses" class="stat-number">0</span></div>
+        <div class="stat-card"><h3>Quizzes</h3><span id="stat-quizzes" class="stat-number">0</span></div>
+        <div class="stat-card"><h3>Pending Certificates</h3><span id="stat-certificates" class="stat-number">0</span></div>
+        <div class="stat-card"><h3>Pending Testimonials</h3><span id="stat-pending" class="stat-number">0</span></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="dashboard-charts">
+        <div class="chart-card">
+            <h3>Certificates Status</h3>
+            <canvas id="certStatusChart"></canvas>
         </div>
+
+        <div class="chart-card">
+            <h3>Certificates (Last 7 Days)</h3>
+            <canvas id="certTimelineChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3>Certificates by Course</h3>
+            <canvas id="certCourseChart"></canvas>
+        </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="dashboard-activity">
+        <div class="activity-card">
+            <h3>Recent Certificates</h3>
+            <ul id="recent-certificates"></ul>
+        </div>
+
+        <div class="activity-card">
+            <h3>Recent Testimonials</h3>
+            <ul id="recent-testimonials"></ul>
+        </div>
+    </div>
+</div>
 
         <!-- TESTIMONIALS -->
         <div id="tab-testimonials" class="content-page">
@@ -232,22 +265,78 @@ sidebarButtons.forEach(btn => {
 async function loadDashboard() {
 
     const shlokas = await fetch('/api/shlokas').then(r => r.json());
-    const blogs   = await fetch('/api/blog').then(r => r.json());
+    const blogs = await fetch('/api/blog').then(r => r.json());
     const artwork = await fetch('/api/artwork').then(r => r.json());
-    const testi   = await fetch('/api/testimonials/all').then(r => r.json());
-    const certs = await fetch('/api/certificates').then(r => r.json());
+    const testimonials = await fetch('/api/testimonials/all').then(r => r.json());
+    const courses = await fetch('/api/courses').then(r => r.json());
+    const quizzes = await fetch('/api/quiz').then(r => r.json());
+    const certificates = await fetch('/api/certificates').then(r => r.json());
 
+    // ---- COUNTS ----
+    document.getElementById('stat-shlokas').textContent = shlokas.length;
+    document.getElementById('stat-blog').textContent = blogs.length;
+    document.getElementById('stat-artwork').textContent = artwork.length;
+    document.getElementById('stat-courses').textContent = courses.length;
+    document.getElementById('stat-quizzes').textContent = quizzes.length;
+
+    document.getElementById('stat-pending').textContent =
+        testimonials.filter(t => t.status === 'pending').length;
+
+    document.getElementById('stat-certificates').textContent =
+        certificates.filter(c => c.status === 'pending').length;
+
+    // ---- LIKES ----
     let likes = 0;
     shlokas.forEach(s => likes += (s.likes || 0));
+    document.getElementById('stat-likes').textContent = likes;
 
-    document.getElementById('stat-shlokas').textContent = shlokas.length;
-    document.getElementById('stat-likes').textContent  = likes;
-    document.getElementById('stat-blog').textContent   = blogs.length;
-    document.getElementById('stat-artwork').textContent= artwork.length;
+    // ---- RECENT CERTIFICATES ----
+    const recentCertBox = document.getElementById('recent-certificates');
+    recentCertBox.innerHTML = '';
+    certificates.slice(0,5).forEach(c => {
+        recentCertBox.innerHTML += `<li>${c.name} – ${c.courseTitle}</li>`;
+    });
 
-    const pending = testi.filter(t => t.status === 'pending').length;
-    document.getElementById('stat-pending').textContent = pending;
-    document.getElementById('stat-certificates').textContent = certs.filter(c => c.status === 'pending').length;
+    // ---- RECENT TESTIMONIALS ----
+    const recentTestBox = document.getElementById('recent-testimonials');
+    recentTestBox.innerHTML = '';
+    testimonials.slice(0,5).forEach(t => {
+        recentTestBox.innerHTML += `<li>${t.author}</li>`;
+    });
+
+    // ---- CHART: CERT STATUS ----
+    const approved = certificates.filter(c => c.status === 'approved').length;
+    const pending = certificates.filter(c => c.status === 'pending').length;
+
+    new Chart(document.getElementById('certStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Approved', 'Pending'],
+            datasets: [{
+                data: [approved, pending],
+                backgroundColor: ['#4caf50', '#ff9800']
+            }]
+        }
+    });
+
+    // ---- CHART: COURSE WISE ----
+    const courseMap = {};
+    certificates.forEach(c => {
+        courseMap[c.courseTitle] = (courseMap[c.courseTitle] || 0) + 1;
+    });
+
+    new Chart(document.getElementById('certCourseChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(courseMap),
+            datasets: [{
+                label: 'Certificates',
+                data: Object.values(courseMap),
+                backgroundColor: '#1e88e5'
+            }]
+        },
+        options: { responsive: true }
+    });
 }
 
 /* SHLOKAS */
@@ -956,5 +1045,6 @@ async function loadTestimonials() {
 }
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
