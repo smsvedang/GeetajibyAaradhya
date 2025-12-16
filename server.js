@@ -571,8 +571,15 @@ app.get('/api/certificate', async (req, res) => {
     try {
         const { name, email, mobile, courseTitle, lang } = req.query;
 
-        if (!name || !courseTitle) {
+        if (!mobile || !courseTitle) {
             return res.status(400).send('Missing data');
+        }
+
+        // 🔥 ONLY READ FROM DB
+        const cert = await Certificate.findOne({ mobile, courseTitle });
+
+        if (!cert) {
+            return res.status(404).send('Certificate request not found');
         }
 
         const fs = require('fs');
@@ -584,21 +591,12 @@ app.get('/api/certificate', async (req, res) => {
         );
 
         html = html
-            .replace('{{NAME}}', name)
-            .replace('{{COURSE}}', courseTitle)
-            .replace('{{EMAIL}}', email || '')
-            .replace('{{LANG}}', lang || 'en');
+            .replace('{{NAME}}', cert.name)
+            .replace('{{COURSE}}', cert.courseTitle)
+            .replace('{{EMAIL}}', cert.email || '')
+            .replace('{{LANG}}', cert.language || 'en');
 
-        // ✅ 1️⃣ FIRST: SAVE TO DATABASE
-        await Certificate.create({
-            name,
-            email,
-            mobile,
-            courseTitle,
-            language: lang
-        });
-
-        // ✅ 2️⃣ THEN: SEND RESPONSE
+        // ✅ ONLY SEND HTML
         res.send(html);
 
     } catch (err) {
