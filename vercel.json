@@ -20,7 +20,31 @@
 
     
     {
+      "src": "^/admin\\.html$",
+      "has": [
+        {
+          "type": "host",
+          "value": "warrioraaradhya.in"
+        }
+      ],
+      "status": 404
+    },
+
+    
+    {
       "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.warrioraaradhya.in"
+        }
+      ],
+      "dest": "public/admin.html"
+    },
+
+    
+    {
+      "src": "^/admin\\.html$",
       "has": [
         {
           "type": "host",
