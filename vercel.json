@@ -14,7 +14,7 @@
 
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "^/api/(.*)",
       "dest": "server.js"
     },
 
@@ -41,6 +41,27 @@
     },
 
     {
+      "src": "^/courses\\.html$",
+      "status": 301,
+      "headers": { "Location": "/courses" }
+    },
+    {
+      "src": "^/shlokas\\.html$",
+      "status": 301,
+      "headers": { "Location": "/shlokas" }
+    },
+    {
+      "src": "^/blog\\.html$",
+      "status": 301,
+      "headers": { "Location": "/blog" }
+    },
+    {
+      "src": "^/artwork\\.html$",
+      "status": 301,
+      "headers": { "Location": "/artwork" }
+    },
+
+    {
       "src": "^/courses$",
       "dest": "public/courses.html"
     },
@@ -49,12 +70,12 @@
       "dest": "public/shlokas.html"
     },
     {
-      "src": "^/artwork$",
-      "dest": "public/artwork.html"
-    },
-    {
       "src": "^/blog$",
       "dest": "public/blog.html"
+    },
+    {
+      "src": "^/artwork$",
+      "dest": "public/artwork.html"
     },
 
     {
