@@ -18,9 +18,15 @@
       "dest": "server.js"
     },
 
-   
+    
     {
       "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.warrioraaradhya.in"
+        }
+      ],
       "dest": "public/admin.html"
     },
 
