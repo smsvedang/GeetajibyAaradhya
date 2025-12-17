@@ -19,49 +19,44 @@
     },
 
     {
-      "src": "^/admin\\.html$",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.warrioraaradhya.in"
-        }
-      ],
+      "src": "^/admin$",
+      "has": [{ "type": "host", "value": "warrioraaradhya.in" }],
       "status": 404
     },
     {
       "src": "^/admin\\.html$",
-      "has": [
-        {
-          "type": "host",
-          "value": "warrioraaradhya.in"
-        }
-      ],
+      "has": [{ "type": "host", "value": "warrioraaradhya.in" }],
       "status": 404
     },
 
     {
       "src": "^/$",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.warrioraaradhya.in"
-        }
-      ],
+      "has": [{ "type": "host", "value": "admin.warrioraaradhya.in" }],
+      "dest": "public/admin.html"
+    },
+    {
+      "src": "^/admin$",
+      "has": [{ "type": "host", "value": "admin.warrioraaradhya.in" }],
       "dest": "public/admin.html"
     },
 
     {
-      "src": "^/admin\\.html$",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.warrioraaradhya.in"
-        }
-      ],
-      "dest": "public/admin.html"
+      "src": "^/courses$",
+      "dest": "public/courses.html"
+    },
+    {
+      "src": "^/shlokas$",
+      "dest": "public/shlokas.html"
+    },
+    {
+      "src": "^/artwork$",
+      "dest": "public/artwork.html"
+    },
+    {
+      "src": "^/blog$",
+      "dest": "public/blog.html"
     },
 
-    
     {
       "src": "/(.*)",
       "dest": "public/$1"
