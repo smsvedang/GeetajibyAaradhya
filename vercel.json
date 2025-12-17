@@ -18,7 +18,16 @@
       "dest": "server.js"
     },
 
-    
+    {
+      "src": "^/admin\\.html$",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.warrioraaradhya.in"
+        }
+      ],
+      "status": 404
+    },
     {
       "src": "^/admin\\.html$",
       "has": [
@@ -30,7 +39,6 @@
       "status": 404
     },
 
-    
     {
       "src": "^/$",
       "has": [
@@ -42,7 +50,6 @@
       "dest": "public/admin.html"
     },
 
-    
     {
       "src": "^/admin\\.html$",
       "has": [
