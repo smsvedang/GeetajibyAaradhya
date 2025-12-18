@@ -896,7 +896,7 @@ async function loadCoursesForCertificate() {
 }
 
 /* ================= CERTIFICATE GENERATE ================= */
-window.generateCertificate = function () {
+window.generateCertificate = async function () {
 
     const name   = document.getElementById('cert-name').value;
     const mobile = document.getElementById('cert-mobile').value;
@@ -905,21 +905,33 @@ window.generateCertificate = function () {
     const courseSelect = document.getElementById('cert-course');
     const courseTitle  = courseSelect.selectedOptions[0]?.text;
 
-    const lang = document.getElementById('cert-lang').value;
+    const language = document.getElementById('cert-lang').value;
 
-    if (!name || !courseTitle) {
-        alert('Please fill name and select course');
+    if (!name || !mobile || !courseTitle) {
+        alert('Fill all details');
         return;
     }
 
-    const url =
-        `/api/certificate?name=${encodeURIComponent(name)}` +
-        `&mobile=${mobile}` +
-        `&email=${encodeURIComponent(email)}` +
-        `&courseTitle=${encodeURIComponent(courseTitle)}` +
-        `&lang=${lang}`;
+    // 🔥 STEP 1: SAVE REQUEST
+    const res = await fetch('/api/certificate/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            email,
+            mobile,
+            courseTitle,
+            language
+        })
+    });
 
-    window.open(url, '_blank');
+    if (!res.ok) {
+        alert('Certificate request already exists');
+        return;
+    }
+
+    alert('Certificate request created. Now approve from list.');
+    loadCertificates();
 };
 
 /* ================= QUIZ COURSE LOAD ================= */
