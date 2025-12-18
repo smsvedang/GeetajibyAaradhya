@@ -123,7 +123,7 @@ async function submitQuiz(e) {
  * RESULT UI (PASS / FAIL)
  *********************************/
 function showResultUI(passed, score, passingMarks) {
-    const quizSection = document.getElementById("quiz-section");
+    const quizSection = document.getElementById("quiz-questions");
 
     quizSection.innerHTML = `
         <div class="quiz-result ${passed ? "pass" : "fail"}">
@@ -133,8 +133,8 @@ function showResultUI(passed, score, passingMarks) {
 
             ${
                 passed
-                    ? `<button class="btn-primary" onclick="goToCourse()">Continue</button>`
-                    : `<button class="btn-secondary" onclick="retryQuiz()">Retry Quiz</button>`
+                    ? `<button class="primary-btn" onclick="goToCourse()">Continue</button>`
+                    : `<button class="secondary-btn" onclick="retryQuiz()">Retry Quiz</button>`
             }
         </div>
     `;
