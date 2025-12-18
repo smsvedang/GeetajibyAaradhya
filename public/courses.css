@@ -74,22 +74,6 @@ body {
     margin-bottom: 18px;
 }
 
-/* ---------- PROGRESS BAR ---------- */
-.progress-wrapper {
-    background: #E0E0E0;
-    border-radius: 20px;
-    overflow: hidden;
-    height: 14px;
-    margin: 20px 0;
-}
-
-#progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #6D4C41, #8D6E63);
-    transition: width 0.4s ease;
-}
-
 /* ---------- SHLOKA LIST ---------- */
 .shloka-item {
     background: #FFFDF7;
@@ -226,6 +210,63 @@ body {
 
 .footer p {
     margin: 6px 0;
+}
+
+/* ---------- START COURSE BUTTON ---------- */
+.start-course-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.start-course-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+}
+
+/* ---------- QUIZ QUESTION CARD ---------- */
+.quiz-card {
+    background: #FFFFFF;
+    border: 1px solid #FFECB3;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.quiz-card h4 {
+    margin-top: 0;
+    color: #D84315;
+}
+
+/* ---------- OPTIONS ---------- */
+.quiz-option {
+    display: block;
+    padding: 10px 14px;
+    border: 1px solid #FFCC80;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #FFFDF7;
+    transition: all 0.2s ease;
+}
+
+.quiz-option:hover {
+    background: #FFF3E0;
+}
+
+.quiz-option.selected {
+    background: #FFE0B2;
+    border-color: #FB8C00;
+    font-weight: 600;
 }
 
 /* ---------- RESPONSIVE ---------- */
