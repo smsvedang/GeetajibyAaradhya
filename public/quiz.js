@@ -13,41 +13,33 @@ const courseId = params.get("courseId");
 
 if (!courseId) {
     alert("Course ID missing");
-    throw new Error("Course ID not found in URL");
+    throw new Error("Course ID not found");
 }
 
 /*********************************
- * LOAD QUIZ FROM SERVER
+ * LOAD QUIZ
  *********************************/
 async function loadQuiz() {
     try {
         const res = await fetch(`/api/quiz/${courseId}`);
-
-        if (!res.ok) {
-            alert("Quiz not found for this course");
-            return;
-        }
+        if (!res.ok) throw new Error("Quiz not found");
 
         quizData = await res.json();
 
-        if (
-            !quizData ||
-            !Array.isArray(quizData.questions) ||
-            quizData.questions.length === 0
-        ) {
-            alert("Quiz questions are missing");
+        if (!quizData.questions || quizData.questions.length === 0) {
+            alert("Quiz questions missing");
             return;
         }
 
         renderQuiz();
     } catch (err) {
-        console.error("Quiz load error:", err);
+        console.error(err);
         alert("Failed to load quiz");
     }
 }
 
 /*********************************
- * RENDER QUIZ (CARDS + OPTIONS)
+ * RENDER QUIZ (CARDS)
  *********************************/
 function renderQuiz() {
     const container = document.getElementById("quiz-questions");
@@ -59,16 +51,18 @@ function renderQuiz() {
 
         card.innerHTML = `
             <h4>Q${qIndex + 1}. ${q.question}</h4>
-            ${q.options
-                .map(
-                    (opt, optIndex) => `
-                <div class="quiz-option"
-                     onclick="selectOption(${qIndex}, ${optIndex}, this)">
-                    ${opt}
-                </div>
-            `
-                )
-                .join("")}
+            <div class="quiz-options">
+                ${q.options
+                    .map(
+                        (opt, optIndex) => `
+                        <div class="quiz-option"
+                             onclick="selectOption(${qIndex}, ${optIndex}, this)">
+                            ${opt}
+                        </div>
+                    `
+                    )
+                    .join("")}
+            </div>
         `;
 
         container.appendChild(card);
@@ -78,51 +72,36 @@ function renderQuiz() {
 /*********************************
  * OPTION SELECT (HIGHLIGHT)
  *********************************/
-function selectOption(questionIndex, optionIndex, element) {
-    userAnswers[questionIndex] = optionIndex;
+function selectOption(qIndex, optIndex, el) {
+    userAnswers[qIndex] = optIndex;
 
-    const options =
-        element.parentElement.querySelectorAll(".quiz-option");
+    const options = el.parentElement.querySelectorAll(".quiz-option");
+    options.forEach(o => o.classList.remove("selected"));
 
-    options.forEach(opt => opt.classList.remove("selected"));
-    element.classList.add("selected");
+    el.classList.add("selected");
 }
 
 /*********************************
- * SUBMIT QUIZ (STRICT PASS LOGIC)
+ * SUBMIT QUIZ
  *********************************/
 async function submitQuiz(e) {
-    if (e) e.preventDefault();
+    e.preventDefault();
 
-    if (!quizData) {
-        alert("Quiz not loaded");
-        return;
-    }
+    const total = quizData.questions.length;
+    let correct = 0;
 
-    const totalQuestions = quizData.questions.length;
-    let correctAnswers = 0;
-
-    quizData.questions.forEach((q, index) => {
-        if (userAnswers[index] === q.correctIndex) {
-            correctAnswers++;
+    quizData.questions.forEach((q, i) => {
+        if (userAnswers[i] === q.correctIndex) {
+            correct++;
         }
     });
 
-    const percentage = Math.round(
-        (correctAnswers / totalQuestions) * 100
-    );
-
+    const percentage = Math.round((correct / total) * 100);
     const passingMarks = Number(quizData.passingMarks || 50);
 
-    /* ❗ STRICT CHECK */
-    if (percentage < passingMarks) {
-        alert(
-            `❌ Failed\n\nScore: ${percentage}%\nMinimum Required: ${passingMarks}%`
-        );
-        return;
-    }
+    const isPassed = percentage >= passingMarks;
 
-    /* ✅ SAVE QUIZ PASS */
+    /* RESULT SAVE (PASS / FAIL BOTH) */
     try {
         await fetch("/api/quiz/complete", {
             method: "POST",
@@ -130,17 +109,17 @@ async function submitQuiz(e) {
             body: JSON.stringify({
                 mobile: userMobile,
                 courseId,
-                score: percentage
+                score: percentage,
+                passed: isPassed
             })
         });
-
-        alert(`🎉 Passed!\nScore: ${percentage}%`);
-
-        window.location.href = `/courses.html?courseId=${courseId}&quiz=passed`;
     } catch (err) {
-        console.error("Quiz submit error:", err);
-        alert("Error saving quiz result");
+        console.error("Save error", err);
     }
+
+    /* REDIRECT BACK TO COURSE PAGE WITH RESULT */
+    window.location.href =
+        `/courses.html?courseId=${courseId}&quizResult=${isPassed ? "pass" : "fail"}&score=${percentage}`;
 }
 
 /*********************************
@@ -150,7 +129,5 @@ document.addEventListener("DOMContentLoaded", () => {
     loadQuiz();
 
     const form = document.getElementById("quiz-form");
-    if (form) {
-        form.addEventListener("submit", submitQuiz);
-    }
+    if (form) form.addEventListener("submit", submitQuiz);
 });
