@@ -39,7 +39,7 @@ async function loadQuiz() {
 }
 
 /*********************************
- * RENDER QUIZ (CARDS)
+ * RENDER QUIZ
  *********************************/
 function renderQuiz() {
     const container = document.getElementById("quiz-questions");
@@ -58,8 +58,7 @@ function renderQuiz() {
                         <div class="quiz-option"
                              onclick="selectOption(${qIndex}, ${optIndex}, this)">
                             ${opt}
-                        </div>
-                    `
+                        </div>`
                     )
                     .join("")}
             </div>
@@ -70,7 +69,7 @@ function renderQuiz() {
 }
 
 /*********************************
- * OPTION SELECT (HIGHLIGHT)
+ * OPTION SELECT
  *********************************/
 function selectOption(qIndex, optIndex, el) {
     userAnswers[qIndex] = optIndex;
@@ -98,10 +97,9 @@ async function submitQuiz(e) {
 
     const percentage = Math.round((correct / total) * 100);
     const passingMarks = Number(quizData.passingMarks || 50);
-
     const isPassed = percentage >= passingMarks;
 
-    /* RESULT SAVE (PASS / FAIL BOTH) */
+    /* SAVE RESULT (PASS & FAIL BOTH) */
     try {
         await fetch("/api/quiz/complete", {
             method: "POST",
@@ -117,9 +115,40 @@ async function submitQuiz(e) {
         console.error("Save error", err);
     }
 
-    /* REDIRECT BACK TO COURSE PAGE WITH RESULT */
-    window.location.href =
-        `/courses.html?courseId=${courseId}&quizResult=${isPassed ? "pass" : "fail"}&score=${percentage}`;
+    /* SHOW RESULT UI */
+    showResultUI(isPassed, percentage, passingMarks);
+}
+
+/*********************************
+ * RESULT UI (PASS / FAIL)
+ *********************************/
+function showResultUI(passed, score, passingMarks) {
+    const quizSection = document.getElementById("quiz-section");
+
+    quizSection.innerHTML = `
+        <div class="quiz-result ${passed ? "pass" : "fail"}">
+            <h2>${passed ? "🎉 Congratulations!" : "❌ Quiz Failed"}</h2>
+            <p>Your Score: <b>${score}%</b></p>
+            <p>Passing Marks: <b>${passingMarks}%</b></p>
+
+            ${
+                passed
+                    ? `<button class="btn-primary" onclick="goToCourse()">Continue</button>`
+                    : `<button class="btn-secondary" onclick="retryQuiz()">Retry Quiz</button>`
+            }
+        </div>
+    `;
+}
+
+/*********************************
+ * ACTIONS
+ *********************************/
+function goToCourse() {
+    window.location.href = `/courses?courseId=${courseId}&quizResult=pass`;
+}
+
+function retryQuiz() {
+    window.location.reload();
 }
 
 /*********************************
