@@ -123,19 +123,36 @@ async function submitQuiz(e) {
  * RESULT UI (PASS / FAIL)
  *********************************/
 function showResultUI(passed, score, passingMarks) {
-    const quizSection = document.getElementById("quiz-questions");
+    const quizQuestions = document.getElementById("quiz-questions");
+    const submitBtn = document.getElementById("submit-quiz-btn");
 
-    quizSection.innerHTML = `
+    // ❌ Submit button hamesha hata do
+    if (submitBtn) submitBtn.style.display = "none";
+
+    quizQuestions.innerHTML = `
         <div class="quiz-result ${passed ? "pass" : "fail"}">
             <h2>${passed ? "🎉 Congratulations!" : "❌ Quiz Failed"}</h2>
             <p>Your Score: <b>${score}%</b></p>
             <p>Passing Marks: <b>${passingMarks}%</b></p>
 
-            ${
-                passed
-                    ? `<button class="primary-btn" onclick="goToCourse()">Continue</button>`
-                    : `<button class="secondary-btn" onclick="retryQuiz()">Retry Quiz</button>`
-            }
+            <div style="margin-top:20px;">
+                ${
+                    passed
+                        ? `
+                          <button class="primary-btn" onclick="goToCourse()">
+                              Continue to Course
+                          </button>
+                        `
+                        : `
+                          <button class="secondary-btn" onclick="backToCourse()">
+                              Back to Course
+                          </button>
+                          <button class="primary-btn" style="margin-left:10px;" onclick="retryQuiz()">
+                              Retry Quiz
+                          </button>
+                        `
+                }
+            </div>
         </div>
     `;
 }
@@ -145,6 +162,10 @@ function showResultUI(passed, score, passingMarks) {
  *********************************/
 function goToCourse() {
     window.location.href = `/courses?courseId=${courseId}&quizResult=pass`;
+}
+
+function backToCourse() {
+    window.location.href = `/courses?courseId=${courseId}`;
 }
 
 function retryQuiz() {
