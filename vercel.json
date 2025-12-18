@@ -19,13 +19,11 @@
     },
 
     {
-      "src": "^/admin$",
-      "has": [{ "type": "host", "value": "warrioraaradhya.in" }],
+      "src": "^/admin\\.html$",
       "status": 404
     },
     {
-      "src": "^/admin\\.html$",
-      "has": [{ "type": "host", "value": "warrioraaradhya.in" }],
+      "src": "^/admin$",
       "status": 404
     },
 
