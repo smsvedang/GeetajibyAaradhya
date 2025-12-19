@@ -24,7 +24,7 @@ async function loadCourses() {
         list.innerHTML += `
 <div class="course-card" onclick="openCourse('${course._id}')">
     <img 
-        src="${course.imageUrl || '/images/course-placeholder.jpg'}"
+        src="${course.image}"
         alt="Course Image"
         loading="lazy"
         onerror="this.src='/images/course-placeholder.jpg'"
