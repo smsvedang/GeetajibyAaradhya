@@ -22,14 +22,15 @@ async function loadCourses() {
 
     courses.forEach(course => {
         list.innerHTML += `
-            <div class="course-card">
-                <h3>${course.title}</h3>
-                <p>${course.description || ''}</p>
-                <button onclick="openCourse('${course._id}')">
-                    Start Course
-                </button>
-            </div>
-        `;
+<div class="course-card" onclick="openCourse('${course._id}')">
+    <img src="${course.imageUrl || '/default-course.jpg'}">
+    <div class="content">
+        <h3>${course.title}</h3>
+        <p>${course.description || ''}</p>
+        <button>Start Course</button>
+    </div>
+</div>
+`;
     });
 }
 

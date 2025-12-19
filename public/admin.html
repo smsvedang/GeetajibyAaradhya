@@ -149,6 +149,7 @@
                 <form id="course-form">
                     <input id="course-title" placeholder="Title" required>
                     <textarea id="course-description"></textarea>
+                    <input type="text" id="course-image" placeholder="Course Image URL">
                     <select id="course-adhyay"></select>
                     <div id="course-shloka-list"></div>
                     <button type="submit">Save</button>
@@ -624,6 +625,7 @@ courseForm.addEventListener('submit', async e => {
         description: document.getElementById('course-description').value,
         adhyay: document.getElementById('course-adhyay').value,
         shlokas: selectedShlokas,
+        image: document.getElementById('course-image').value,
         password: adminPassword
     };
 
