@@ -89,6 +89,20 @@ body {
     color: #5d4037;
 }
 
+.video-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;      /* 🔑 sab cards equal */
+    background: #000;          /* YouTube style */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.video-wrapper iframe,
+.video-wrapper > div {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* =========================
    COURSE DETAIL (Netflix)
 ========================= */
