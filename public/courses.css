@@ -144,10 +144,13 @@ body {
 }
 
 .shloka-item-card {
-    background: #1a1a1a;
-    border-radius: 12px;
+    background: #fffdf6;                 /* light cream */
+    border-radius: 14px;
     overflow: hidden;
+    border: 1px solid #f0e0b6;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
 }
+
 
 /* =========================
    QUIZ & CERTIFICATE
