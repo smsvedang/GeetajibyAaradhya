@@ -413,6 +413,30 @@ app.delete('/api/blog/:id', async (req, res) => {
 });
 
 // --- Course APIs ---
+// UPDATE COURSE
+app.put('/api/courses/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        const { id } = req.params;
+
+        await Course.findByIdAndUpdate(id, {
+            title: req.body.title,
+            description: req.body.description,
+            adhyay: Number(req.body.adhyay),
+            shlokas: req.body.shlokas,
+            imageUrl: req.body.image
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('COURSE UPDATE ERROR:', err);
+        res.status(500).json({ success: false });
+    }
+});
+
 app.get('/api/courses/:id', async (req, res) => {
     const course = await Course
         .findById(req.params.id)

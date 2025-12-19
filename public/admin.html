@@ -310,7 +310,14 @@ async function loadDashboard() {
         recentTestBox.innerHTML += `<li>${t.author}</li>`;
     });
 
-    if (certStatusChart) {
+    // ================= CERTIFICATES DASHBOARD CHARTS =================
+
+// ---- CALCULATE STATUS COUNTS FIRST ----
+const approved = certificates.filter(c => c.status === 'approved').length;
+const pending  = certificates.filter(c => c.status === 'pending').length;
+
+// ---- CERT STATUS PIE CHART ----
+if (certStatusChart) {
     certStatusChart.destroy();
 }
 
@@ -324,26 +331,24 @@ certStatusChart = new Chart(
                 data: [approved, pending],
                 backgroundColor: ['#4caf50', '#ff9800']
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
         }
     }
 );
 
-    // ---- CHART: CERT STATUS ----
-    const approved = certificates.filter(c => c.status === 'approved').length;
-    const pending = certificates.filter(c => c.status === 'pending').length;
+// ---- COURSE WISE CERTIFICATE MAP ----
+const courseMap = {};
+certificates.forEach(c => {
+    courseMap[c.courseTitle] = (courseMap[c.courseTitle] || 0) + 1;
+});
 
-    new Chart(document.getElementById('certStatusChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Approved', 'Pending'],
-            datasets: [{
-                data: [approved, pending],
-                backgroundColor: ['#4caf50', '#ff9800']
-            }]
-        }
-    });
-
-    if (certCourseChart) {
+    // ---- COURSE WISE BAR CHART ----
+if (certCourseChart) {
     certCourseChart.destroy();
 }
 
@@ -358,28 +363,21 @@ certCourseChart = new Chart(
                 data: Object.values(courseMap),
                 backgroundColor: '#1e88e5'
             }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
         }
     }
 );
-
-    // ---- CHART: COURSE WISE ----
-    const courseMap = {};
-    certificates.forEach(c => {
-        courseMap[c.courseTitle] = (courseMap[c.courseTitle] || 0) + 1;
-    });
-
-    new Chart(document.getElementById('certCourseChart'), {
-        type: 'bar',
-        data: {
-            labels: Object.keys(courseMap),
-            datasets: [{
-                label: 'Certificates',
-                data: Object.values(courseMap),
-                backgroundColor: '#1e88e5'
-            }]
-        },
-        options: { responsive: true }
-    });
 }
 
 /* SHLOKAS */
@@ -1100,7 +1098,7 @@ async function loadTestimonials() {
     });
 }
 });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ </script>
+ <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
