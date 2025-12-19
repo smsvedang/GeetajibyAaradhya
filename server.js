@@ -427,7 +427,7 @@ app.put('/api/courses/:id', async (req, res) => {
             description: req.body.description,
             adhyay: Number(req.body.adhyay),
             shlokas: req.body.shlokas,
-            imageUrl: req.body.image
+            imageUrl: req.body.imageUrl
         });
 
         res.json({ success: true });
@@ -462,7 +462,8 @@ app.post('/api/courses', async (req, res) => {
             title: req.body.title,
             description: req.body.description,
             adhyay: Number(req.body.adhyay),
-            shlokas: req.body.shlokas // array of shloka IDs
+            shlokas: req.body.shlokas, // array of shloka IDs
+            imageUrl: req.body.imageUrl
         });
         await course.save();
         res.status(201).json(course);
