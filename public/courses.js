@@ -23,7 +23,7 @@ async function loadCourses() {
     courses.forEach(course => {
         list.innerHTML += `
 <div class="course-card" onclick="openCourse('${course._id}')">
-    <img src="${course.imageUrl || '/default-course.jpg'}">
+    <img src="${course.imageUrl || ''}" 
     <div class="content">
         <h3>${course.title}</h3>
         <p>${course.description || ''}</p>
@@ -34,24 +34,30 @@ async function loadCourses() {
     });
 }
 
-if (autoCourseId) {
-    openCourse(autoCourseId);
+document.addEventListener('DOMContentLoaded', () => {
+    loadCourses();
 
-    if (quizStatus === 'passed') {
-        setTimeout(() => {
-            document.getElementById('certificate-box').scrollIntoView({
-                behavior: 'smooth'
-            });
-        }, 800);
+    if (autoCourseId) {
+        openCourse(autoCourseId);
+
+        if (quizStatus === 'passed') {
+            setTimeout(() => {
+                const certBox = document.getElementById('certificate-box');
+                if (certBox) certBox.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        }
     }
-}
+});
 
 /***********************
  * OPEN COURSE
  ***********************/
 async function openCourse(courseId) {
-    document.getElementById('course-list').style.display = 'none';
-    document.getElementById('single-course').style.display = 'block';
+    const courseListEl = document.getElementById('course-list');
+    if (courseListEl) courseListEl.style.display = 'none';
+
+    const singleCourseEl = document.getElementById('single-course');
+    if (singleCourseEl) singleCourseEl.style.display = 'block';
 
     const res = await fetch(`/api/courses/${courseId}`);
     currentCourse = await res.json();
@@ -59,28 +65,36 @@ async function openCourse(courseId) {
     completedShlokas.clear();
     quizPassed = false;
 
-    document.getElementById('course-title').textContent = currentCourse.title;
-    document.getElementById('header-title').textContent = currentCourse.title;
+    const courseTitleEl = document.getElementById('course-title');
+    if (courseTitleEl) courseTitleEl.textContent = currentCourse.title;
 
-    document.getElementById('quiz-box').style.display = 'none';
-    document.getElementById('certificate-box').style.display = 'none';
+    const headerTitleEl = document.getElementById('header-title');
+    if (headerTitleEl) headerTitleEl.textContent = currentCourse.title;
+
+    const quizBoxEl = document.getElementById('quiz-box');
+    if (quizBoxEl) quizBoxEl.style.display = 'none';
+
+    const certificateBoxEl = document.getElementById('certificate-box');
+    if (certificateBoxEl) certificateBoxEl.style.display = 'none';
 
     const shlokaBox = document.getElementById('course-shlokas');
-    shlokaBox.innerHTML = '';
+    if (shlokaBox) {
+        shlokaBox.innerHTML = '';
 
-    currentCourse.shlokas.forEach(shloka => {
-        shlokaBox.innerHTML += `
-            <div class="shloka-item-card">
-                <div class="video-wrapper">
-                    <div id="player-${shloka._id}"></div>
+        currentCourse.shlokas.forEach(shloka => {
+            shlokaBox.innerHTML += `
+                <div class="shloka-item-card">
+                    <div class="video-wrapper">
+                        <div id="player-${shloka._id}"></div>
+                    </div>
+                    <div class="card-content">
+                        <p>${shloka.text || ''}</p>
+                        <p id="status-${shloka._id}">⏳ Not completed</p>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <p>${shloka.text || ''}</p>
-                    <p id="status-${shloka._id}">⏳ Not completed</p>
-                </div>
-            </div>
-        `;
-    });
+            `;
+        });
+    }
 
     setTimeout(() => {
         initPlayers();
@@ -304,4 +318,3 @@ function goHome() {
 /***********************
  * INIT
  ***********************/
-loadCourses();
