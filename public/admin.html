@@ -199,6 +199,7 @@
     </main>
 </div>
 <script>
+
 document.addEventListener('DOMContentLoaded', () => {
 
 const loginForm = document.getElementById('login-form');
@@ -207,6 +208,8 @@ const adminDashboard = document.getElementById('admin-dashboard');
 const sidebarButtons = document.querySelectorAll('.sidebar-button');
 const pages = document.querySelectorAll('.content-page');
 
+let certStatusChart = null;
+let certCourseChart = null;
 let adminPassword = '';
 
 /* LOGIN */
@@ -307,6 +310,24 @@ async function loadDashboard() {
         recentTestBox.innerHTML += `<li>${t.author}</li>`;
     });
 
+    if (certStatusChart) {
+    certStatusChart.destroy();
+}
+
+certStatusChart = new Chart(
+    document.getElementById('certStatusChart'),
+    {
+        type: 'pie',
+        data: {
+            labels: ['Approved', 'Pending'],
+            datasets: [{
+                data: [approved, pending],
+                backgroundColor: ['#4caf50', '#ff9800']
+            }]
+        }
+    }
+);
+
     // ---- CHART: CERT STATUS ----
     const approved = certificates.filter(c => c.status === 'approved').length;
     const pending = certificates.filter(c => c.status === 'pending').length;
@@ -321,6 +342,25 @@ async function loadDashboard() {
             }]
         }
     });
+
+    if (certCourseChart) {
+    certCourseChart.destroy();
+}
+
+certCourseChart = new Chart(
+    document.getElementById('certCourseChart'),
+    {
+        type: 'bar',
+        data: {
+            labels: Object.keys(courseMap),
+            datasets: [{
+                label: 'Certificates',
+                data: Object.values(courseMap),
+                backgroundColor: '#1e88e5'
+            }]
+        }
+    }
+);
 
     // ---- CHART: COURSE WISE ----
     const courseMap = {};

@@ -417,6 +417,7 @@ app.get('/api/courses/:id', async (req, res) => {
     const course = await Course
         .findById(req.params.id)
         .populate('shlokas');
+        if (!course) return res.status(404).json({ error: 'Course not found' });
     res.json(course);
 });
 app.get('/api/courses', async (req, res) => {
