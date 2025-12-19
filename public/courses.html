@@ -1,78 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Courses | Warrior Aaradhya</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="courses.css">
-
-    <!-- YouTube API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/courses.css" />
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="course-header">
-    <button onclick="goHome()">🏠 Home</button>
-    <button onclick="goBack()">⬅ Back</button>
-    <h1 id="header-title">Courses</h1>
+<!-- TOP NAV -->
+<header class="courses-header">
+    <a href="/" class="nav-btn">🏠 Home</a>
+    <h1>📚 Courses</h1>
 </header>
 
-<div class="container">
+<!-- COURSES GRID -->
+<section id="course-list" class="courses-grid">
+    <!-- JS se courses inject honge -->
+</section>
 
-    <!-- COURSE LIST -->
-    <div id="course-list"></div>
+<!-- SINGLE COURSE (Netflix Detail Page) -->
+<section id="single-course" class="course-detail hidden">
 
-    <!-- SINGLE COURSE -->
-    <div id="single-course" style="display:none;">
-        <h2 id="course-title"></h2>
-        <p id="course-description"></p>
+    <div class="course-hero">
+        <img id="course-image" src="" alt="Course Image" />
+        <div class="course-overlay">
+            <h2 id="course-title"></h2>
+            <p id="course-desc"></p>
 
-        <div id="course-shlokas"></div>
-
-        <!-- QUIZ BOX -->
-        <div id="quiz-box" class="quiz-box" style="display:none;">
-            <h3>📝 Quiz</h3>
-            <p id="quiz-status">Complete all shlokas to unlock quiz</p>
-
-            <!-- 🔥 FIXED BUTTON -->
-            <button id="quiz-btn" onclick="startQuiz()">
-                Start Quiz
+            <button class="primary-btn" onclick="startCourse()">
+                ▶ Start Course
             </button>
         </div>
+    </div>
 
-        <!-- CERTIFICATE -->
-        <div id="certificate-box" class="certificate-box" style="display:none;">
-    <h3>🎉 Congratulations! Course Completed</h3>
+    <!-- SHLOKAS -->
+    <div id="course-shlokas" class="shloka-grid"></div>
 
-    <input type="text" id="user-name" placeholder="Enter your full name">
-    <input type="text" id="user-mobile" placeholder="Mobile Number">
-    <input type="email" id="user-email" placeholder="Email Address">
+    <!-- QUIZ -->
+    <div id="quiz-box" class="quiz-box hidden">
+        <h3>📝 Course Quiz</h3>
+        <button class="primary-btn" onclick="startQuiz()">Start Quiz</button>
+    </div>
 
-    <select id="cert-lang">
-        <option value="en">English</option>
-        <option value="hi">Hindi</option>
-    </select>
+    <!-- CERTIFICATE -->
+    <div id="certificate-box" class="certificate-box hidden"></div>
 
-    <button onclick="submitCertificateDetails()">
-    Submit Details
-</button>
+</section>
 
-    <div id="certificate-status"></div>
-</div>
-
-</div>
-
-<!-- MAIN LOGIC -->
-<script src="courses.js"></script>
-<footer class="footer">
-        <p>Contact: Aaradhya Soni</p>
-        <p>Email: warrioraaradhya111@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 - All Rights Reserved.</p>
-    </footer>
+<script src="/courses.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 
 </body>
 </html>

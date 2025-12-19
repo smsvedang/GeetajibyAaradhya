@@ -1,287 +1,168 @@
-/* =====================================================
-   COURSES PAGE – Professional & Theme Matched
-   Matches style.css (Warrior Aaradhya Theme)
-===================================================== */
-
-/* ---------- PAGE BASE ---------- */
+/* =========================
+   GLOBAL
+========================= */
 body {
-    background-color: #FFF8E1;
-    color: #4E342E;
-    font-family: Arial, sans-serif;
     margin: 0;
+    background: #0f0f0f;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
 }
 
-/* ---------- HEADER BAR ---------- */
-.course-header {
+/* =========================
+   HEADER
+========================= */
+.courses-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
-    background: #FFFFFF;
-    border-bottom: 2px solid #FFECB3;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    gap: 20px;
+    padding: 20px 30px;
+    background: linear-gradient(to right, #111, #1a1a1a);
+    border-bottom: 1px solid #222;
 }
 
-.course-header h1 {
-    font-size: 22px;
-    margin: 0;
-    color: #D84315;
+.courses-header h1 {
+    font-size: 26px;
     font-weight: 700;
 }
 
-.course-header button {
-    background: #FFF3E0;
-    border: 1px solid #FFB74D;
-    color: #D84315;
+.nav-btn {
+    background: #ff9900;
+    color: #000;
     padding: 8px 14px;
     border-radius: 6px;
+    text-decoration: none;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.course-header button:hover {
-    background: #FFECB3;
+/* =========================
+   COURSES GRID
+========================= */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+    padding: 30px;
 }
 
-/* ---------- MAIN CONTAINER ---------- */
-.course-container {
-    max-width: 950px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-/* ---------- COURSE CARD ---------- */
 .course-card {
-    background: #FFFFFF;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 30px;
-    border: 1px solid #FFECB3;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    background: #181818;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.course-card h2 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 22px;
-    color: #D84315;
+.course-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+}
+
+.course-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.course-card-content {
+    padding: 15px;
+}
+
+.course-card h3 {
+    margin: 0;
+    font-size: 18px;
 }
 
 .course-card p {
-    color: #5D4037;
-    line-height: 1.7;
-    margin-bottom: 18px;
+    font-size: 14px;
+    opacity: 0.8;
+    margin-top: 8px;
 }
 
-/* ---------- SHLOKA LIST ---------- */
-.shloka-item {
-    background: #FFFDF7;
-    border: 1px solid #FFE0B2;
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 10px;
-    transition: background 0.2s ease;
-}
-
-.shloka-item.completed {
-    background: #E8F5E9;
-    border-color: #A5D6A7;
-}
-
-/* ---------- VIDEO ---------- */
-.video-wrapper {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%;
-    border-radius: 12px;
-    overflow: hidden;
-    background: #000;
-    margin-bottom: 20px;
-}
-
-.video-wrapper iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* ---------- BUTTONS ---------- */
-.primary-btn {
-    background: #FF9800;
-    color: #FFFFFF;
-    padding: 10px 18px;
-    border-radius: 6px;
-    border: none;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.primary-btn:hover {
-    background: #F57C00;
-}
-
-.secondary-btn {
-    background: #FFF3E0;
-    border: 1px solid #FFB74D;
-    color: #D84315;
-    padding: 9px 14px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* ---------- QUIZ BOX ---------- */
-.quiz-box {
-    margin-top: 30px;
-    padding: 24px;
-    border-radius: 12px;
-    border: 2px dashed #FFB74D;
-    background: #FFFDF9;
-}
-
-.quiz-box h3 {
-    margin-top: 0;
-    color: #D84315;
-}
-
-/* ---------- COURSE COMPLETION MESSAGE ---------- */
-.certificate-box {
-    margin-top: 30px;
-    padding: 24px;
-    border-radius: 12px;
-    background: #F1F8E9;
-    border: 2px solid #4CAF50;
+/* =========================
+   COURSE DETAIL (Netflix)
+========================= */
+.hidden {
     display: none;
 }
 
-.certificate-box h3 {
-    color: #2E7D32;
-    margin-top: 0;
+.course-detail {
+    animation: fadeIn 0.4s ease;
 }
 
-.certificate-box p {
-    color: #33691E;
-    font-weight: 600;
+.course-hero {
+    position: relative;
+    height: 60vh;
 }
 
-/* ---------- FORM (CERTIFICATE DETAILS) ---------- */
-.course-complete-form {
-    margin-top: 25px;
-    border-top: 1px solid #FFECB3;
-    padding-top: 20px;
-}
-
-.course-complete-form input,
-.course-complete-form select {
+.course-hero img {
     width: 100%;
-    padding: 11px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.95em;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.4);
 }
 
-.course-complete-form button {
-    width: 100%;
-    background: #4CAF50;
-    color: #fff;
-    padding: 12px;
-    border-radius: 6px;
-    border: none;
-    font-weight: 700;
-    cursor: pointer;
+.course-overlay {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    max-width: 600px;
 }
 
-.course-complete-form button:hover {
-    background: #43A047;
-}
-
-/* ---------- FOOTER ---------- */
-.footer {
-    margin-top: 50px;
-    background: #5D4037;
-    color: #FFFFFF;
-    text-align: center;
-    padding: 30px 15px;
-}
-
-.footer p {
-    margin: 6px 0;
-}
-
-/* ---------- START COURSE BUTTON ---------- */
-.start-course-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #FF9800, #F57C00);
-    color: #ffffff;
-    padding: 12px 22px;
-    border-radius: 8px;
-    border: none;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.start-course-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
-}
-
-/* ---------- QUIZ QUESTION CARD ---------- */
-.quiz-card {
-    background: #FFFFFF;
-    border: 1px solid #FFECB3;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-}
-
-.quiz-card h4 {
-    margin-top: 0;
-    color: #D84315;
-}
-
-/* ---------- OPTIONS ---------- */
-.quiz-option {
-    display: block;
-    padding: 10px 14px;
-    border: 1px solid #FFCC80;
-    border-radius: 6px;
+.course-overlay h2 {
+    font-size: 36px;
     margin-bottom: 10px;
+}
+
+.course-overlay p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.primary-btn {
+    margin-top: 15px;
+    background: #ff9900;
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    font-weight: 700;
     cursor: pointer;
-    background: #FFFDF7;
-    transition: all 0.2s ease;
 }
 
-.quiz-option:hover {
-    background: #FFF3E0;
+/* =========================
+   SHLOKAS
+========================= */
+.shloka-grid {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
 }
 
-.quiz-option.selected {
-    background: #FFE0B2;
-    border-color: #FB8C00;
-    font-weight: 600;
+.shloka-item-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 768px) {
-    .course-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
+/* =========================
+   QUIZ & CERTIFICATE
+========================= */
+.quiz-box,
+.certificate-box {
+    margin: 40px auto;
+    max-width: 600px;
+    background: #181818;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
 
-    .course-container {
-        padding: 0 12px;
-    }
-
-    .course-card {
-        padding: 18px;
-    }
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
