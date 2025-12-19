@@ -23,12 +23,6 @@ async function loadCourses() {
     courses.forEach(course => {
         list.innerHTML += `
 <div class="course-card" onclick="openCourse('${course._id}')">
-    <img 
-        src="${course.imageUrl}"
-        alt="Course Image"
-        loading="lazy"
-        onerror="this.src='/images/course-placeholder.jpg'"
-    >
     <div class="course-card-content">
         <h3>${course.title}</h3>
         <p>${course.description || ''}</p>
