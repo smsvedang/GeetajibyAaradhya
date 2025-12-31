@@ -196,8 +196,8 @@ body {
 ========================= */
 
 #quiz-questions {
+    color: #4E342E;   /* same as site text */
     text-align: left;
-    color: #fff;
 }
 
 #quiz-questions label {
@@ -211,6 +211,22 @@ body {
     transform: scale(1.2);
     margin-right: 8px;
 }
+
+#quiz-questions label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0;
+    cursor: pointer;
+}
+
+#quiz-questions input[type="radio"] {
+    margin-top: 3px;
+    accent-color: #ff9800;
+    transform: scale(1.15);
+    flex-shrink: 0;
+}
+
 
 #quiz-questions label {
     padding: 10px 14px;
