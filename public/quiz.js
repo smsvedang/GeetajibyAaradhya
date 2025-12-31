@@ -52,21 +52,22 @@ function renderQuiz() {
         card.innerHTML = `
             <h4>Q${qIndex + 1}. ${q.question}</h4>
             <div class="quiz-options">
-                ${q.options
-                    .map(
-                        (opt, optIndex) => `
-                        <div class="quiz-option"
-                             onclick="selectOption(${qIndex}, ${optIndex}, this)">
-                            ${opt}
-                        </div>`
-                    )
-                    .join("")}
+                ${q.options.map((opt, optIndex) => `
+                    <label class="quiz-radio">
+                        <input type="radio"
+                               name="q${qIndex}"
+                               value="${optIndex}"
+                               onchange="userAnswers[${qIndex}] = ${optIndex}">
+                        ${opt}
+                    </label>
+                `).join("")}
             </div>
         `;
 
         container.appendChild(card);
     });
 }
+
 
 /*********************************
  * OPTION SELECT

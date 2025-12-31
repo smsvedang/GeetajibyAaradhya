@@ -239,6 +239,18 @@ body {
     border-color: #ff9800;
 }
 
+.quiz-radio {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.quiz-radio input {
+    accent-color: #ff9800;
+    transform: scale(1.2);
+}
+
 /* =========================
    ANIMATIONS
 ========================= */
