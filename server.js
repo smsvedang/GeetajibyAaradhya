@@ -5,6 +5,7 @@ const Progress = require('./models/Progress');
 const bodyParser = require('body-parser');
 const path = require('path');
 const Certificate = require('./models/Certificate');
+const { image } = require('pdfkit');
 
 const app = express();
 
@@ -49,6 +50,7 @@ const Artwork = mongoose.model('Artwork', artworkSchema);
 const blogSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
+    imageUrl: { type: String, required: false },
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 } // Likes added
 });
@@ -376,7 +378,8 @@ app.post('/api/blog', async (req, res) => {
     try {
         const newPost = new Blog({
             title: req.body.title,
-            content: req.body.content
+            content: req.body.content,
+            imageUrl: req.body.imageUrl || null
         });
         await newPost.save();
         res.status(201).json(newPost);
@@ -392,7 +395,8 @@ app.put('/api/blog/:id', async (req, res) => {
         const { id } = req.params;
         const updatedPost = await Blog.findByIdAndUpdate(id, {
             title: req.body.title,
-            content: req.body.content
+            content: req.body.content,
+            imageUrl: req.body.imageUrl || null
         }, { new: true });
         res.json(updatedPost);
     } catch (err) {

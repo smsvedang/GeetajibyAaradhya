@@ -205,6 +205,13 @@ button.cancel-button { background-color: #6c757d; }
     overflow-wrap: break-word;
     word-wrap: break-word; /* Puraane browsers ke liye */
 }
+.blog-image {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 15px 0 20px;
+}
 .testimonial-item { background-color: #FFFDF9; border-left: 5px solid #BFA080; padding: 20px 25px; margin-bottom: 20px; border-radius: 0 8px 8px 0; }
 .testimonial-item blockquote { font-size: 1.1em; font-style: italic; color: #444; line-height: 1.6; margin: 0 0 10px 0; padding: 0; position: relative; white-space: pre-wrap; }
 .testimonial-item cite { font-size: 1em; font-weight: bold; color: #BFA080; display: block; text-align: right; font-style: normal; }

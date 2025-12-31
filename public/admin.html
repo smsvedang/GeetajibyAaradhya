@@ -125,6 +125,7 @@
             <form id="blog-form">
                 <input type="hidden" id="blog-id">
                 <input id="blog-title" placeholder="Title" required>
+                <input id="blog-image" placeholder="Image URL (optional)">
                 <textarea id="blog-content" placeholder="Content"></textarea>
                 <button type="submit">Save</button>
             </form>
@@ -380,6 +381,49 @@ certCourseChart = new Chart(
     }
 );
 }
+
+/* ================= BLOG SAVE / UPDATE ================= */
+
+const blogForm = document.getElementById('blog-form');
+
+blogForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const blogId = document.getElementById('blog-id').value;
+
+    const payload = {
+        title: document.getElementById('blog-title').value,
+        content: document.getElementById('blog-content').value,
+        imageUrl: document.getElementById('blog-image').value, // ✅ IMPORTANT
+        password: adminPassword
+    };
+
+    const url = blogId
+        ? `/api/blog/${blogId}`
+        : `/api/blog`;
+
+    const method = blogId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert(blogId ? 'Blog updated' : 'Blog added');
+        blogForm.reset();
+        document.getElementById('blog-id').value = '';
+        loadBlogPosts();
+    } else {
+        alert('Failed to save blog');
+    }
+});
 
 /* SHLOKAS */
 async function loadShlokasAdmin(){

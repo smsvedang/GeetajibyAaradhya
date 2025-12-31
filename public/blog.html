@@ -52,11 +52,18 @@
             const shareUrl = window.location.href; 
 
             item.innerHTML = `
-                <h3>${post.title}</h3>
-                <p class="blog-date">${postDate}</p>
-                <div class="blog-content">
-                    ${post.content.replace(/\n/g, '<br>')}
-                </div>
+    <h3>${post.title}</h3>
+    <p class="blog-date">${postDate}</p>
+
+    ${post.imageUrl ? `
+        <img src="${post.imageUrl}"
+             class="blog-image"
+             alt="${post.title}">
+    ` : ''}
+
+    <div class="blog-content">
+        ${post.content.replace(/\n/g, '<br>')}
+    </div>
                 <div class="shloka-actions">
                     <button class="shloka-action-button like-button" data-id="${post._id}" ${isLiked ? 'disabled' : ''}>
                         ❤️ <span class="like-count">${post.likes || 0}</span>
