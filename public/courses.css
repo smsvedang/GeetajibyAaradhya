@@ -192,6 +192,38 @@ body {
 }
 
 /* =========================
+   QUIZ RADIO FIX
+========================= */
+
+#quiz-questions {
+    text-align: left;
+    color: #fff;
+}
+
+#quiz-questions label {
+    display: block;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+#quiz-questions input[type="radio"] {
+    accent-color: #ff9800;   /* 🔥 makes bullet visible */
+    transform: scale(1.2);
+    margin-right: 8px;
+}
+
+#quiz-questions label {
+    padding: 10px 14px;
+    border: 1px solid #444;
+    border-radius: 8px;
+}
+
+#quiz-questions label:hover {
+    background: #222;
+    border-color: #ff9800;
+}
+
+/* =========================
    ANIMATIONS
 ========================= */
 @keyframes fadeIn {
