@@ -425,6 +425,39 @@ blogForm.addEventListener('submit', async e => {
     }
 });
 
+/* ================= ARTWORK SAVE ================= */
+
+const artworkForm = document.getElementById('artwork-form');
+
+artworkForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const payload = {
+        title: document.getElementById('artwork-title').value,
+        imageUrl: document.getElementById('artwork-url').value,
+        password: adminPassword
+    };
+
+    const res = await fetch('/api/artwork', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert('Artwork added');
+        artworkForm.reset();
+        loadArtwork();
+    } else {
+        alert('Failed to add artwork');
+    }
+});
+
 /* SHLOKAS */
 async function loadShlokasAdmin(){
     const r=await fetch('/api/shlokas');
