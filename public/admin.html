@@ -296,6 +296,8 @@ async function loadDashboard() {
     // ---- LIKES ----
     let likes = 0;
     shlokas.forEach(s => likes += (s.likes || 0));
+    blogs.forEach(b => likes += (b.likes || 0));
+    artwork.forEach(a => likes += (a.likes || 0));
     document.getElementById('stat-likes').textContent = likes;
 
     // ---- RECENT CERTIFICATES ----
