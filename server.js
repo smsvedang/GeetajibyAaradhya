@@ -115,19 +115,41 @@ if (!admin.apps.length) {
 async function sendAutoPush(title, body) {
   try {
     const tokens = await PushToken.find();
+    if (!tokens.length) {
+      console.log('⚠️ No push tokens');
+      return;
+    }
 
     for (const t of tokens) {
-      await admin.messaging().send({
-        token: t.token,
-        notification: { title, body },
-        data: {
-          type: 'auto',
-          click_action: 'https://warrioraaradhya.in'
+      try {
+        await admin.messaging().send({
+          token: t.token,
+          notification: { title, body },
+          webpush: {
+            notification: {
+              title,
+              body,
+              icon: 'https://warrioraaradhya.in/favicon.png',
+              data: { url: 'https://warrioraaradhya.in' }
+            }
+          }
+        });
+      } catch (err) {
+
+        // 🔴 THIS IS THE KEY FIX
+        if (
+          err.code === 'messaging/registration-token-not-registered' ||
+          err.errorInfo?.code === 'messaging/registration-token-not-registered'
+        ) {
+          console.log('🗑 Removing dead token');
+          await PushToken.deleteOne({ token: t.token });
+        } else {
+          console.error('Push error:', err.message);
         }
-      });
+      }
     }
   } catch (err) {
-    console.error('Auto push error:', err.message);
+    console.error('sendAutoPush fatal:', err.message);
   }
 }
 
