@@ -113,24 +113,22 @@ if (!admin.apps.length) {
 
 // ===== AUTO PUSH HELPER FUNCTION =====
 async function sendAutoPush(title, body) {
-    try {
-        if (!admin?.messaging) return;
+  try {
+    const tokens = await PushToken.find();
 
-        const tokens = await PushToken.find().catch(() => []);
-
-        for (const t of tokens) {
-            try {
-                await admin.messaging().send({
-                    token: t.token,
-                    notification: { title, body }
-                });
-            } catch (err) {
-                console.error('Push failed for one token');
-            }
+    for (const t of tokens) {
+      await admin.messaging().send({
+        token: t.token,
+        notification: { title, body },
+        data: {
+          type: 'auto',
+          click_action: 'https://warrioraaradhya.in'
         }
-    } catch (err) {
-        console.error('sendAutoPush error:', err.message);
+      });
     }
+  } catch (err) {
+    console.error('Auto push error:', err.message);
+  }
 }
 
 // --- API Routes ---
