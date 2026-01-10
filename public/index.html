@@ -556,7 +556,7 @@ async function initPush() {
   if (permission !== 'granted') return;
 
   const token = await messaging.getToken({
-    vapidKey: "YOUR_PUBLIC_VAPID_KEY"
+    vapidKey: "BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os"
   });
 
   if (token) {
@@ -590,7 +590,7 @@ async function registerPushToken() {
   }
 
   const token = await messaging.getToken({
-    vapidKey: 'YOUR_PUBLIC_VAPID_KEY'
+    vapidKey: 'BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os'
   });
 
   console.log('FCM TOKEN:', token);
