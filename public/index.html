@@ -570,6 +570,45 @@ async function initPush() {
 
 initPush();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then(reg => {
+      console.log('SW registered:', reg.scope);
+    })
+    .catch(err => {
+      console.error('SW registration failed', err);
+    });
+}
+</script>
+<script>
+async function registerPushToken() {
+
+  if (Notification.permission !== 'granted') {
+    console.log('Permission not granted');
+    return;
+  }
+
+  const token = await messaging.getToken({
+    vapidKey: 'YOUR_PUBLIC_VAPID_KEY'
+  });
+
+  console.log('FCM TOKEN:', token);
+
+  if (!token) return;
+
+  await fetch('/api/push/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  });
+
+  console.log('Token saved to backend');
+}
+
+// 🔥 IMPORTANT: call this once page loads
+window.addEventListener('load', registerPushToken);
+</script>
 
 </body>
 </html>
