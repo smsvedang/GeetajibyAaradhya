@@ -111,6 +111,24 @@ if (!admin.apps.length) {
     });
 }
 
+// ===== AUTO PUSH HELPER FUNCTION =====
+async function sendAutoPush(title, body) {
+    const tokens = await PushToken.find();
+
+    for (let t of tokens) {
+        try {
+            await admin.messaging().send({
+                token: t.token,
+                notification: {
+                    title,
+                    body
+                }
+            });
+        } catch (err) {
+            console.error('Push failed:', err.message);
+        }
+    }
+}
 
 // --- API Routes ---
 
@@ -503,10 +521,10 @@ app.post('/api/courses', async (req, res) => {
         });
         await course.save();
         await sendAutoPush(
-  'New Course Launched ',
-  course.title,
-  'Adhyay ' + course.adhyay, 'Complete it and get certified!'
+  'New Course Launched 📚',
+  `${course.title} (Adhyay ${course.adhyay}) – Complete it and get certified!`
 );
+
         res.status(201).json(course);
     } catch (err) {
         res.status(500).json({ message: 'Course save karne mein error' });

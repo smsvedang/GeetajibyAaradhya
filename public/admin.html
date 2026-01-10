@@ -1204,19 +1204,6 @@ async function sendPush() {
   alert('Notification Sent');
 }
 
-async function sendAutoPush(title, body) {
-    const tokens = await PushToken.find();
-
-    for (let t of tokens) {
-        try {
-            await admin.messaging().send({
-                token: t.token,
-                notification: { title, body }
-            });
-        } catch {}
-    }
-}
-
  </script>
  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
