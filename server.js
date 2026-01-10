@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const Certificate = require('./models/Certificate');
 const { image } = require('pdfkit');
+const admin = require('firebase-admin');
 
 const app = express();
 
@@ -92,6 +93,25 @@ const quizSchema = new mongoose.Schema({
 });
 const Quiz = mongoose.model('Quiz', quizSchema);
 
+// --- 8. Web push Notifications Setup ---
+const pushTokenSchema = new mongoose.Schema({
+    token: { type: String, unique: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const PushToken = mongoose.model('PushToken', pushTokenSchema);
+
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: process.env.FB_PROJECT_ID,
+            clientEmail: process.env.FB_CLIENT_EMAIL,
+            privateKey: process.env.FB_PRIVATE_KEY.replace(/\\n/g, '\n')
+        })
+    });
+}
+
+
 // --- API Routes ---
 
 // --- Login API ---
@@ -168,6 +188,10 @@ app.post('/api/shlokas', async (req, res) => {
             video_id: req.body.video_url
         });
         await newShloka.save();
+        await sendAutoPush(
+  'New Gita Shloka Added 🙏',
+  `Adhyay ${newShloka.adhyay}, Shloka ${newShloka.shloka}`
+);
         res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
     } catch (err) {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
@@ -302,6 +326,10 @@ app.post('/api/artwork', async (req, res) => {
             imageUrl: req.body.imageUrl
         });
         await newArtwork.save();
+        await sendAutoPush(
+  'New Artwork Added 🎨',
+  newArtwork.title
+);
         res.status(201).json(newArtwork);
     } catch (err) {
         res.status(500).json({ message: 'Artwork jodne mein error' });
@@ -382,6 +410,10 @@ app.post('/api/blog', async (req, res) => {
             imageUrl: req.body.imageUrl || null
         });
         await newPost.save();
+        await sendAutoPush(
+  'New Blog Published ✍️',
+  newPost.title
+);
         res.status(201).json(newPost);
     } catch (err) {
         res.status(500).json({ message: 'Post jodne mein error' });
@@ -470,6 +502,11 @@ app.post('/api/courses', async (req, res) => {
             imageUrl: req.body.imageUrl
         });
         await course.save();
+        await sendAutoPush(
+  'New Course Launched ',
+  course.title,
+  'Adhyay ' + course.adhyay, 'Complete it and get certified!'
+);
         res.status(201).json(course);
     } catch (err) {
         res.status(500).json({ message: 'Course save karne mein error' });
@@ -792,6 +829,47 @@ app.put('/api/certificates/approve/:id', async (req, res) => {
         status: 'approved'
     });
     res.json({ success: true });
+});
+
+//--- Notification Token Save API ---
+app.post('/api/push/register', async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ success: false });
+
+        await PushToken.updateOne(
+            { token },
+            { token },
+            { upsert: true }
+        );
+
+        res.json({ success: true });
+    } catch {
+        res.status(500).json({ success: false });
+    }
+});
+
+app.get('/api/push/count', async (req, res) => {
+    const count = await PushToken.countDocuments();
+    res.json({ count });
+});
+
+app.post('/api/push/send', async (req, res) => {
+    const { title, body } = req.body;
+    const tokens = await PushToken.find();
+
+    let sent = 0;
+    for (let t of tokens) {
+        try {
+            await admin.messaging().send({
+                token: t.token,
+                notification: { title, body }
+            });
+            sent++;
+        } catch {}
+    }
+
+    res.json({ success: true, sent });
 });
 
 

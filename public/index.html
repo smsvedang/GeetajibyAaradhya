@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
@@ -539,5 +541,35 @@
       });
     </script>
     
+    <script>
+firebase.initializeApp({
+  apiKey: "YOUR_KEY",
+  projectId: "YOUR_PROJECT_ID",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+});
+
+const messaging = firebase.messaging();
+
+async function initPush() {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+
+  const token = await messaging.getToken({
+    vapidKey: "YOUR_PUBLIC_VAPID_KEY"
+  });
+
+  if (token) {
+    await fetch('/api/push/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ token })
+    });
+  }
+}
+
+initPush();
+</script>
+
 </body>
 </html>
