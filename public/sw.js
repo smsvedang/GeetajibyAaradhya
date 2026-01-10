@@ -1,55 +1,62 @@
-const CACHE_NAME = 'warrior-aaradhya-v1';
-const OFFLINE_URL = 'offline.html';
+/* ===== PWA + FIREBASE PUSH : MERGED SERVICE WORKER ===== */
 
-// ऐप "install" होते ही ज़रूरी चीज़ें कैशे कर लो
-self.addEventListener('install', (event) => {
+// -------- Firebase (Push Notifications) --------
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCmAzjIpbPy1ENyiLoURLWg2cI7fBWcUa4",
+  authDomain: "warrior-aaradhya.firebaseapp.com",
+  projectId: "warrior-aaradhya",
+  messagingSenderId: "105939562180",
+  appId: "1:105939562180:web:6eb2d862a01902a98fe391"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(payload => {
+  self.registration.showNotification(
+    payload.notification.title,
+    {
+      body: payload.notification.body,
+      icon: '/web-app-manifest-192x192.png',
+      badge: '/web-app-manifest-192x192.png'
+    }
+  );
+});
+
+
+// -------- PWA Offline Cache --------
+const CACHE_NAME = 'warrior-aaradhya-v2';
+const OFFLINE_URL = '/offline.html';
+
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Cache खोला गया');
-      // Naya aur Sahi code:
-return cache.addAll([
-  '/',
-  '/index.html',
-  '/style.css',
-  '/offline.html',
-  '/web-app-manifest-192x192.png' // <-- YEH SAHI HAI
-]);
-    })
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll([
+        '/',
+        '/index.html',
+        '/style.css',
+        OFFLINE_URL,
+        '/web-app-manifest-192x192.png'
+      ])
+    )
   );
   self.skipWaiting();
 });
 
-// कोई भी रिक्वेस्ट (fetch) आने पर
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    // पहले कैशे में ढूँढो
-    caches.match(event.request).then((response) => {
-      // 1. अगर कैशे में मिल गया, तो वही दिखा दो
-      if (response) {
-        return response;
-      }
-
-      // 2. अगर कैशे में नहीं है, तो इंटरनेट से लाने की कोशिश करो
-      return fetch(event.request).catch(() => {
-        // 3. अगर इंटरनेट भी नहीं चला, तो offline.html दिखा दो
-        return caches.match(OFFLINE_URL);
-      });
-    })
+    caches.match(event.request).then(response =>
+      response || fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+    )
   );
 });
 
-// पुराने कैशे को डिलीट करो
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => k !== CACHE_NAME && caches.delete(k)))
+    )
   );
 });

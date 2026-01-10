@@ -543,47 +543,39 @@
     
     <script>
 firebase.initializeApp({
-   apiKey: "AIzaSyCmAzjIpbPy1ENyiLoURLWg2cI7fBWcUa4",
+  apiKey: "AIzaSyCmAzjIpbPy1ENyiLoURLWg2cI7fBWcUa4",
   authDomain: "warrior-aaradhya.firebaseapp.com",
   projectId: "warrior-aaradhya",
-  storageBucket: "warrior-aaradhya.firebasestorage.app",
   messagingSenderId: "105939562180",
-  appId: "1:105939562180:web:6eb2d862a01902a98fe391",
-  measurementId: "G-Y4KCBXN8Y4"
+  appId: "1:105939562180:web:6eb2d862a01902a98fe391"
 });
 
 const messaging = firebase.messaging();
 
-async function initPush() {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return;
-
-  const token = await messaging.getToken({
-    vapidKey: "BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os"
-  });
-
-  if (token) {
-    await fetch('/api/push/register', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ token })
-    });
-  }
-}
-
-initPush();
-</script>
-<script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then(reg => {
-      console.log('SW registered:', reg.scope);
-    })
-    .catch(err => {
-      console.error('SW registration failed', err);
+  navigator.serviceWorker.register('/sw.js').then(async reg => {
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const token = await messaging.getToken({
+      vapidKey: 'BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os',
+      serviceWorkerRegistration: reg
     });
+
+    console.log('FCM TOKEN:', token);
+
+    if (token) {
+      await fetch('/api/push/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    }
+  });
 }
 </script>
+
 <script>
 async function registerPushToken() {
 
