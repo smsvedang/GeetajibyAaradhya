@@ -218,7 +218,6 @@ sendAutoPush(
 
 res.json(newShloka);
 
-        res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
     } catch (err) {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
     }
