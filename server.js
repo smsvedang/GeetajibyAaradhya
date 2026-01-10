@@ -113,20 +113,23 @@ if (!admin.apps.length) {
 
 // ===== AUTO PUSH HELPER FUNCTION =====
 async function sendAutoPush(title, body) {
-    const tokens = await PushToken.find();
+    try {
+        if (!admin?.messaging) return;
 
-    for (let t of tokens) {
-        try {
-            await admin.messaging().send({
-                token: t.token,
-                notification: {
-                    title,
-                    body
-                }
-            });
-        } catch (err) {
-            console.error('Push failed:', err.message);
+        const tokens = await PushToken.find().catch(() => []);
+
+        for (const t of tokens) {
+            try {
+                await admin.messaging().send({
+                    token: t.token,
+                    notification: { title, body }
+                });
+            } catch (err) {
+                console.error('Push failed for one token');
+            }
         }
+    } catch (err) {
+        console.error('sendAutoPush error:', err.message);
     }
 }
 
@@ -206,10 +209,15 @@ app.post('/api/shlokas', async (req, res) => {
             video_id: req.body.video_url
         });
         await newShloka.save();
-        await sendAutoPush(
+
+// 🔔 auto push (NON-BLOCKING)
+sendAutoPush(
   'New Gita Shloka Added 🙏',
   `Adhyay ${newShloka.adhyay}, Shloka ${newShloka.shloka}`
-);
+).catch(err => console.error('Auto push failed:', err.message));
+
+res.json(newShloka);
+
         res.status(201).json({ success: true, message: 'Shloka jud gaya!' });
     } catch (err) {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
