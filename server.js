@@ -206,7 +206,7 @@ app.post('/api/shlokas', async (req, res) => {
             adhyay: Number(req.body.adhyay),
             shloka: Number(req.body.shloka),
             text: req.body.text,
-            video_id: req.body.video_url
+            video_id: req.body.video_id
         });
         await newShloka.save();
 
@@ -232,7 +232,7 @@ app.put('/api/shlokas/:id', async (req, res) => {
             adhyay: Number(req.body.adhyay),
             shloka: Number(req.body.shloka),
             text: req.body.text,
-            video_id: req.body.video_url
+            video_id: req.body.video_id
         };
         await Shloka.findByIdAndUpdate(id, updatedShloka);
         res.json({ success: true, message: 'Shloka updated!' });
