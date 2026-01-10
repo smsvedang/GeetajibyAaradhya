@@ -19,11 +19,20 @@ messaging.onBackgroundMessage(payload => {
     payload.notification.title,
     {
       body: payload.notification.body,
-      icon: '/web-app-manifest-192x192.png',
-      badge: '/web-app-manifest-192x192.png'
+
+      // 🔔 Notification icon
+      icon: '/favicon.png',
+
+      // 🔴 Android badge (small icon)
+      badge: '/favicon-96x96.png',
+
+      data: {
+        url: '/'
+      }
     }
   );
 });
+
 
 
 // -------- PWA Offline Cache --------
@@ -58,5 +67,21 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys =>
       Promise.all(keys.map(k => k !== CACHE_NAME && caches.delete(k)))
     )
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clientList => {
+        for (const client of clientList) {
+          if (client.url === '/' && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        return clients.openWindow('/');
+      })
   );
 });
