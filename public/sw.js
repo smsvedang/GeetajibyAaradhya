@@ -21,10 +21,12 @@ messaging.onBackgroundMessage(payload => {
       body: payload.notification.body,
 
       // 🔔 Notification icon
-      icon: '/favicon.png',
+      icon: '/apple-touch-icon.png',
 
       // 🔴 Android badge (small icon)
       badge: '/favicon-96x96.png',
+
+      image: '/apple-touch-icon.png',
 
       data: {
         url: '/'
