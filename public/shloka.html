@@ -129,7 +129,7 @@
                 if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
                 likeButton.disabled = true;
                 try {
-                    const response = await fetch(`/api/shlokas/like/${shlokaDbId}`, { method: 'POST' });
+                    const response = await fetch(`/api/shloka/like/${shlokaDbId}`, { method: 'POST' });
                     const data = await response.json();
                     if (data.success) {
                         const countSpan = likeButton.querySelector('.like-count');
