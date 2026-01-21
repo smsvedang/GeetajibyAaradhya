@@ -185,10 +185,19 @@ body {
 .certificate-box {
     margin: 40px auto;
     max-width: 600px;
-    background: #181818;
+    background: #fff8e6;
     padding: 25px;
     border-radius: 12px;
     text-align: center;
+}
+.certificate-box input,
+.certificate-box select,
+.certificate-box button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
 /* =========================
