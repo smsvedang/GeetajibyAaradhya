@@ -229,21 +229,6 @@
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            // ✅ AUTO PROGRESS FROM HOME PAGE
-setTimeout(() => {
-  const courseId = localStorage.getItem('active_course');
-  if (!courseId) return;
-
-  fetch('/api/progress/save', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mobile: localStorage.getItem('user_mobile'),
-      courseId,
-      completed: [shloka._id]
-    })
-  });
-}, 15000); // 15 sec suna = completed
             item.innerHTML = `
                 <div class="card-video-container">
                     ${createVideo(shloka.video_id).innerHTML}
@@ -263,6 +248,45 @@ setTimeout(() => {
                         </button>
                     </div>
                 </div>`;
+                // 🔥 80% WATCH TRACKING (CORRECT WAY)
+let marked = false;
+
+new YT.Player(`yt-${shloka._id}`, {
+  videoId: shloka.video_id,
+  events: {
+    onStateChange: (e) => {
+      if (e.data === YT.PlayerState.PLAYING && !marked) {
+
+        const duration = e.target.getDuration();
+
+        const interval = setInterval(() => {
+          const current = e.target.getCurrentTime();
+
+          if (current / duration >= 0.8) {
+            marked = true;
+            clearInterval(interval);
+
+            const courseId = localStorage.getItem('active_course');
+            const mobile = localStorage.getItem('user_mobile');
+            if (!courseId || !mobile) return;
+
+            fetch('/api/progress/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mobile,
+                courseId,
+                completed: [shloka._id]
+              })
+            });
+
+            console.log('✅ 80% completed', shloka._id);
+          }
+        }, 1000);
+      }
+    }
+  }
+});
             return item;
         }
         async function loadAboutSection() {
@@ -625,6 +649,6 @@ if (!localStorage.getItem('user_mobile')) {
   if (mobile) localStorage.setItem('user_mobile', mobile);
 }
 </script>
-
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
