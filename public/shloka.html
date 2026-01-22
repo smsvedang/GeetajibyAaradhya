@@ -105,10 +105,9 @@
 
 new YT.Player(`yt-single-${shloka._id}`, {
   videoId: shloka.video_id,
-  host: 'https://www.youtube.com',
   playerVars: {
     enablejsapi: 1,
-    origin: window.location.origin
+    origin: 'https://www.warrioraaradhya.in'
   },
   events: {
     onStateChange: (e) => {
