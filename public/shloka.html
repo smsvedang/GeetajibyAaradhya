@@ -33,7 +33,47 @@
     </footer>
 
     <script>
+        let ytApiReady = false;
      let pendingPlayers = [];
+
+     function createPendingPlayers() {
+  if (!ytApiReady) return;
+
+  pendingPlayers.forEach(p => {
+    if (p._created) return; // duplicate se bachao
+    p._created = true;
+
+    new YT.Player(p.elementId, {
+      videoId: p.videoId,
+      playerVars: {
+        enablejsapi: 1,
+        origin: window.location.origin
+      },
+      events: {
+        onStateChange: (e) => {
+          if (e.data === YT.PlayerState.ENDED) {
+            const courseId = localStorage.getItem('active_course');
+            const mobile = localStorage.getItem('user_mobile');
+            if (!courseId || !mobile) return;
+
+            fetch('/api/progress/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mobile,
+                courseId,
+                completed: [p.shlokaId]
+              })
+            });
+
+            console.log('✅ COMPLETED (ENDED)', p.shlokaId);
+          }
+        }
+      }
+    });
+  });
+}
+
         function createSingleShlokaCard(shloka) {
     const item = document.createElement('div');
     item.className = 'shloka-item-card'; 
@@ -106,6 +146,7 @@
   videoId: shloka.video_id,
   shlokaId: shloka._id
 });
+createPendingPlayers();
 
             } catch (err) {
                 console.error(err);
@@ -154,42 +195,8 @@ if (!localStorage.getItem('user_mobile')) {
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 function onYouTubeIframeAPIReady() {
-
-  pendingPlayers.forEach(p => {
-
-    new YT.Player(p.elementId, {
-      videoId: p.videoId,
-      playerVars: {
-        enablejsapi: 1,
-        origin: window.location.origin
-      },
-      events: {
-        onStateChange: (e) => {
-
-          if (e.data === YT.PlayerState.ENDED) {
-            const courseId = localStorage.getItem('active_course');
-            const mobile = localStorage.getItem('user_mobile');
-            if (!courseId || !mobile) return;
-
-            fetch('/api/progress/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                mobile,
-                courseId,
-                completed: [p.shlokaId]
-              })
-            });
-
-            console.log('✅ COMPLETED (ENDED)', p.shlokaId);
-          }
-
-        }
-      }
-    });
-
-  });
-
+  ytApiReady = true;
+  createPendingPlayers();
 }
 </script>
 </body>
