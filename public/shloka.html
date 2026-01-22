@@ -45,30 +45,30 @@
     const shareUrl = window.location.href; 
 
     item.innerHTML = `
-        <div class="card-video-container">
-            <div id="yt-single-${shloka._id}"></div>
-        </div>
+  <div class="card-video-container">
+    <div id="yt-single-${shloka._id}"></div>
+  </div>
 
-        <div class="card-content">
-            <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
-            <p class="shloka-text">${formattedText}</p>
+  <div class="card-content">
+    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+    <p class="shloka-text">${formattedText}</p>
 
-            <div class="shloka-actions">
-                <button class="shloka-action-button like-button"
-                        data-id="${shloka._id}"
-                        ${isLiked ? 'disabled' : ''}>
-                    ❤️ <span class="like-count">${shloka.likes || 0}</span>
-                </button>
+    <div class="shloka-actions">
+      <button class="shloka-action-button like-button"
+              data-id="${shloka._id}"
+              ${isLiked ? 'disabled' : ''}>
+        ❤️ <span class="like-count">${shloka.likes || 0}</span>
+      </button>
 
-                <button class="shloka-action-button share-button"
-                        data-url="${shareUrl}"
-                        data-title="${shareTitle}"
-                        data-text="${shareText}">
-                    🔗 Share
-                </button>
-            </div>
-        </div>
-    `;
+      <button class="shloka-action-button share-button"
+              data-url="${shareUrl}"
+              data-title="${shareTitle}"
+              data-text="${shareText}">
+        🔗 Share
+      </button>
+    </div>
+  </div>
+`;
     return item;
 }
 
@@ -105,6 +105,7 @@
 
 new YT.Player(`yt-single-${shloka._id}`, {
   videoId: shloka.video_id,
+  host: 'https://www.youtube.com',
   playerVars: {
     enablejsapi: 1,
     origin: window.location.origin
