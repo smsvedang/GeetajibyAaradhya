@@ -62,6 +62,11 @@ Loading course...
     <p><strong>WhatsApp:</strong> +91 9243714402</p>
     <p>&copy; 2025 Warrior Aaradhya. All Rights Reserved.</p>
 </footer>
-
+<script>
+if (!localStorage.getItem('user_mobile')) {
+  const mobile = prompt("Enter mobile number (for course progress & certificate)");
+  if (mobile) localStorage.setItem('user_mobile', mobile);
+}
+</script>
 </body>
 </html>

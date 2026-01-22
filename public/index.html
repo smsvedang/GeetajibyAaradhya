@@ -229,6 +229,21 @@
             const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            // ✅ AUTO PROGRESS FROM HOME PAGE
+setTimeout(() => {
+  const courseId = localStorage.getItem('active_course');
+  if (!courseId) return;
+
+  fetch('/api/progress/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mobile: localStorage.getItem('user_mobile'),
+      courseId,
+      completed: [shloka._id]
+    })
+  });
+}, 15000); // 15 sec suna = completed
             item.innerHTML = `
                 <div class="card-video-container">
                     ${createVideo(shloka.video_id).innerHTML}
@@ -603,6 +618,12 @@ async function registerPushToken() {
 
 // 🔥 IMPORTANT: call this once page loads
 window.addEventListener('load', registerPushToken);
+</script>
+<script>
+if (!localStorage.getItem('user_mobile')) {
+  const mobile = prompt("Enter mobile number (for course progress & certificate)");
+  if (mobile) localStorage.setItem('user_mobile', mobile);
+}
 </script>
 
 </body>

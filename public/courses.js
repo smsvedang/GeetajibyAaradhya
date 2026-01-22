@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
  * OPEN COURSE
  ***********************/
 async function openCourse(courseId) {
+    // ✅ ACTIVE COURSE SAVE (VERY IMPORTANT)
+localStorage.setItem('active_course', courseId);
     const courseListEl = document.getElementById('course-list');
     if (courseListEl) courseListEl.style.display = 'none';
 

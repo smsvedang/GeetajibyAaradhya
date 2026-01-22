@@ -1,6 +1,21 @@
 const params = new URLSearchParams(location.search);
 const courseId = params.get('id');
 
+async function saveProgress(shlokaId) {
+  const mobile = localStorage.getItem('user_mobile');
+  if (!mobile || !courseId) return;
+
+  await fetch('/api/progress/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mobile,
+      courseId,
+      completed: [shlokaId]
+    })
+  });
+}
+
 async function loadCourse() {
     if (!courseId) return;
 
@@ -18,6 +33,14 @@ async function loadCourse() {
             return;
         }
 
+        const mobile = localStorage.getItem('user_mobile');
+let completed = [];
+
+if (mobile) {
+  const p = await fetch(`/api/progress/${mobile}/${courseId}`).then(r => r.json());
+  completed = p.completed || [];
+}
+
         course.shlokas.forEach((s, index) => {
             const div = document.createElement('div');
             div.className = 'shloka-card';
@@ -31,9 +54,11 @@ async function loadCourse() {
                     allowfullscreen>
                 </iframe>
 
-                <button class="complete-btn">
-                    Mark as Completed
-                </button>
+                <button class="complete-btn"
+  ${completed.includes(s._id) ? 'disabled' : ''}
+  onclick="saveProgress('${s._id}')">
+  ${completed.includes(s._id) ? 'Completed ✅' : 'Mark as Completed'}
+</button>
             `;
 
             container.appendChild(div);
