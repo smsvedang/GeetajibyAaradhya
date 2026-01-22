@@ -49,10 +49,7 @@ if (mobile) {
                 <h3>Shloka ${index + 1}</h3>
                 <p>${s.text || ''}</p>
 
-                <iframe
-                    src="https://www.youtube.com/embed/${s.video_id}"
-                    allowfullscreen>
-                </iframe>
+                <div id="player-${s._id}"></div>
 
                 <button class="complete-btn"
   ${completed.includes(s._id) ? 'disabled' : ''}
@@ -62,6 +59,13 @@ if (mobile) {
             `;
 
             container.appendChild(div);
+            new YT.Player(`player-${s._id}`, {
+  videoId: s.video_id,
+  playerVars: {
+    enablejsapi: 1,
+    origin: 'https://www.warrioraaradhya.in'
+  }
+});
         });
 
     } catch (err) {
