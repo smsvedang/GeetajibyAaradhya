@@ -211,7 +211,7 @@
     </footer>
 
    <script>
-        
+        let pendingPlayers = [];
         // --- FUNCTIONS 1-7 (Data Loaders) ---
         function createShlokaItem(shloka) {
             const item = document.createElement('div');
@@ -248,48 +248,6 @@
     </div>
   </div>
 `;
-let marked = false;
-
-new YT.Player(`yt-${shloka._id}`, {
-  videoId: shloka.video_id,
-  playerVars: {
-    enablejsapi: 1,
-    origin: 'https://www.warrioraaradhya.in'
-  },
-  events: {
-    onStateChange: (e) => {
-      if (e.data === YT.PlayerState.PLAYING && !marked) {
-
-        const duration = e.target.getDuration();
-
-        const interval = setInterval(() => {
-          const current = e.target.getCurrentTime();
-
-          if (current / duration >= 0.8) {
-            marked = true;
-            clearInterval(interval);
-
-            const courseId = localStorage.getItem('active_course');
-            const mobile = localStorage.getItem('user_mobile');
-            if (!courseId || !mobile) return;
-
-            fetch('/api/progress/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                mobile,
-                courseId,
-                completed: [shloka._id]
-              })
-            });
-
-            console.log('✅ HOME 80% completed', shloka._id);
-          }
-        }, 1000);
-      }
-    }
-  }
-});
             return item;
         }
         async function loadAboutSection() {
@@ -653,5 +611,45 @@ if (!localStorage.getItem('user_mobile')) {
 }
 </script>
 <script src="https://www.youtube.com/iframe_api"></script>
+<script>
+function onYouTubeIframeAPIReady() {
+
+  pendingPlayers.forEach(p => {
+
+    new YT.Player(p.elementId, {
+      videoId: p.videoId,
+      playerVars: {
+        enablejsapi: 1,
+        origin: window.location.origin
+      },
+      events: {
+        onStateChange: (e) => {
+
+          if (e.data === YT.PlayerState.ENDED) {
+            const courseId = localStorage.getItem('active_course');
+            const mobile = localStorage.getItem('user_mobile');
+            if (!courseId || !mobile) return;
+
+            fetch('/api/progress/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mobile,
+                courseId,
+                completed: [p.shlokaId]
+              })
+            });
+
+            console.log('✅ COMPLETED (ENDED)', p.shlokaId);
+          }
+
+        }
+      }
+    });
+
+  });
+
+}
+</script>
 </body>
 </html>
