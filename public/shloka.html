@@ -33,44 +33,44 @@
     </footer>
 
     <script>
-        // --- Copy/Paste from index.html ---
-        function createVideo(video_id) {
-            const videoWrapper = document.createElement('div');
-            videoWrapper.className = 'video-wrapper';
-            videoWrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${video_id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-            return videoWrapper;
-        }
 
         function createSingleShlokaCard(shloka) {
-            const item = document.createElement('div');
-            item.className = 'shloka-item-card'; 
-            const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
-            const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
-            const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            const shareUrl = window.location.href; 
-            item.innerHTML = `
-                <div class="card-video-container">
-                    ${createVideo(shloka.video_id).innerHTML}
-                </div>
-                <div class="card-content">
-                    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
-                    <p class="shloka-text">${formattedText}</p>
-                    <div class="shloka-actions">
-                        <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
-                            ❤️ <span class="like-count">${shloka.likes || 0}</span>
-                        </button>
-                        <button class="shloka-action-button share-button" 
-                                data-url="${shareUrl}" 
-                                data-title="${shareTitle}" 
-                                data-text="${shareText}">
-                            🔗 Share
-                        </button>
-                    </div>
-                </div>
-            `;
-            return item;
-        }
+    const item = document.createElement('div');
+    item.className = 'shloka-item-card'; 
+
+    const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
+    const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
+    const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+    const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+    const shareUrl = window.location.href; 
+
+    item.innerHTML = `
+        <div class="card-video-container">
+            <div id="yt-single-${shloka._id}"></div>
+        </div>
+
+        <div class="card-content">
+            <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+            <p class="shloka-text">${formattedText}</p>
+
+            <div class="shloka-actions">
+                <button class="shloka-action-button like-button"
+                        data-id="${shloka._id}"
+                        ${isLiked ? 'disabled' : ''}>
+                    ❤️ <span class="like-count">${shloka.likes || 0}</span>
+                </button>
+
+                <button class="shloka-action-button share-button"
+                        data-url="${shareUrl}"
+                        data-title="${shareTitle}"
+                        data-text="${shareText}">
+                    🔗 Share
+                </button>
+            </div>
+        </div>
+    `;
+    return item;
+}
 
         // Page load hone par shlok fetch karo (UPDATED - Reverted to ID)
         document.addEventListener('DOMContentLoaded', async () => {
@@ -101,24 +101,23 @@
                 container.innerHTML = ''; 
                 const shlokaCard = createSingleShlokaCard(shloka);
                 container.appendChild(shlokaCard);
-               // ===============================
-// 🔥 80% WATCH TRACKING (SINGLE)
-// ===============================
-const playerId = `yt-single-${shloka._id}`;
-shlokaCard.querySelector('.card-video-container').innerHTML =
-  `<div id="${playerId}"></div>`;
+               let marked = false;
 
-let marked = false;
-
-new YT.Player(playerId, {
+new YT.Player(`yt-single-${shloka._id}`, {
   videoId: shloka.video_id,
+  playerVars: {
+    enablejsapi: 1,
+    origin: window.location.origin
+  },
   events: {
     onStateChange: (e) => {
       if (e.data === YT.PlayerState.PLAYING && !marked) {
+
         const duration = e.target.getDuration();
 
         const interval = setInterval(() => {
           const current = e.target.getCurrentTime();
+
           if (current / duration >= 0.8) {
             marked = true;
             clearInterval(interval);
@@ -137,7 +136,7 @@ new YT.Player(playerId, {
               })
             });
 
-            console.log('✅ 80% completed (SINGLE)', shloka._id);
+            console.log('✅ SINGLE 80% completed', shloka._id);
           }
         }, 1000);
       }
