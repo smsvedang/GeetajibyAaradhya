@@ -29,6 +29,23 @@
     "url": "https://warrioraaradhya.in"
     }
     </script>
+    <script>
+async function safeRequestNotificationPermission() {
+  if (!('Notification' in window) || typeof Notification === 'undefined') {
+    console.log('Notification API not available (Android WebView)');
+    return null;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return null;
+    return permission;
+  } catch (e) {
+    console.log('Notification error:', e);
+    return null;
+  }
+}
+</script>
     <link rel="stylesheet" href="style.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -555,8 +572,8 @@ const messaging = firebase.messaging();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(async reg => {
 
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
+    const permission = await safeRequestNotificationPermission();
+    if (!permission) return;
 
     const token = await messaging.getToken({
       vapidKey: 'BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os',
@@ -579,10 +596,10 @@ if ('serviceWorker' in navigator) {
 <script>
 async function registerPushToken() {
 
-  if (Notification.permission !== 'granted') {
-    console.log('Permission not granted');
-    return;
-  }
+  if (!('Notification' in window) || Notification.permission !== 'granted') {
+  console.log('Notification not available / not granted');
+  return;
+}
 
   const token = await messaging.getToken({
     vapidKey: 'BK3eBEfiKIR5vFjLqjDs6-Oq6QlsuUmtSxEc6MmNVrucv7K7yI3L0l6Z2jNDPbqhYPfrwa6giHKz6OWKS9LJ0os'
