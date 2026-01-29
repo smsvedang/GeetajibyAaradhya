@@ -604,12 +604,6 @@ async function registerPushToken() {
 // 🔥 IMPORTANT: call this once page loads
 window.addEventListener('load', registerPushToken);
 </script>
-<script>
-if (!localStorage.getItem('user_mobile')) {
-  const mobile = prompt("Enter mobile number (for course progress & certificate)");
-  if (mobile) localStorage.setItem('user_mobile', mobile);
-}
-</script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 function onYouTubeIframeAPIReady() {
