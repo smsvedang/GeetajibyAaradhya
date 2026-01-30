@@ -478,13 +478,30 @@ async function loadShlokasAdmin(){
     const list=await r.json();
     const box=document.getElementById('shloka-list-admin');
     box.innerHTML='';
-    list.forEach(s=>{
-        box.innerHTML+=`
-        <div>
-            ${s.adhyay}.${s.shloka}
-            <button onclick="deleteShloka('${s._id}')">Delete</button>
-        </div>`;
-    });
+list.forEach(s => {
+    box.innerHTML += `
+        <div class="shloka-admin-item">
+            <div>
+                <b>Adhyay ${s.adhyay} · Shloka ${s.shloka}</b><br>
+                <small>${s.text ? s.text.slice(0, 80) + '…' : 'No text'}</small>
+            </div>
+
+            <div class="admin-buttons">
+                <button 
+                    class="edit-button"
+                    data-shloka='${JSON.stringify(s)}'>
+                    Edit
+                </button>
+
+                <button 
+                    class="delete-button"
+                    onclick="deleteShloka('${s._id}')">
+                    Delete
+                </button>
+            </div>
+        </div>
+    `;
+});
 }
 window.deleteShloka=async id=>{
     await fetch('/api/shlokas/'+id,{method:'DELETE',
