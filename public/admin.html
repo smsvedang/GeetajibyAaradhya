@@ -1101,6 +1101,36 @@ async function loadAboutContent() {
     }
 }
 
+/* ================= ABOUT SAVE ================= */
+
+const aboutForm = document.getElementById('about-form');
+
+aboutForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // 🔥 THIS STOPS PAGE RELOAD
+
+    if (!adminPassword) {
+        alert('Please login first');
+        return;
+    }
+
+    const payload = {
+        content: document.getElementById('about-text-input').value,
+        imageUrl: document.getElementById('about-image-url').value,
+        password: adminPassword
+    };
+
+    const res = await fetch('/api/about', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        alert('About page updated successfully');
+    } else {
+        alert('Failed to update About page');
+    }
+});
 
 /* TESTIMONIALS */
 /* ================= TESTIMONIALS ================= */
