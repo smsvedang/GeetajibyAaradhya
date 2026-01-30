@@ -53,8 +53,7 @@
         onStateChange: (e) => {
           if (e.data === YT.PlayerState.ENDED) {
             const courseId = localStorage.getItem('active_course');
-            const mobile = localStorage.getItem('user_mobile');
-            if (!courseId || !mobile) return;
+            if (!courseId ) return;
 
             fetch('/api/progress/save', {
               method: 'POST',

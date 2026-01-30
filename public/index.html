@@ -330,6 +330,7 @@ async function safeRequestNotificationPermission() {
                     adhyayGroup.appendChild(shlokaGrid);
                     container.appendChild(adhyayGroup);
                 }
+                setTimeout(initYouTubePlayers, 300);
             } catch (err) {
                 console.error("Error loading shlokas:", err);
                 container.innerHTML = '<p>Could not load shlokas. Please try again later.</p>';
@@ -628,9 +629,12 @@ window.addEventListener('load', registerPushToken);
 </script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-function onYouTubeIframeAPIReady() {
+function initYouTubePlayers() {
+  if (typeof YT === 'undefined' || !YT.Player) return;
 
   pendingPlayers.forEach(p => {
+    if (p.initialized) return;
+    p.initialized = true;
 
     new YT.Player(p.elementId, {
       videoId: p.videoId,
@@ -640,10 +644,8 @@ function onYouTubeIframeAPIReady() {
       },
       events: {
         onStateChange: (e) => {
-
           if (e.data === YT.PlayerState.ENDED) {
             const courseId = localStorage.getItem('active_course');
-            const mobile = localStorage.getItem('user_mobile');
             if (!courseId || !mobile) return;
 
             fetch('/api/progress/save', {
@@ -655,16 +657,15 @@ function onYouTubeIframeAPIReady() {
                 completed: [p.shlokaId]
               })
             });
-
-            console.log('✅ COMPLETED (ENDED)', p.shlokaId);
           }
-
         }
       }
     });
-
   });
+}
 
+function onYouTubeIframeAPIReady() {
+  initYouTubePlayers();
 }
 </script>
 </body>
