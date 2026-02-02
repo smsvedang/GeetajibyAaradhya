@@ -4,883 +4,824 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal | Aaradhya Geetaji</title>
-    <link rel="icon" href="/favicon.ico" sizes="any">
+    <title>Aaradhya Geetaji | Enterprise Admin</title>
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
-
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <!-- CSS -->
     <link rel="stylesheet" href="admin-style.css">
+    <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-    <!-- LOGIN SECTION -->
+    <!-- ================= AUTHENTICATION ================= -->
     <div id="login-section">
-        <form id="login-form">
+        <div class="login-card">
             <h2>Admin Portal</h2>
-            <p style="color:#6b7280; margin-bottom:20px;">Please enter your credentials</p>
-            <input type="password" id="password" placeholder="Access Password" required>
-            <button type="submit" style="width:100%;">Secure Login</button>
-        </form>
+            <p>Authorized personnel only. Please sign in.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="password" id="password" class="form-control" placeholder="Enter security key..."
+                        required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Authenticate</button>
+            </form>
+        </div>
     </div>
 
-    <!-- MAIN DASHBOARD -->
-    <div id="admin-dashboard" class="admin-wrapper" style="display:none;">
+    <!-- ================= ADMIN LAYOUT ================= -->
+    <div id="admin-layout" class="admin-layout" style="display:none;">
 
         <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                Admin Panel
+            <div class="brand">
+                <span>⚡</span> AdminOS
             </div>
-            <nav class="sidebar-nav">
-                <button class="sidebar-button active" data-tab="tab-dashboard">Dashboard</button>
-                <button class="sidebar-button" data-tab="tab-shloka">Shlokas</button>
-                <button class="sidebar-button" data-tab="tab-testimonials">Testimonials</button>
-                <button class="sidebar-button" data-tab="tab-blog">Blog Posts</button>
-                <button class="sidebar-button" data-tab="tab-artwork">Artwork</button>
-                <button class="sidebar-button" data-tab="tab-courses">Courses</button>
-                <button class="sidebar-button" data-tab="tab-quizzes">Quizzes</button>
-                <button class="sidebar-button" data-tab="tab-certificates">Certificates</button>
-                <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);"></div>
-                <button class="sidebar-button" data-tab="tab-about">Site Settings</button>
-            </nav>
+
+            <div class="nav-scroll">
+
+                <div class="nav-group">
+                    <div class="nav-label">Overview</div>
+                    <div class="nav-item active" onclick="switchTab('dashboard')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Dashboard
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">Content Management (CMS)</div>
+                    <div class="nav-item" onclick="switchTab('shlokas')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        Shlokas
+                    </div>
+                    <div class="nav-item" onclick="switchTab('blogs')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Blog Posts
+                    </div>
+                    <div class="nav-item" onclick="switchTab('artwork')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        Artwork Gallery
+                    </div>
+                    <div class="nav-item" onclick="switchTab('testimonials')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Testimonials
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">Learning System (LMS)</div>
+                    <div class="nav-item" onclick="switchTab('courses')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        Courses
+                    </div>
+                    <div class="nav-item" onclick="switchTab('quizzes')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        Quizzes
+                    </div>
+                    <div class="nav-item" onclick="switchTab('certificates')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                        Certificates
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">User Management</div>
+                    <div class="nav-item" onclick="switchTab('students')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Student Roster
+                    </div>
+                </div>
+
+                <div class="nav-group">
+                    <div class="nav-label">System</div>
+                    <div class="nav-item" onclick="switchTab('settings')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                        Settings & Push
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="location.reload()">Sign Out</button>
+            </div>
         </aside>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="main-content">
+        <!-- MAIN WRAPPER -->
+        <main class="main-wrapper">
+            <header class="top-header">
+                <div class="page-title" id="page-title">Dashboard Overview</div>
+                <div style="font-size:0.9rem; color:var(--text-muted);">
+                    Authenticated as Admin
+                </div>
+            </header>
 
-            <!-- TAB: DASHBOARD -->
-            <div id="tab-dashboard" class="content-page active">
-                <h1>Dashboard Overview</h1>
+            <div class="content-scroll">
 
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Total Shlokas</h3>
-                        <div id="stat-shlokas" class="stat-number">0</div>
+                <!-- VIEW: DASHBOARD -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="stats-grid" id="stats-grid">
+                        <!-- Populated by JS -->
                     </div>
-                    <div class="stat-card">
-                        <h3>Total Likes</h3>
-                        <div id="stat-likes" class="stat-number">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Active Courses</h3>
-                        <div id="stat-courses" class="stat-number">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Subscribers</h3>
-                        <div id="stat-push" class="stat-number">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Pending Actions</h3>
-                        <div style="font-size:1.2rem; font-weight:600; margin-top:8px;">
-                            <span id="stat-pending" style="color:var(--warning)">0</span> Reviews<br>
-                            <span id="stat-certificates" style="color:var(--info)">0</span> Certs
+
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Pending Approvals</h3>
+                        </div>
+                        <div class="modal-body" id="dashboard-alerts">
+                            <!-- JS -->
                         </div>
                     </div>
                 </div>
 
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <h3>Certificate Distribution</h3>
-                        <canvas id="certStatusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: MANAGE SHLOKAS -->
-            <div id="tab-shloka" class="content-page">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h1>Manage Shlokas</h1>
-                    <button class="add-btn" onclick="openShlokaModal()">+ Add New Shloka</button>
-                </div>
-
-                <div id="shloka-list-admin" class="admin-list"></div>
-            </div>
-
-            <!-- TAB: MANAGE TESTIMONIALS -->
-            <div id="tab-testimonials" class="content-page">
-                <h1>Manage Testimonials</h1>
-                <div class="form-card">
-                    <h3>Add Testimonial</h3>
-                    <form id="testimonial-form">
-                        <input id="testimonial-author" placeholder="Author Name" required>
-                        <textarea id="testimonial-quote" placeholder="Testimonial text" style="min-height:80px;"
-                            required></textarea>
-                        <button type="submit">Submit Testimonial</button>
-                    </form>
-                </div>
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
-                    <div>
-                        <h3 style="color:var(--warning); margin-bottom:15px;">Pending Approval</h3>
-                        <div id="testimonial-list-pending" class="admin-list"></div>
-                    </div>
-                    <div>
-                        <h3 style="color:var(--success); margin-bottom:15px;">Published</h3>
-                        <div id="testimonial-list-approved" class="admin-list"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: BLOG -->
-            <div id="tab-blog" class="content-page">
-                <h1>Manage Blog</h1>
-                <div class="form-card">
-                    <form id="blog-form">
-                        <input type="hidden" id="blog-id">
-                        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
-                            <input id="blog-title" placeholder="Blog Title" required>
-                            <input id="blog-image" placeholder="Cover Image URL">
+                <!-- VIEW: SHLOKAS -->
+                <div id="view-shlokas" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">All Shlokas Database</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openShlokaModal()">+ New Shloka</button>
                         </div>
-                        <textarea id="blog-content" placeholder="Blog Content (HTML supported)"></textarea>
-                        <button type="submit" class="btn-primary">Publish Post</button>
-                    </form>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Adhyay</th>
+                                        <th>Shloka</th>
+                                        <th>Content Preview</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-shlokas"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div id="blog-list-admin" class="admin-list"></div>
-            </div>
 
-            <!-- TAB: ARTWORK -->
-            <div id="tab-artwork" class="content-page">
-                <h1>Manage Artwork</h1>
-                <div class="form-card">
-                    <form id="artwork-form" style="display:flex; gap:15px; align-items:flex-start;">
-                        <input id="artwork-title" placeholder="Artwork Title" style="flex:1" required>
-                        <input id="artwork-url" placeholder="Image URL" style="flex:1" required>
-                        <button type="submit" style="height:45px;">Add Artwork</button>
-                    </form>
+                <!-- VIEW: BLOGS -->
+                <div id="view-blogs" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Blog Management</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openBlogModal()">+ Write Post</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-blogs"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div id="artwork-list" class="admin-list"></div>
-            </div>
 
-            <!-- TAB: COURSES -->
-            <div id="tab-courses" class="content-page">
-                <h1>Manage Courses</h1>
-                <button class="add-btn" id="show-course-form">➕ Create New Course</button>
+                <!-- VIEW: ARTWORK -->
+                <div id="view-artwork" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Gallery Items</h3>
+                            <form id="artwork-quick-add" style="display:flex; gap:10px;">
+                                <input id="art-title" placeholder="Title" class="form-control" style="width:150px">
+                                <input id="art-url" placeholder="Image URL" class="form-control" style="width:200px">
+                                <button type="submit" class="btn btn-primary btn-sm">Quick Add</button>
+                            </form>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Preview</th>
+                                        <th>Title</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-artwork"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                <div id="course-form-wrapper" class="form-card" style="display:none; margin-top:20px;">
-                    <form id="course-form">
-                        <input type="hidden" id="course-id">
-                        <input id="course-title" placeholder="Course Title" required>
-                        <textarea id="course-description" placeholder="Description" style="min-height:80px;"></textarea>
-                        <input type="text" id="course-image" placeholder="Course Image URL">
+                <!-- VIEW: STUDENTS (NEW) -->
+                <div id="view-students" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Student Registry</h3>
+                            <button class="btn btn-secondary btn-sm" onclick="loadStudentData()">Refresh Data</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mobile / ID</th>
+                                        <th>Progress</th>
+                                        <th>Quizzes</th>
+                                        <th>Last Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-students"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                        <div style="background:#f9fafb; padding:15px; border-radius:8px; margin-bottom:20px;">
-                            <label>Link Shlokas (Adhyay Selection)</label>
-                            <select id="course-adhyay"></select>
-                            <div id="course-shloka-list"
-                                style="margin-top:10px; max-height:200px; overflow-y:auto; border:1px solid #e5e7eb; padding:10px; background:white;">
+                <!-- VIEW: COURSES -->
+                <div id="view-courses" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Course Offerings</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openCourseForm()">+ New Course</button>
+                        </div>
+                        <div id="course-list-container" style="padding:1.5rem;"></div>
+                    </div>
+
+                    <!-- Course Form (Inline for now) -->
+                    <div id="course-editor" class="data-card" style="display:none; border-color:var(--brand-primary);">
+                        <div class="card-header" style="background:var(--slate-50)">
+                            <h3 class="card-title">Course Editor</h3>
+                            <button class="btn btn-secondary btn-sm" onclick="closeCourseForm()">Cancel</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="course-form">
+                                <input type="hidden" id="course-id">
+                                <div class="form-group"><label class="form-label">Title</label><input id="course-title"
+                                        class="form-control" required></div>
+                                <div class="form-group"><label class="form-label">Description</label><textarea
+                                        id="course-desc" class="form-control" required></textarea></div>
+                                <div class="form-group"><label class="form-label">Image URL</label><input
+                                        id="course-img" class="form-control"></div>
+
+                                <div class="form-group"
+                                    style="background:var(--slate-50); padding:1rem; border-radius:6px;">
+                                    <label class="form-label">Select Adhyay to Link Shlokas</label>
+                                    <select id="course-adhyay" class="form-control" style="margin-bottom:10px"></select>
+                                    <div id="course-shloka-select"
+                                        style="max-height:150px; overflow-y:auto; border:1px solid #ddd; padding:10px; background:white;">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Save Course</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: QUIZZES -->
+                <div id="view-quizzes" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quiz Management</h3>
+                            <button class="btn btn-primary btn-sm" onclick="openQuizForm()">Create Quiz</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Course</th>
+                                        <th>Pass %</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-quizzes"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Inline Quiz Form -->
+                    <div id="quiz-editor" class="data-card" style="display:none;">
+                        <div class="card-header">
+                            <h3 class="card-title">Quiz Editor</h3><button class="btn btn-secondary"
+                                onclick="document.getElementById('quiz-editor').style.display='none'">Close</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group"><label class="form-label">Course</label><select id="quiz-course-sel"
+                                    class="form-control"></select></div>
+                            <div class="form-group"><label class="form-label">Pass %</label><input type="number"
+                                    id="quiz-pass" class="form-control" value="50"></div>
+                            <div id="quiz-q-container"></div>
+                            <button class="btn btn-secondary btn-sm" id="add-q-btn">+ Add Question</button>
+                            <hr>
+                            <button class="btn btn-primary" id="save-quiz-btn">Save Quiz</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: CERTIFICATES -->
+                <div id="view-certificates" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Certificate Requests</h3>
+                            <button class="btn btn-secondary btn-sm"
+                                onclick="document.getElementById('manual-cert-form').style.display='block'">Manual
+                                Issue</button>
+                        </div>
+                        <div id="manual-cert-form"
+                            style="display:none; padding:1.5rem; background:var(--slate-50); border-bottom:1px solid #eee;">
+                            <h4>Issue New Certificate</h4>
+                            <div class="form-grid-2">
+                                <input id="c-name" placeholder="Name" class="form-control">
+                                <input id="c-mobile" placeholder="Mobile" class="form-control">
+                                <input id="c-email" placeholder="Email" class="form-control">
+                                <select id="c-course" class="form-control"></select>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="margin-top:10px;"
+                                onclick="issueCert()">Generate</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-certs"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: TESTIMONIALS -->
+                <div id="view-testimonials" class="view-section">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">User Reviews</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Author</th>
+                                        <th>Experience</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-testimonials"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: SETTINGS -->
+                <div id="view-settings" class="view-section">
+                    <div class="form-grid-2">
+                        <div class="data-card">
+                            <div class="card-header">
+                                <h3 class="card-title">About Page Config</h3>
+                            </div>
+                            <div class="modal-body">
+                                <form id="settings-form">
+                                    <div class="form-group"><label class="form-label">Image URL</label><input
+                                            id="abt-img" class="form-control"></div>
+                                    <div class="form-group"><label class="form-label">Content</label><textarea
+                                            id="abt-content" class="form-control" style="min-height:150px"></textarea>
+                                    </div>
+                                    <button class="btn btn-primary" type="submit">Update Site</button>
+                                </form>
                             </div>
                         </div>
 
-                        <div style="display:flex; gap:10px;">
-                            <button type="submit">Save Course</button>
-                            <button type="button" class="cancel-button"
-                                onclick="document.getElementById('course-form-wrapper').style.display='none'">Cancel</button>
+                        <div class="data-card" style="border-color:var(--brand-primary)">
+                            <div class="card-header">
+                                <h3 class="card-title">Push Notification Console</h3>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group"><label class="form-label">Title</label><input id="push-title"
+                                        class="form-control"></div>
+                                <div class="form-group"><label class="form-label">Message</label><textarea id="push-msg"
+                                        class="form-control"></textarea></div>
+                                <button class="btn btn-primary" onclick="sendPush()">BROADCAST TO ALL</button>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
 
-                <div id="course-list" class="admin-list" style="margin-top:20px;"></div>
             </div>
-
-            <!-- TAB: QUIZZES -->
-            <div id="tab-quizzes" class="content-page">
-                <h1>Manage Quizzes</h1>
-                <div class="form-card">
-                    <div style="display:flex; gap:15px; margin-bottom:15px;">
-                        <select id="quiz-course" style="flex:2"></select>
-                        <input id="quiz-pass" value="50" type="number" placeholder="Pass %" style="flex:1">
-                    </div>
-
-                    <div id="quiz-questions"></div>
-
-                    <div style="display:flex; gap:15px; margin-top:15px;">
-                        <button id="add-question" style="background:var(--secondary); color:#fff;">+ Add
-                            Question</button>
-                        <button id="quiz-save" class="btn-primary">Save Entire Quiz</button>
-                    </div>
-                </div>
-                <div id="quiz-list" class="admin-list"></div>
-            </div>
-
-            <!-- TAB: CERTIFICATES -->
-            <div id="tab-certificates" class="content-page">
-                <h1>Certificates Management</h1>
-
-                <div class="form-card">
-                    <h3>Generate Manual Certificate</h3>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <input id="cert-name" placeholder="Student Name">
-                        <input id="cert-mobile" placeholder="Mobile Number">
-                        <input id="cert-email" placeholder="Email (Optional)">
-                        <select id="cert-course"></select>
-                    </div>
-                    <select id="cert-lang" style="margin-top:15px;">
-                        <option value="en">English</option>
-                        <option value="hi">Hindi</option>
-                    </select>
-                    <button type="button" onclick="generateCertificate()" style="margin-top:15px;">Create
-                        Request</button>
-                </div>
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-top:30px;">
-                    <div>
-                        <h3 style="color:var(--warning)">Pending Requests</h3>
-                        <div id="certificate-pending" class="admin-list"></div>
-                    </div>
-                    <div>
-                        <h3 style="color:var(--success)">Approved Certificates</h3>
-                        <div id="certificate-approved" class="admin-list"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: SITE SETTINGS (ABOUT) -->
-            <div id="tab-about" class="content-page">
-                <h1>Site Settings</h1>
-
-                <div class="form-card">
-                    <h3>About Page Content</h3>
-                    <form id="about-form">
-                        <input id="about-image-url" placeholder="About Section Image URL">
-                        <textarea id="about-text-input" placeholder="About text content..."
-                            style="min-height:150px;"></textarea>
-                        <button type="submit">Update Settings</button>
-                    </form>
-                </div>
-
-                <div class="form-card" style="border-color: var(--primary);">
-                    <h3 style="color:var(--primary);">Push Notifications</h3>
-                    <p style="color:#6b7280; font-size:0.9rem;">Send a manual push notification to all subscribers.</p>
-                    <input id="push-title" placeholder="Notification Title">
-                    <textarea id="push-body" placeholder="Message Body" style="min-height:60px;"></textarea>
-                    <button onclick="sendPush()" class="primary-btn">Send Blast</button>
-                </div>
-            </div>
-
         </main>
     </div>
 
-    <!-- SHLOKA EDIT MODAL -->
-    <div class="modal-overlay" id="shloka-modal-overlay">
-        <div class="modal">
+    <!-- ================= MODALS ================= -->
+
+    <!-- SHLOKA MODAL -->
+    <div class="modal-overlay" id="shloka-modal">
+        <div class="modal-dialog">
             <div class="modal-header">
-                <h3 class="modal-title" id="shloka-modal-title">Add/Edit Shloka</h3>
-                <button class="modal-close" onclick="closeModal('shloka-modal-overlay')">&times;</button>
+                <h3>Shloka Editor</h3>
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('shloka-modal')">X</button>
             </div>
             <div class="modal-body">
                 <form id="shloka-form">
                     <input type="hidden" id="shloka-id">
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <div>
-                            <label>Adhyay Number</label>
-                            <input id="adhyay" placeholder="e.g. 1" type="number" required>
-                        </div>
-                        <div>
-                            <label>Shloka Number</label>
-                            <input id="shloka" placeholder="e.g. 15" type="number" required>
-                        </div>
+                    <div class="form-grid-2">
+                        <div class="form-group"><label class="form-label">Adhyay</label><input type="number"
+                                id="s-adhyay" class="form-control" required></div>
+                        <div class="form-group"><label class="form-label">Shloka</label><input type="number"
+                                id="s-shloka" class="form-control" required></div>
                     </div>
-
-                    <label>Shloka Text / Meaning</label>
-                    <textarea id="text" placeholder="Enter Sanskrit text or translation..."
-                        style="min-height:100px;"></textarea>
-
-                    <label>YouTube Video ID</label>
-                    <input id="video_url" placeholder="e.g. dQw4w9WgXcQ">
+                    <div class="form-group"><label class="form-label">Text Details</label><textarea id="s-text"
+                            class="form-control" style="min-height:100px"></textarea></div>
+                    <div class="form-group"><label class="form-label">YouTube Video ID</label><input id="s-vid"
+                            class="form-control"></div>
+                    <button type="submit" class="btn btn-primary" style="width:100%">Save Changes</button>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button class="cancel-button" onclick="closeModal('shloka-modal-overlay')">Cancel</button>
-                <button type="button" class="primary-btn" onclick="submitShlokaForm()">Save Shloka</button>
+        </div>
+    </div>
+
+    <!-- BLOG MODAL -->
+    <div class="modal-overlay" id="blog-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Blog Post</h3><button class="btn btn-secondary btn-sm" onclick="closeModal('blog-modal')">X</button>
+            </div>
+            <div class="modal-body">
+                <form id="blog-form">
+                    <div class="form-group"><label class="form-label">Title</label><input id="b-title"
+                            class="form-control" required></div>
+                    <div class="form-group"><label class="form-label">Cover Image</label><input id="b-img"
+                            class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Content</label><textarea id="b-content"
+                            class="form-control" style="min-height:200px"></textarea></div>
+                    <button type="submit" class="btn btn-primary">Publish</button>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-        // ================= GLOBAL VARIABLES =================
+        // ================= APP STATE =================
         let adminPassword = '';
-        let certStatusChart = null;
+        let currentTab = 'dashboard';
 
-        // ================= DOM ELEMENTS =================
-        const loginSection = document.getElementById('login-section');
-        const adminDashboard = document.getElementById('admin-dashboard');
-
-        // ================= LOGIN LOGIC =================
+        // ================= AUTH =================
         document.getElementById('login-form').addEventListener('submit', async e => {
             e.preventDefault();
-            const password = document.getElementById('password').value;
-
+            const pwd = document.getElementById('password').value;
             try {
-                const r = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
-                });
+                const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd }) });
                 const d = await r.json();
-
-                if (!d.success) return alert('Invalid Password');
-
-                adminPassword = password;
-                loginSection.style.display = 'none';
-                adminDashboard.style.display = 'flex';
-
-                // Load Initial Data
-                loadDashboard();
-            } catch (err) {
-                alert('Connection Error');
-            }
+                if (d.success) {
+                    adminPassword = pwd;
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('admin-layout').style.display = 'grid';
+                    initApp();
+                } else alert('Access Denied');
+            } catch { alert('Network Error'); }
         });
 
-        // ================= TAB NAVIGATION =================
-        document.querySelectorAll('.sidebar-button').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.sidebar-button').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
+        function initApp() { switchTab('dashboard'); }
 
-                btn.classList.add('active');
-                const tab = btn.dataset.tab;
-                document.getElementById(tab).classList.add('active');
+        // ================= NAVIGATION =================
+        function switchTab(tabId) {
+            currentTab = tabId;
+            // UI Update
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Find the clicked element (naive approach or event passing) - simplifying
+            // We just update all views visibility
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
 
-                // Load Data Based on Tab
-                if (tab === 'tab-dashboard') loadDashboard();
-                if (tab === 'tab-shloka') loadShlokasAdmin();
-                if (tab === 'tab-testimonials') loadTestimonials();
-                if (tab === 'tab-blog') loadBlogPosts();
-                if (tab === 'tab-artwork') loadArtwork();
-                if (tab === 'tab-courses') { loadCoursesAdmin(); loadAdhyayForCourses(); }
-                if (tab === 'tab-certificates') loadCertificates();
-                if (tab === 'tab-quizzes') { loadCoursesForQuiz(); loadQuizzes(); }
-                if (tab === 'tab-about') loadAboutContent();
+            // Set Header
+            const titles = {
+                'dashboard': 'Executive Overview',
+                'shlokas': 'Shloka Database',
+                'blogs': 'Blog Management',
+                'artwork': 'Artwork Gallery',
+                'courses': 'Course Catalog',
+                'quizzes': 'Assessments & Quizzes',
+                'certificates': 'Certification Center',
+                'students': 'Student Roster',
+                'testimonials': 'Reviews & Feedback',
+                'settings': 'System Configuration'
             };
-        });
+            document.getElementById('page-title').textContent = titles[tabId] || 'Admin';
+
+            // Load Data
+            if (tabId === 'dashboard') loadStats();
+            if (tabId === 'shlokas') loadShlokas();
+            if (tabId === 'blogs') loadBlogs();
+            if (tabId === 'artwork') loadArtwork();
+            if (tabId === 'courses') loadCourses();
+            if (tabId === 'quizzes') loadQuizzes();
+            if (tabId === 'certificates') loadCertificates();
+            if (tabId === 'students') loadStudentData();
+            if (tabId === 'testimonials') loadTestimonials();
+            if (tabId === 'settings') loadSettings();
+        }
 
         // ================= DASHBOARD =================
-        async function loadDashboard() {
-            const shlokas = await fetch('/api/shlokas').then(r => r.json());
-            const blogs = await fetch('/api/blog').then(r => r.json());
-            const artwork = await fetch('/api/artwork').then(r => r.json());
-            const testimonials = await fetch('/api/testimonials/all').then(r => r.json());
-            const courses = await fetch('/api/courses').then(r => r.json());
-            const certificates = await fetch('/api/certificates').then(r => r.json());
-            const push = await fetch('/api/push/count').then(r => r.json());
+        async function loadStats() {
+            try {
+                // Fallback to individual calls if /api/admin/stats not ready, but we updated server so it should work
+                const res = await fetch('/api/admin/stats');
+                const data = await res.json();
 
-            document.getElementById('stat-shlokas').textContent = shlokas.length;
-            document.getElementById('stat-courses').textContent = courses.length;
-            document.getElementById('stat-push').textContent = push.count;
-            document.getElementById('stat-pending').textContent = testimonials.filter(t => t.status === 'pending').length;
-            document.getElementById('stat-certificates').textContent = certificates.filter(c => c.status === 'pending').length;
+                if (data.stats) {
+                    const grid = document.getElementById('stats-grid');
+                    grid.innerHTML = '';
+                    data.stats.forEach(s => {
+                        grid.innerHTML += `
+                        <div class="stat-card">
+                            <div class="stat-head"><span>${s.label}</span><div class="stat-icon">${s.icon}</div></div>
+                            <div class="stat-value">${s.value}</div>
+                        </div>`;
+                    });
+                }
+            } catch (e) { console.error(e); }
+        }
 
-            let likes = 0;
-            shlokas.forEach(s => likes += (s.likes || 0));
-            blogs.forEach(b => likes += (b.likes || 0));
-            artwork.forEach(a => likes += (a.likes || 0));
-            document.getElementById('stat-likes').textContent = likes;
-
-            // Chart
-            const approved = certificates.filter(c => c.status === 'approved').length;
-            const pending = certificates.filter(c => c.status === 'pending').length;
-
-            if (certStatusChart) certStatusChart.destroy();
-            certStatusChart = new Chart(document.getElementById('certStatusChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Approved', 'Pending'],
-                    datasets: [{
-                        data: [approved, pending],
-                        backgroundColor: ['#10b981', '#f59e0b']
-                    }]
-                },
-                options: { responsive: true, cutout: '70%' }
+        // ================= SHLOKAS =================
+        async function loadShlokas() {
+            const res = await fetch('/api/shlokas');
+            const data = await res.json();
+            const tb = document.getElementById('table-shlokas');
+            tb.innerHTML = '';
+            data.forEach(s => {
+                tb.innerHTML += `<tr>
+                    <td><b>${s.adhyay}</b></td>
+                    <td>${s.shloka}</td>
+                    <td><span style="color:#666">${s.text ? s.text.substring(0, 50) + '...' : '—'}</span></td>
+                    <td style="text-align:right">
+                        <button class="btn btn-secondary btn-sm" onclick='editShloka(${JSON.stringify(s)})'>Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="delShloka('${s._id}')">Delete</button>
+                    </td>
+                </tr>`;
             });
         }
-
-        // ================= MODAL LOGIC =================
-        function openModal(id) {
-            document.getElementById(id).classList.add('open');
+        function openShlokaModal() {
+            document.getElementById('shloka-form').reset();
+            document.getElementById('shloka-id').value = '';
+            document.getElementById('shloka-modal').classList.add('open');
         }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
+        function closeShlokaModal() { document.getElementById('shloka-modal').classList.remove('open'); }
+        window.editShloka = (s) => {
+            document.getElementById('shloka-id').value = s._id;
+            document.getElementById('s-adhyay').value = s.adhyay;
+            document.getElementById('s-shloka').value = s.shloka;
+            document.getElementById('s-text').value = s.text || '';
+            document.getElementById('s-vid').value = s.video_id || '';
+            document.getElementById('shloka-modal').classList.add('open');
         }
-
-        // ================= SHLOKA MANAGEMENT =================
-        function openShlokaModal(shloka = null) {
-            const modalTitle = document.getElementById('shloka-modal-title');
-
-            if (shloka) {
-                modalTitle.textContent = 'Edit Shloka';
-                document.getElementById('shloka-id').value = shloka._id;
-                document.getElementById('adhyay').value = shloka.adhyay;
-                document.getElementById('shloka').value = shloka.shloka;
-                document.getElementById('text').value = shloka.text || '';
-                document.getElementById('video_url').value = shloka.video_id || '';
-            } else {
-                modalTitle.textContent = 'Add New Shloka';
-                document.getElementById('shloka-form').reset();
-                document.getElementById('shloka-id').value = '';
-            }
-            openModal('shloka-modal-overlay');
-        }
-
-        async function submitShlokaForm() {
-            if (!adminPassword) return alert('Session expired, please login again');
-
+        document.getElementById('shloka-form').addEventListener('submit', async e => {
+            e.preventDefault();
             const id = document.getElementById('shloka-id').value;
             const payload = {
-                adhyay: document.getElementById('adhyay').value,
-                shloka: document.getElementById('shloka').value,
-                text: document.getElementById('text').value,
-                video_id: document.getElementById('video_url').value,
+                adhyay: document.getElementById('s-adhyay').value,
+                shloka: document.getElementById('s-shloka').value,
+                text: document.getElementById('s-text').value,
+                video_id: document.getElementById('s-vid').value,
                 password: adminPassword
             };
-
-            const url = id ? `/api/shlokas/${id}` : `/api/shlokas`;
             const method = id ? 'PUT' : 'POST';
-
-            try {
-                const res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (res.ok) {
-                    closeModal('shloka-modal-overlay');
-                    loadShlokasAdmin();
-                    // Alert logic: PUT (Edit) does not send push. POST (Add) does. 
-                    // Backend handles this automatically.
-                    alert(id ? 'Shloka updated successfully' : 'Shloka added (Notification sent)');
-                } else {
-                    alert('Failed to save shloka');
-                }
-            } catch (err) {
-                alert('Error saving shloka');
-            }
-        }
-
-        async function loadShlokasAdmin() {
-            const r = await fetch('/api/shlokas');
-            const list = await r.json();
-            const box = document.getElementById('shloka-list-admin');
-            box.innerHTML = '';
-
-            list.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'admin-item';
-                div.innerHTML = `
-                    <div class="admin-item-content">
-                        <span class="admin-item-title">Adhyay ${s.adhyay} &middot; Shloka ${s.shloka}</span>
-                        <span class="admin-item-meta">${s.text ? s.text.substring(0, 60) + '...' : 'No text content'}</span>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-button">Edit</button>
-                        <button class="delete-button">Delete</button>
-                    </div>
-                `;
-
-                div.querySelector('.edit-button').onclick = () => openShlokaModal(s);
-                div.querySelector('.delete-button').onclick = async () => {
-                    if (confirm('Delete this shloka?')) {
-                        await fetch('/api/shlokas/' + s._id, {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ password: adminPassword })
-                        });
-                        loadShlokasAdmin();
-                    }
-                };
-                box.appendChild(div);
-            });
-        }
-
-        // ================= SITE SETTINGS (ABOUT) FIX =================
-        const aboutForm = document.getElementById('about-form');
-        aboutForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login');
-
-            const payload = {
-                newText: document.getElementById('about-text-input').value, // Matches backend 'newText'
-                newImageUrl: document.getElementById('about-image-url').value, // Matches backend 'newImageUrl'
-                password: adminPassword
-            };
-
-            // CORRECTED: Changed from PUT to POST to match server.js
-            const res = await fetch('/api/about', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                alert('Settings updated successfully');
-            } else {
-                alert('Failed to update settings');
-            }
+            const url = id ? '/api/shlokas/' + id : '/api/shlokas';
+            await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            closeModal('shloka-modal');
+            loadShlokas();
         });
-
-        async function loadAboutContent() {
-            try {
-                const res = await fetch('/api/about');
-                const data = await res.json();
-                document.getElementById('about-text-input').value = data.content || '';
-                document.getElementById('about-image-url').value = data.imageUrl || '';
-            } catch (err) { console.error(err); }
-        }
-
-        // ================= BLOG =================
-        const blogForm = document.getElementById('blog-form');
-        blogForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Please login');
-
-            const blogId = document.getElementById('blog-id').value;
-            const payload = {
-                title: document.getElementById('blog-title').value,
-                content: document.getElementById('blog-content').value,
-                imageUrl: document.getElementById('blog-image').value,
-                password: adminPassword
-            };
-
-            const url = blogId ? `/api/blog/${blogId}` : `/api/blog`;
-            const method = blogId ? 'PUT' : 'POST';
-
-            const res = await fetch(url, {
-                method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
-            if (res.ok) {
-                alert('Blog saved');
-                blogForm.reset();
-                document.getElementById('blog-id').value = '';
-                loadBlogPosts();
-            } else { alert('Failed to save blog'); }
-        });
-
-        async function loadBlogPosts() {
-            const res = await fetch('/api/blog');
-            const posts = await res.json();
-            const box = document.getElementById('blog-list-admin');
-            box.innerHTML = '';
-            posts.forEach(p => {
-                box.innerHTML += `
-                    <div class="admin-item">
-                        <div class="admin-item-content"><b>${p.title}</b></div>
-                        <div class="admin-item-actions"><button class="delete-button" onclick="deleteBlog('${p._id}')">Delete</button></div>
-                    </div>`;
-            });
-        }
-        window.deleteBlog = async id => {
-            if (!confirm('Delete?')) return;
-            await fetch('/api/blog/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-            loadBlogPosts();
+        window.delShloka = async id => {
+            if (confirm('Confirm deletion?')) {
+                await fetch('/api/shlokas/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
+                loadShlokas();
+            }
         };
 
-        // ================= ARTWORK =================
-        document.getElementById('artwork-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Login required');
+        // ================= STUDENTS =================
+        async function loadStudentData() {
+            const tb = document.getElementById('table-students');
+            tb.innerHTML = '<tr><td colspan="4">Loading data...</td></tr>';
 
+            try {
+                const res = await fetch('/api/admin/detailed-students');
+                const data = await res.json();
+                tb.innerHTML = '';
+
+                data.forEach(s => {
+                    const date = new Date(s.lastActive).toLocaleDateString();
+                    tb.innerHTML += `<tr>
+                        <td><b>${s._id}</b></td>
+                        <td>${s.coursesEnrolled} Courses</td>
+                        <td><span class="badge badge-success">${s.quizzesPassed} Passed</span></td>
+                        <td>${date}</td>
+                    </tr>`;
+                });
+            } catch { tb.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>'; }
+        }
+
+        // ================= ARTWORK =================
+        document.getElementById('artwork-quick-add').addEventListener('submit', async e => {
+            e.preventDefault();
             const payload = {
-                title: document.getElementById('artwork-title').value,
-                imageUrl: document.getElementById('artwork-url').value,
+                title: document.getElementById('art-title').value,
+                imageUrl: document.getElementById('art-url').value,
                 password: adminPassword
             };
-            const res = await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (res.ok) { alert('Artwork Added'); document.getElementById('artwork-form').reset(); loadArtwork(); }
-            else alert('Failed');
+            await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            document.getElementById('artwork-quick-add').reset();
+            loadArtwork();
         });
-
         async function loadArtwork() {
             const res = await fetch('/api/artwork');
-            const items = await res.json();
-            const box = document.getElementById('artwork-list');
-            box.innerHTML = '';
-            items.forEach(a => {
-                box.innerHTML += `
-                    <div class="admin-item">
-                        <div style="display:flex; align-items:center;">
-                            <img src="${a.imageUrl}" style="width:50px; height:50px; border-radius:4px; object-fit:cover; margin-right:15px;">
-                            <b>${a.title}</b>
-                        </div>
-                        <button class="delete-button" onclick="deleteArtwork('${a._id}')">Delete</button>
-                    </div>`;
+            const data = await res.json();
+            const tb = document.getElementById('table-artwork');
+            tb.innerHTML = '';
+            data.forEach(a => {
+                tb.innerHTML += `<tr>
+                    <td><img src="${a.imageUrl}" style="height:40px; border-radius:4px;"></td>
+                    <td>${a.title}</td>
+                    <td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="delArt('${a._id}')">Delete</button></td>
+                </tr>`;
             });
         }
-        window.deleteArtwork = async id => {
-            if (!confirm('Delete?')) return;
-            await fetch('/api/artwork/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-            loadArtwork();
+        window.delArt = async id => {
+            if (confirm('Delete?')) { await fetch('/api/artwork/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadArtwork(); }
         };
 
         // ================= COURSES =================
-        async function loadCoursesAdmin() {
+        async function loadCourses() {
             const res = await fetch('/api/courses');
-            const courses = await res.json();
-            const box = document.getElementById('course-list');
-            box.innerHTML = '';
-            courses.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'admin-item';
-                div.innerHTML = `
-                    <div class="admin-item-content"><b>${c.title}</b><br><small>Adhyay ${c.adhyay}</small></div>
-                    <div class="admin-item-actions">
-                        <button class="delete-button">Delete</button>
-                    </div>
-                `;
-                div.querySelector('.delete-button').onclick = async () => {
-                    if (confirm('Delete Course?')) {
-                        await fetch('/api/courses/' + c._id, { method: 'DELETE' });
-                        loadCoursesAdmin();
-                    }
-                };
-                box.appendChild(div);
+            const data = await res.json();
+            const c = document.getElementById('course-list-container');
+            c.innerHTML = '';
+            data.forEach(x => {
+                c.innerHTML += `<div style="border:1px solid #eee; padding:1rem; margin-bottom:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <div><b>${x.title}</b><br><small class="text-muted">Adhyay ${x.adhyay}</small></div>
+                    <button class="btn btn-danger btn-sm" onclick="delCourse('${x._id}')">Delete</button>
+                </div>`;
             });
         }
-        document.getElementById('show-course-form').onclick = () => document.getElementById('course-form-wrapper').style.display = 'block';
+        function openCourseForm() { document.getElementById('course-editor').style.display = 'block'; loadAdhyayOptions(); }
+        function closeCourseForm() { document.getElementById('course-editor').style.display = 'none'; }
 
-        // Course Form Save
-        document.getElementById('course-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!adminPassword) return alert('Login first');
-
-            const selectedShlokas = [];
-            document.querySelectorAll('#course-shloka-list input[type="checkbox"]:checked').forEach(cb => selectedShlokas.push(cb.value));
-            if (!selectedShlokas.length) return alert('Select at least one shloka');
-
-            const payload = {
-                title: document.getElementById('course-title').value,
-                description: document.getElementById('course-description').value,
-                adhyay: document.getElementById('course-adhyay').value,
-                shlokas: selectedShlokas,
-                imageUrl: document.getElementById('course-image').value,
-                password: adminPassword
-            };
-
-            await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            alert('Course Created');
-            document.getElementById('course-form').reset();
-            document.getElementById('course-form-wrapper').style.display = 'none';
-            loadCoursesAdmin();
-        });
-
-        // Load Adhyay Logic
-        async function loadAdhyayForCourses() {
+        async function loadAdhyayOptions() {
             const shlokas = await fetch('/api/shlokas').then(r => r.json());
             const adhyays = [...new Set(shlokas.map(s => s.adhyay))];
             const sel = document.getElementById('course-adhyay');
             sel.innerHTML = '<option value="">Select Adhyay</option>';
-            adhyays.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a;
-                opt.textContent = 'Adhyay ' + a;
-                sel.appendChild(opt);
-            });
-        }
-        document.getElementById('course-adhyay').onchange = async e => {
-            const adhyay = e.target.value;
-            const box = document.getElementById('course-shloka-list');
-            box.innerHTML = '';
-            if (!adhyay) return;
-            const shlokas = await fetch('/api/shlokas').then(r => r.json());
-            shlokas.filter(s => s.adhyay == adhyay).forEach(s => {
-                box.innerHTML += `<label style="display:block; padding:4px;"><input type="checkbox" value="${s._id}"> Shloka ${s.shloka}</label>`;
-            });
-        };
+            adhyays.forEach(a => sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`);
 
-        // ================= TESTIMONIALS =================
-        document.getElementById('testimonial-form').addEventListener('submit', async e => {
+            sel.onchange = () => {
+                const box = document.getElementById('course-shloka-select');
+                box.innerHTML = '';
+                shlokas.filter(s => s.adhyay == sel.value).forEach(s => {
+                    box.innerHTML += `<div style="padding:2px;"><input type="checkbox" value="${s._id}"> Shloka ${s.shloka}</div>`;
+                });
+            };
+        }
+        document.getElementById('course-form').addEventListener('submit', async e => {
             e.preventDefault();
-            await fetch('/api/testimonials/admin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    author: document.getElementById('testimonial-author').value,
-                    quote: document.getElementById('testimonial-quote').value,
-                    password: adminPassword
-                })
-            });
-            alert('Testimonial added');
-            document.getElementById('testimonial-form').reset();
-            loadTestimonials();
+            const sel = [];
+            document.querySelectorAll('#course-shloka-select input:checked').forEach(i => sel.push(i.value));
+            const payload = {
+                title: document.getElementById('course-title').value,
+                description: document.getElementById('course-desc').value,
+                adhyay: document.getElementById('course-adhyay').value,
+                shlokas: sel,
+                imageUrl: document.getElementById('course-img').value,
+                password: adminPassword
+            };
+            await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            closeCourseForm();
+            loadCourses();
         });
-
-        async function loadTestimonials() {
-            const list = await fetch('/api/testimonials/all').then(r => r.json());
-            const pBox = document.getElementById('testimonial-list-pending');
-            const aBox = document.getElementById('testimonial-list-approved');
-            pBox.innerHTML = ''; aBox.innerHTML = '';
-
-            list.forEach(t => {
-                const div = document.createElement('div');
-                div.className = 'admin-item';
-                div.innerHTML = `<div class="admin-item-content"><b>${t.author}</b><p style="font-size:0.85rem; margin:0;">${t.quote}</p></div>`;
-
-                const actions = document.createElement('div');
-                actions.className = 'admin-item-actions';
-
-                if (t.status === 'pending') {
-                    actions.innerHTML = `<button class="btn-primary" onclick="approveTestimonial('${t._id}')">Approve</button><button class="delete-button" onclick="deleteTestimonial('${t._id}')">Delete</button>`;
-                } else {
-                    actions.innerHTML = `<button class="delete-button" onclick="deleteTestimonial('${t._id}')">Delete</button>`;
-                }
-                div.appendChild(actions);
-                (t.status === 'pending' ? pBox : aBox).appendChild(div);
-            });
-        }
-        window.approveTestimonial = async id => {
-            await fetch('/api/testimonials/approve/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-            loadTestimonials();
-        };
-        window.deleteTestimonial = async id => {
-            if (confirm('Delete?')) {
-                await fetch('/api/testimonials/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-                loadTestimonials();
-            }
-        };
+        window.delCourse = async id => { if (confirm('Del?')) { await fetch('/api/courses/' + id, { method: 'DELETE' }); loadCourses(); } };
 
         // ================= CERTIFICATES =================
         async function loadCertificates() {
-            const list = await fetch('/api/certificates').then(r => r.json());
-            window._certificateCache = list;
-            const pBox = document.getElementById('certificate-pending');
-            const aBox = document.getElementById('certificate-approved');
-            pBox.innerHTML = ''; aBox.innerHTML = '';
+            const res = await fetch('/api/certificates');
+            const data = await res.json();
+            window._certs = data;
+            const tb = document.getElementById('table-certs');
+            tb.innerHTML = '';
+            data.forEach(c => {
+                const statusBadge = c.status === 'pending' ? '<span class="badge badge-warning">Pending</span>' : '<span class="badge badge-success">Approved</span>';
+                const action = c.status === 'pending' ? `<button class="btn btn-primary btn-sm" onclick="approveCert('${c._id}')">Approve</button>` : `<button class="btn btn-secondary btn-sm" onclick="downloadCert('${c._id}')">Download</button>`;
 
-            list.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'admin-item';
-                div.innerHTML = `
-                    <div class="admin-item-content">
-                        <b>${c.name}</b> (${c.courseTitle})<br>
-                        <small>${c.mobile} ${c.email ? '| ' + c.email : ''}</small>
-                    </div>
-                    <div class="admin-item-actions"></div>
-                 `;
-                const btns = div.querySelector('.admin-item-actions');
-                if (c.status === 'pending') {
-                    btns.innerHTML = `<button class="btn-primary" onclick="approveCertificate('${c._id}')">Approve</button><button class="delete-button" onclick="deleteCert('${c._id}')">Delete</button>`;
-                    pBox.appendChild(div);
-                } else {
-                    btns.innerHTML = `<button style="background:var(--info); color:white;" onclick="downloadCertificate('${c._id}')">Download</button><button class="delete-button" onclick="deleteCert('${c._id}')">Delete</button>`;
-                    aBox.appendChild(div);
-                }
+                tb.innerHTML += `<tr>
+                    <td><b>${c.name}</b><br><small>${c.mobile}</small></td>
+                    <td>${c.courseTitle}</td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align:right">${action} <button class="btn btn-danger btn-sm" onclick="delCert('${c._id}')">Del</button></td>
+                </tr>`;
             });
         }
-        window.approveCertificate = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); };
-        window.deleteCert = async id => { if (confirm('Delete?')) { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); } };
-
-        window.generateCertificate = async () => {
-            const name = document.getElementById('cert-name').value;
-            const mobile = document.getElementById('cert-mobile').value;
-            const email = document.getElementById('cert-email').value;
-            const courseTitle = document.getElementById('cert-course').selectedOptions[0]?.text;
-            const language = document.getElementById('cert-lang').value;
-
-            if (!name || !mobile || !courseTitle) return alert('Fill required fields');
-
-            const res = await fetch('/api/certificate/request', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, mobile, courseTitle, language })
-            });
-            if (res.ok) { alert('Request Created'); loadCertificates(); } else { alert('Error/Duplicate'); }
-        };
-
-        window.downloadCertificate = id => {
-            const cert = window._certificateCache.find(c => c._id === id);
-            if (!cert) return alert('Data not found');
+        window.approveCert = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); };
+        window.delCert = async id => { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); };
+        window.downloadCert = id => {
+            const cert = window._certs.find(x => x._id == id);
             const url = `/api/certificate?name=${encodeURIComponent(cert.name)}&mobile=${encodeURIComponent(cert.mobile)}&email=${encodeURIComponent(cert.email || '')}&courseTitle=${encodeURIComponent(cert.courseTitle)}&lang=${cert.language || 'en'}`;
             window.open(url, '_blank');
-        };
-
-        async function loadCoursesForCertificate() { /* Reusing Course Loader Logic Simplified */
-            const courses = await fetch('/api/courses').then(r => r.json());
-            const sel = document.getElementById('cert-course');
-            sel.innerHTML = '<option value="">Select Course</option>';
-            courses.forEach(c => sel.innerHTML += `<option value="${c._id}">${c.title}</option>`);
         }
 
-        // ================= QUIZZES =================
-        async function loadCoursesForQuiz() { /* Same as above */
-            const courses = await fetch('/api/courses').then(r => r.json());
-            const sel = document.getElementById('quiz-course');
-            sel.innerHTML = '<option value="">Select Course</option>';
-            courses.forEach(c => sel.innerHTML += `<option value="${c._id}">${c.title}</option>`);
-        }
-
-        async function loadQuizzes() {
-            const quizzes = await fetch('/api/quiz').then(r => r.json());
-            const box = document.getElementById('quiz-list');
-            box.innerHTML = '';
-            quizzes.forEach(q => {
-                box.innerHTML += `
-                    <div class="admin-item">
-                        <div class="admin-item-content"><b>${q.course?.title || 'Unknown'}</b> (Pass: ${q.passPercentage}%)</div>
-                        <div class="admin-item-actions"><button class="delete-button" onclick="deleteQuiz('${q._id}')">Delete</button></div>
-                    </div>`;
+        // ================= HELPERS =================
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        async function loadTestimonials() {
+            const res = await fetch('/api/testimonials/all');
+            const data = await res.json();
+            const tb = document.getElementById('table-testimonials');
+            tb.innerHTML = '';
+            data.forEach(t => {
+                const isPending = t.status === 'pending';
+                const s = isPending ? '<span class="badge badge-warning">Pending</span>' : '<span class="badge badge-success">Live</span>';
+                const act = isPending ? `<button class="btn btn-primary btn-sm" onclick="approveTest('${t._id}')">Approve</button>` : '';
+                tb.innerHTML += `<tr><td>${t.author}</td><td><small>${t.quote.substring(0, 50)}</small></td><td>${s}</td><td style="text-align:right">${act} <button class="btn btn-danger btn-sm" onclick="delTest('${t._id}')">Del</button></td></tr>`;
             });
         }
-        window.deleteQuiz = async id => {
-            if (confirm('Delete Quiz?')) {
-                await fetch('/api/quiz/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-                loadQuizzes();
-            }
-        };
+        window.approveTest = async id => { await fetch('/api/testimonials/approve/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); };
+        window.delTest = async id => { await fetch('/api/testimonials/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); };
 
-        document.getElementById('add-question').onclick = () => {
-            const div = document.createElement('div');
-            div.style.marginBottom = '10px';
-            div.innerHTML = `
-                <input placeholder="Question" style="margin-bottom:5px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-                    <input placeholder="Op A"><input placeholder="Op B"><input placeholder="Op C"><input placeholder="Op D">
-                </div>
-                <input type="number" placeholder="Correct (0-3)" style="width:100px;">
-                <hr>
-             `;
-            document.getElementById('quiz-questions').appendChild(div);
-        };
-
-        document.getElementById('quiz-save').onclick = async () => {
-            if (!adminPassword) return alert('Login first');
-            const courseId = document.getElementById('quiz-course').value;
-            const passPercentage = document.getElementById('quiz-pass').value;
-            const questions = [];
-            document.querySelectorAll('#quiz-questions > div').forEach(d => {
-                const inps = d.querySelectorAll('input');
-                questions.push({
-                    question: inps[0].value,
-                    options: [inps[1].value, inps[2].value, inps[3].value, inps[4].value],
-                    correctIndex: Number(inps[5].value)
-                });
+        async function loadBlogs() {
+            const res = await fetch('/api/blog');
+            const data = await res.json();
+            const tb = document.getElementById('table-blogs');
+            tb.innerHTML = '';
+            data.forEach(b => {
+                tb.innerHTML += `<tr><td>${b.title}</td><td>${new Date(b.createdAt).toLocaleDateString()}</td><td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="delBlog('${b._id}')">Del</button></td></tr>`;
             });
+        }
+        window.delBlog = async id => { await fetch('/api/blog/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadBlogs(); };
+        function openBlogModal() { document.getElementById('blog-modal').classList.add('open'); }
+        document.getElementById('blog-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const payload = {
+                title: document.getElementById('b-title').value,
+                content: document.getElementById('b-content').value,
+                imageUrl: document.getElementById('b-img').value,
+                password: adminPassword
+            };
+            await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            closeModal('blog-modal'); loadBlogs();
+        });
 
-            await fetch('/api/quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ course: courseId, passPercentage, questions, password: adminPassword })
-            });
-            alert('Quiz Saved');
-            document.getElementById('quiz-questions').innerHTML = '';
-            loadQuizzes();
-        };
-
-        // ================= PUSH =================
-        async function sendPush() {
-            if (!confirm('Send push notification to all users?')) return;
-            await fetch('/api/push/send', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: document.getElementById('push-title').value,
-                    body: document.getElementById('push-body').value
+        async function loadSettings() {
+            const r = await fetch('/api/about');
+            const d = await r.json();
+            document.getElementById('abt-content').value = d.content || '';
+            document.getElementById('abt-img').value = d.imageUrl || '';
+        }
+        document.getElementById('settings-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            await fetch('/api/about', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                    newText: document.getElementById('abt-content').value,
+                    newImageUrl: document.getElementById('abt-img').value,
+                    password: adminPassword
                 })
             });
-            alert('Sent!');
+            alert('Saved');
+        });
+        async function sendPush() {
+            if (!confirm('Broadcast?')) return;
+            await fetch('/api/push/send', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                    title: document.getElementById('push-title').value,
+                    body: document.getElementById('push-msg').value
+                })
+            });
+            alert('Sent');
         }
 
     </script>

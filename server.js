@@ -1,4 +1,4 @@
-/* --- Aaradhya Geetaji - Final Server Code (All Likes Fixed) --- */
+/* --- Aaradhya Geetaji - Final Server Code (Admin Enhanced) --- */
 const express = require('express');
 const mongoose = require('mongoose');
 const Progress = require('./models/Progress'); 
@@ -917,7 +917,70 @@ app.post('/api/push/send', async (req, res) => {
     res.json({ success: true, sent });
 });
 
+// --- ADMIN ACCESS APIs (NEW) ---
 
+// 1. Get All Students List (Unique Mobiles from Progress)
+app.get('/api/admin/detailed-students', async (req, res) => {
+    try {
+        // Aggregate unique users from data
+        const students = await Progress.aggregate([
+            { 
+              $group: { 
+                 _id: "$mobile",
+                 coursesEnrolled: { $sum: 1 },
+                 quizzesPassed: { $sum: { $cond: ["$quizPassed", 1, 0] } },
+                 avgScore: { $avg: "$quizScore" },
+                 lastActive: { $max: "$updatedAt" }
+              }
+            },
+            { $sort: { lastActive: -1 } }
+        ]);
+        res.json(students);
+    } catch (err) {
+        console.error("Aggregation error:", err);
+        res.status(500).json([]);
+    }
+});
+
+// 2. Comprehensive Admin Stats
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const [
+            shlokaCount, 
+            courseCount, 
+            blogCount, 
+            artCount, 
+            pendingTestimonials,
+            pendingCerts,
+            uniqueStudents
+        ] = await Promise.all([
+            Shloka.countDocuments(),
+            Course.countDocuments(),
+            Blog.countDocuments(),
+            Artwork.countDocuments(),
+            Testimonial.countDocuments({ status: 'pending' }),
+            Certificate.countDocuments({ status: 'pending' }),
+            Progress.distinct('mobile')
+        ]);
+
+        res.json({
+            stats: [
+                { label: 'Total Shlokas', value: shlokaCount, icon: '📖' },
+                { label: 'Courses Active', value: courseCount, icon: '📚' },
+                { label: 'Blog Posts', value: blogCount, icon: '✍️' },
+                { label: 'Artworks', value: artCount, icon: '🎨' },
+                { label: 'Total Students', value: uniqueStudents.length, icon: '🎓' }
+            ],
+            alerts: {
+                testimonials: pendingTestimonials,
+                certificates: pendingCerts
+            }
+        });
+    } catch (err) {
+        console.error("Stats error", err);
+        res.json({ stats: [], alerts: {testimonials:0, certificates:0} });
+    }
+});
 
 // --- Server Start ---
 const PORT = process.env.PORT || 3000;
