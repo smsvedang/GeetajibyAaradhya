@@ -1,981 +1,424 @@
-/* --- Basic Setup --- */
-* { box-sizing: border-box; }
-body { 
-    font-family: Arial, sans-serif; 
-    margin: 0; 
-    background-color: #FFF8E1; 
-    color: #4E342E;
-    padding-top: 60px; /* Sticky Navbar ke liye space */
+:root {
+    --primary: #D84315;
+    --primary-light: #FF7043;
+    --primary-dark: #BF360C;
+    --accent: #FF9800;
+    --bg-main: #FFF8E1;
+    --bg-card: #FFFFFF;
+    --text-main: #2D3436;
+    --text-muted: #636E72;
+    --border: #FFE0B2;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --radius-lg: 20px;
+    --radius-md: 12px;
 }
-.container { max-width: 900px; margin: 0 auto; padding: 20px; }
 
-/* --- Top Sticky Navbar --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- NAVIGATION --- */
 .top-navbar {
-    background-color: #FFFFFF;
-    border-bottom: 2px solid #FFECB3;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 70px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
 }
+
 .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 100%;
-    padding: 0 20px;
+    width: 100%;
 }
-.logo { font-size: 1.5em; font-weight: bold; color: #D84315; }
-.menu-toggle { display: none; }
-.menu-links { display: flex; height: 100%; }
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.menu-links {
+    display: flex;
+    gap: 10px;
+}
+
 .main-tab-button {
-    padding: 0 20px; 
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-    font-size: 1.0em; 
-    color: #5D4037;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    border-bottom: 4px solid transparent;
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-.main-tab-button:hover { background-color: #FFF3E0; }
-.main-tab-button.active {
-    color: #D84315;
-    font-weight: bold;
-    border-bottom-color: #D84315;
-}
-.main-tab-content { display: none; padding-top: 30px; }
-.main-tab-content.active { display: block; }
-
-/* --- Shloka Welcome Hero (Home tab par) --- */
-.shloka-welcome-hero {
-    background-color: #FF9800;
-    color: white;
-    padding: 30px 20px;
-    text-align: center;
-    border-radius: 8px;
-    margin-bottom: 30px;
-}
-.shloka-welcome-hero h1 { margin: 0; font-size: 2.5em; }
-.shloka-welcome-hero .subtitle { font-size: 1.1em; margin: 10px 0 0; }
-
-
-/* --- 2. About Section --- */
-.about h2 { font-size: 2em; color: #D84315; border-bottom: 2px solid #FF9800; padding-bottom: 10px; margin-bottom: 20px; margin-top: 0; }
-.about-content { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 30px; }
-.about-image { flex: 1; min-width: 250px; }
-.about-image img { width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.about-text { flex: 2; min-width: 300px; }
-.about-text p { font-size: 1.1em; line-height: 1.7; margin: 0 0 15px 0; white-space: pre-wrap; }
-
-/* --- 3. Artwork Gallery Section --- */
-.gallery h2 { font-size: 2em; color: #D84315; text-align: center; border-bottom: 2px solid #FF9800; padding-bottom: 10px; margin-bottom: 30px; margin-top: 0; }
-.carousel-container { position: relative; max-width: 700px; margin: auto; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.carousel-item { display: none; animation: fadeEffect 0.5s ease-in-out; }
-.carousel-item.active { display: block; }
-.carousel-item img { width: 100%; display: block; }
-@keyframes fadeEffect { from {opacity: 0.4} to {opacity: 1} }
-.carousel-button { cursor: pointer; position: absolute; top: 50%; width: auto; padding: 16px; margin-top: -22px; color: white; font-weight: bold; font-size: 20px; transition: 0.3s ease; border-radius: 0 3px 3px 0; user-select: none; background-color: rgba(0,0,0,0.3); border: none; }
-.carousel-button.next { right: 0; border-radius: 3px 0 0 3px; }
-.carousel-button:hover { background-color: rgba(0,0,0,0.6); }
-.slide-counter { position: absolute; top: 10px; left: 10px; color: white; background-color: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; font-size: 14px; }
-
-/* --- 4. Shloka List Section (UPDATED) --- */
-.shloka-list-container { margin-top: 0; }
-
-/* [NAYA] Adhyay Group (details tag) */
-.adhyay-group {
-    margin-bottom: 20px;
-    border: 1px solid #FFECB3;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-/* [NAYA] Adhyay Title (summary tag) */
-.adhyay-title {
-    font-size: 1.8em;
-    font-weight: 600;
-    padding: 20px;
-    cursor: pointer;
-    background-color: #FFF3E0;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    color: #D84315;
-}
-.adhyay-group[open] .adhyay-title {
-    border-radius: 8px 8px 0 0; /* Jab khula ho toh corner sharp rakhein */
-}
-/* [NAYA] Arrow ke liye */
-.adhyay-title::after { 
-    content: '▼'; 
-    font-size: 0.8em; 
-    color: #D84315;
-}
-.adhyay-group[open] .adhyay-title::after { 
-    content: '▲'; 
-}
-
-/* Shloka Grid Layout */
-.shloka-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px; /* [NAYA] Grid ke andar padding */
-}
-
-/* Shloka Card Style */
-.shloka-item-card {
-    background: #FFFFFF;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    overflow: hidden; 
-    transition: box-shadow 0.3s ease;
-}
-.shloka-item-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.12); }
-.card-video-container {
-    position: relative;
-    padding-bottom: 56.25%; 
-    height: 0;
-    overflow: hidden;
-}
-.card-video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.card-content { padding: 20px; }
-.card-content h3 { margin: 0 0 10px 0; color: #D84315; }
-.card-content .shloka-text { font-style: italic; color: #6D4C41; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
-.shloka-actions { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #FFECB3; padding-top: 15px; }
-.shloka-action-button { flex: 1; background-color: #f4f4f4; color: #333; border: 1px solid #ddd; padding: 10px; font-size: 1em; font-weight: bold; cursor: pointer; border-radius: 5px; transition: background-color 0.2s; text-align: center; }
-.shloka-action-button:hover { background-color: #e9e9e9; }
-.shloka-action-button .like-count { font-weight: bold; margin-left: 5px; }
-.shloka-action-button:disabled { background-color: #FFEBEE; color: #D84315; border-color: #FFCDD2; cursor: not-allowed; }
-.shloka-item-card.highlight { background-color: #FFF9C4; border: 1px solid #FFEB3B; box-shadow: 0 0 15px #FFEB3B; }
-
-/* --- Footer --- */
-.footer { text-align: center; padding: 30px; background-color: #5D4037; color: #FFFFFF; margin-top: 40px; }
-.footer p { margin: 5px 0; }
-
-/* --- Admin Panel Styles --- */
-/* (Aapka puraana code... no change) */
-.admin-tabs { display: flex; border-bottom: 2px solid #FF9800; margin-bottom: 20px; flex-wrap: wrap; }
-.tab-button { padding: 10px 20px; cursor: pointer; border: none; background-color: #eee; font-size: 1em; border-radius: 5px 5px 0 0; margin-right: 5px; margin-bottom: 5px; }
-.tab-button.active { background-color: #FF9800; color: white; font-weight: bold; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-#about-form label { display: block; margin-top: 10px; font-weight: bold; color: #5D4037; }
-#artwork-list { margin-top: 20px; border-top: 1px solid #eee; }
-.artwork-admin-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-.artwork-admin-item img { width: 100px; height: 70px; object-fit: cover; border-radius: 5px; margin-right: 15px; }
-.artwork-admin-item p { flex-grow: 1; margin: 0; font-weight: bold; color: #5D4037; }
-.shloka-admin-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; background: #FAFAFA; border-radius: 5px; margin-bottom: 5px; flex-wrap: wrap; }
-.shloka-admin-item p { flex-grow: 1; margin: 0; font-weight: bold; color: #5D4037; margin-bottom: 5px; width: 100%; }
-.admin-buttons { display: flex; gap: 10px; }
-button.edit-button { background-color: #007bff; font-size: 0.9em; padding: 8px; width: auto; }
-button.cancel-button { background-color: #6c757d; }
-
-/* --- Blog & Testimonial Styling --- */
-/* (Aapka puraana code... no change) */
-.blog-container h2, 
-.testimonials-container h2 {
-     text-align: center;
-     font-size: 2em;
-    color: #D84315; 
-    margin-bottom: 25px; 
-    margin-top: 0; 
-    border-bottom: 2px solid #FF9800; 
-    padding-bottom: 10px;
- }
-
- .blog-post-item { background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-.blog-post-item h3 { font-size: 1.6em; color: #333; margin-top: 0; margin-bottom: 5px; }
-.blog-post-item .blog-date { font-size: 0.9em; color: #777; margin-bottom: 15px; font-style: italic; }
-.blog-post-item .blog-content {
-    font-size: 1em;
-    line-height: 1.7;
-    color: #555;
-    white-space: pre-wrap; 
-    
-    /* [NAYA FIX] Lambe shabdon ya line ko todne ke liye */
-    overflow-wrap: break-word;
-    word-wrap: break-word; /* Puraane browsers ke liye */
-}
-.blog-image {
-    width: 100%;
-    max-height: 420px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin: 15px 0 20px;
-}
-.testimonial-item { background-color: #FFFDF9; border-left: 5px solid #BFA080; padding: 20px 25px; margin-bottom: 20px; border-radius: 0 8px 8px 0; }
-.testimonial-item blockquote { font-size: 1.1em; font-style: italic; color: #444; line-height: 1.6; margin: 0 0 10px 0; padding: 0; position: relative; white-space: pre-wrap; }
-.testimonial-item cite { font-size: 1em; font-weight: bold; color: #BFA080; display: block; text-align: right; font-style: normal; }
-.add-testimonial-toggle { text-align: center; margin-bottom: 20px; }
-#add-yours-button { background-color: #BFA080; color: white; padding: 12px 25px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
-#add-yours-button:hover { background-color: #a98b6f; }
-.testimonial-submission-form { background-color: #fff; border-radius: 8px; padding: 25px; margin-bottom: 30px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-.testimonial-submission-form h3 { margin-top: 0; font-size: 1.6em; color: #333; text-align: center; }
-.testimonial-submission-form p { text-align: center; font-size: 0.95em; color: #666; margin-bottom: 20px; }
-.testimonial-submission-form input[type="text"],
-.testimonial-submission-form textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; font-family: inherit; box-sizing: border-box; }
-.testimonial-submission-form button[type="submit"] { width: 100%; padding: 12px; background-color: #BFA080; color: white; border: none; border-radius: 5px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
-.testimonial-submission-form button[type="submit"]:hover { background-color: #a98b6f; }
-hr.section-divider { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
-.admin-buttons .approve-button { background-color: #4CAF50; color: white; font-size: 0.9em; padding: 8px; width: auto; }
-.admin-buttons .approve-button:hover { background-color: #45a049; }
-
-
-/* --- Mobile Menu Styles (UPDATED) --- */
-@media (max-width: 768px) {
-    body { padding-top: 60px; }
-    .logo { font-size: 1.2em; }
-
-    /* [NAYA FIX] Mobile par padding kam karein */
-    .container {
-        padding: 10px; /* 20px se 10px kiya */
-    }
-    .blog-post-item {
-        padding: 15px; /* 20px 25px se 15px kiya */
-    }
-    /* --- End Fix --- */
-
-    .nav-container { justify-content: space-between; }
-    .menu-toggle {
-        display: block; 
-        background: transparent;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        z-index: 10;
-    }
-    .menu-toggle span {
-        display: block;
-        width: 25px;
-        height: 3px;
-        background-color: #5D4037; 
-        margin-bottom: 5px;
-        border-radius: 3px;
-        transition: all 0.3s ease;
-    }
-    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-    .menu-toggle.active span:nth-child(2) { opacity: 0; }
-    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
-
-    .menu-links {
-        display: none; 
-        flex-direction: column; 
-        position: absolute;
-        top: 60px; 
-        left: 0;
-        width: 100%;
-        background-color: #FFF3E0; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border-top: 1px solid #FFECB3;
-    }
-    .menu-links.active { display: flex; }
-    .main-tab-button {
-        padding: 15px 20px;
-        font-size: 1.1em;
-        text-align: left;
-        border-bottom: 1px solid #FFECB3;
-        height: auto; 
-        background-color: #FFF3E0; 
-    }
-    .main-tab-button.active,
-    .main-tab-button:hover {
-        border-bottom-color: #D84315;
-        background-color: #FFECB3; 
-    }
-    
-    .shloka-grid {
-        grid-template-columns: 1fr; /* Mobile par 1 column */
-    }
-    .shloka-actions { flex-direction: column; } 
-}
-/* --- NAYA: Single Shloka Page Style --- */
-#single-shloka-container {
-    max-width: 700px; /* Card ko center mein rakhein */
-    margin: 40px auto; /* Upar/neeche margin */
-}
-/* --- NAYA: Shloka Page Home Button --- */
-.shloka-nav-links .home-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #FFF3E0;
-    color: #D84315;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 5px;
-    border: 1px solid #FFECB3;
-    transition: background-color 0.2s ease;
-}
-.shloka-nav-links .home-button:hover {
-    background-color: #FFECB3;
-}
-
-/* Mobile par button chhota karein */
-@media (max-width: 768px) {
-    .shloka-nav-links .home-button {
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-}
-
-.menu-links a.main-tab-button {
-    text-decoration: none;
-}
-
-/* --- NAYA: Blog Post Action Styles --- */
-.blog-post-item .shloka-actions {
-    margin-top: 20px;
-    border-top: 1px solid #FFECB3;
-    padding-top: 15px;
-}
-
-/* --- NAYA: Artwork Overlay Action Styles --- */
-.carousel-item {
-    position: relative; /* Buttons ko position dene ke liye zaroori */
-}
-
-.artwork-actions {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
-    opacity: 0; /* Shuru mein chhipa do */
-    transition: opacity 0.3s ease;
-}
-
-.carousel-item:hover .artwork-actions {
-    opacity: 1; /* Hover karne par dikhaao */
-}
-
-.artwork-actions .shloka-action-button {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #333;
-    border: none;
-    flex: 1;
-}
-.artwork-actions .shloka-action-button:disabled {
-    background-color: rgba(255, 235, 238, 0.9);
-    color: #D84315;
-}
-
-/* Mobile par hamesha dikhaao */
-@media (max-width: 768px) {
-    .artwork-actions {
-        opacity: 1;
-        background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
-        padding: 5px;
-        gap: 5px;
-    }
-    .artwork-actions .shloka-action-button {
-        font-size: 0.8em;
-        padding: 8px;
-    }
-}
-
-/* --- NAYA: Single Artwork Page Style --- */
-#single-artwork-container {
-    max-width: 700px; /* Center mein rakhein */
-    margin: 40px auto; /* Upar/neeche margin */
-}
-#single-artwork-container .artwork-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-#single-artwork-container .artwork-image img {
-    width: 100%;
-    display: block;
-}
-#single-artwork-container .shloka-actions {
-    display: flex; /* Like/Share buttons ko side-by-side rakhein */
-    gap: 10px;
-    padding: 15px;
-    border-top: 1px solid #FFECB3;
-}
-
-/* --- NAYA: Jap Counter (Device) Styles --- */
-
-/* Counter ko page par center karne ke liye */
-.counter-container {
-    position: relative;
-    padding: 80px 0;
-    display: grid;
-    place-items: center;
-    margin-top: 30px; /* Navbar se thoda neeche */
-}
-
-.belt {
-    position: absolute;
-    width: 30px;
-    height: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: -1;
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-image: radial-gradient(
-        circle at center, 
-        #e8e8f0 4px,
-        transparent 4.5px
-    );
-    background-size: 15px 20px;
-    background-repeat: repeat-y;
-    background-position: center;
-}
-
-.belt-top {
-    top: 0;
-    border-radius: 10px 10px 0 0;
-}
-
-.belt-bottom {
-    bottom: 0;
-    border-radius: 0 0 10px 10px;
-}
-
-.finger-counter {
-    width: 170px;
-    height: 200px;
-    background: linear-gradient(145deg, #333, #000);
-    border-radius: 35px;
-    border: 2px solid #111;
-    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.5), 
-                -4px -4px 10px rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    padding: 15px;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 1;
-}
-
-.screen {
-    width: 90%;
-    height: 45px;
-    background-color: #c0c0c0;
-    border: 2px solid #555;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 10px;
-    box-sizing: border-box;
-    box-shadow: inset 2px 2px 4px #444, inset -1px -1px 2px #d0d0d0;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 2em;
-    color: #1a1a1a;
-}
-
-.count-button {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #e0e0e0, #b0b0b0);
-    border: 2px solid #888;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5), 
-                -3px -3px 8px rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    transition: all 0.1s ease;
-    /* Default 'button' styles ko override karna */
-    margin-bottom: 0; 
-}
-
-.count-button:active {
-    transform: translateY(2px);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), 
-                -1px -1px 3px rgba(255, 255, 255, 0.1);
-    background: linear-gradient(145deg, #b0b0b0, #e0e0e0);
-}
-
-.button-row {
-    display: flex;
-    justify-content: space-between;
-    width: 90%;
-    margin-top: 5px;
-}
-
-.small-button {
-    width: 48%;
-    height: 25px;
-    font-size: 10px;
-    font-weight: bold;
-    background-color: #444;
-    color: #aaa;
-    border: 1px solid #666;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-    transition: all 0.1s ease;
-    /* Default 'button' styles ko override karna */
-    padding: 0; 
-    margin-bottom: 0;
-}
-
-.small-button:active {
-    transform: translateY(1px);
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-#recordsButton {
-    background-color: #3a5a9a;
-    color: white;
-}
-
-/* --- Modal (पॉप-अप) का स्टाइल --- */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 20% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 400px;
-    position: relative;
-}
-
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.close-button:hover {
-    color: #000;
-}
-
-.modal-content h2 {
-    font-family: Arial, sans-serif;
-    color: #333;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-    margin-top: 0; /* Default margin fix */
-}
-
-/* रिकॉर्ड्स की लिस्ट */
-#recordsList {
-    list-style-type: none;
-    padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-}
-#recordsList li {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1em;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center; 
-}
-#recordsList li:last-child {
-    border-bottom: none;
-}
-#recordsList li .date {
-    color: #000;
-}
-#recordsList li .count {
-    color: #3a5a9a;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-.delete-button {
-    background-color: #d9534f; 
-    color: white;
-    border: none;
-    border-radius: 5px; 
-    width: auto; 
-    height: 25px; 
-    font-size: 10px; 
-    font-weight: bold;
-    cursor: pointer;
-    padding: 0 8px; 
-    text-align: center;
-    margin-bottom: 0; /* Default margin fix */
-}
-
-.record-info {
-    flex-grow: 1; 
-}
-
-/* --- कन्फर्मेशन Modal के लिए CSS --- */
-.confirm-modal {
-    display: none;
-    position: fixed;
-    z-index: 101; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); 
-    justify-content: center;
-    align-items: center;
-}
-.confirm-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 80%;
-    max-width: 300px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-.confirm-content p {
-    font-size: 1.1em;
-    color: #333;
-    margin-top: 0; /* Default margin fix */
-}
-.confirm-buttons {
-    margin-top: 20px;
-}
-.confirm-buttons button {
-    width: 40%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin: 0 5%;
-    margin-bottom: 0; /* Default margin fix */
-}
-#confirmYes {
-    background-color: #d9534f;
-    color: white;
-}
-#confirmCancel {
-    background-color: #eee;
-    color: #333;
-}
-
-#single-blog-container {
-    max-width: 700px; /* Blog ko center mein rakhein */
-    margin: 40px auto; /* Upar/neeche margin */
-}
-
-/* --- NAYA: Blog Grid Layout --- */
-#blog-posts-container.blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-/* Blog item card ko grid ke liye adjust karein */
-.blog-post-item {
-    display: flex;
-    flex-direction: column; /* Taaki 'Read More' hamesha neeche rahe */
-}
-
-.blog-post-item .blog-content {
-    flex-grow: 1; /* Content ko stretch karein taaki card ek size ke dikhein */
-}
-
-/* NAYA: Read More link ka style */
-.read-more-link {
-    display: inline-block;
-    margin-top: 15px;
-    font-weight: bold;
-    color: #D84315;
-    text-decoration: none;
-    transition: text-decoration 0.2s ease;
-}
-.read-more-link:hover {
-    text-decoration: underline;
-}
-
-/* --- NAYA: Testimonial Grid Layout --- */
-.testimonial-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-/* Testimonial item ko grid ke liye adjust karein */
-.testimonial-item {
-    /* Neeche ka margin hata dein kyunki 'gap' ab spacing karega */
-    margin-bottom: 0; 
-}
-
-/* --- NAYA: Testimonial Slider CSS --- */
-        .testimonialSwiper {
-          width: 100%;
-          max-width: 800px; 
-          margin: 0 auto;
-          height: 380px; /* Thodi height badha di */
-          padding-bottom: 50px; 
-        }
-
-        .testimonialSwiper .swiper-slide {
-          background: none;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 10px;
-        }
-
-        .testimonial-card-new {
-          background: #ffffff;
-          border-radius: 12px;
-          border: 1px solid #e0e0e0;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
-          padding: 30px;
-          padding-top: 40px;
-          height: 300px; /* Card ki height */
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center; /* Vertically center */
-          position: relative;
-          text-align: center;
-          box-sizing: border-box;
-        }
-
-        .testimonial-card-new .quote-icon {
-          position: absolute;
-          top: -10px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 80px;
-          color: #D84315; /* Aapke logo ka color */
-          line-height: 1;
-          opacity: 0.15;
-          font-family: Georgia, serif;
-        }
-
-        .testimonial-card-new .quote-text {
-          font-size: 1.1rem;
-          font-style: italic;
-          color: #333;
-          line-height: 1.6;
-          margin: 0;
-          z-index: 2;
-          flex-grow: 1; 
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow-y: auto; /* Agar quote lamba ho */
-          padding-right: 5px;
-        }
-
-        .testimonial-card-new .author-details {
-          margin-top: 20px;
-          z-index: 2;
-          flex-shrink: 0;
-        }
-
-        .testimonial-card-new .author-name {
-          font-weight: 700;
-          font-size: 1rem;
-          color: #D84315; /* Logo color */
-          display: block;
-        }
-
-        /* Swiper Arrows & Dots */
-        .testimonialSwiper .swiper-button-next,
-        .testimonialSwiper .swiper-button-prev {
-          color: #D84315;
-        }
-        .testimonialSwiper .swiper-pagination-bullet-active {
-          background: #D84315;
-        }
-        /* ================= COURSES PAGE ================= */
-.courses-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-}
-
-.course-card {
-    background: #fff;
-    border: 1px solid #FFECB3;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.course-card h3 {
-    color: #D84315;
-    margin-top: 0;
-}
-
-.course-card p {
-    color: #5D4037;
-    line-height: 1.6;
-}
-
-.course-meta {
-    font-size: 0.9em;
-    color: #777;
-    margin-bottom: 15px;
-}
-
-.start-course-btn {
-    display: inline-block;
     padding: 10px 18px;
-    background: #FF9800;
-    color: #fff;
-    font-weight: bold;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.2s ease;
-}
-
-.start-course-btn:hover {
-    background: #F57C00;
-}
-
-/* ===== Course Completion Form ===== */
-.course-complete-form {
-    margin-top: 20px;
-    border-top: 1px solid #FFECB3;
-    padding-top: 15px;
-}
-
-.course-complete-form input,
-.course-complete-form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-.course-complete-form button {
-    background: #4CAF50;
-    color: #fff;
     border: none;
-    padding: 10px;
-    font-weight: bold;
-    border-radius: 5px;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--text-muted);
     cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    font-size: 0.95rem;
 }
 
-.course-complete-form button:hover {
-    background: #43a047;
+.main-tab-button:hover {
+    color: var(--primary);
+    background: rgba(216, 67, 21, 0.05);
 }
 
-.progress-wrapper {
-    width: 100%;
-    background: #E6E6E6;
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 20px 0;
+.main-tab-button.active {
+    color: #fff;
+    background: var(--primary);
+    box-shadow: 0 4px 15px rgba(216, 67, 21, 0.3);
 }
 
-/* Inline Verified Badge inside old hero */
+/* --- HERO SECTION --- */
+.shloka-welcome-hero {
+    padding: 120px 20px 60px;
+    text-align: center;
+    background: radial-gradient(circle at top right, #FFF3E0, transparent),
+        radial-gradient(circle at bottom left, #FFECB3, transparent);
+}
+
 .verified-badge-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.9);
-  color: #2e7d32;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.9em;
-  font-weight: bold;
-  margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2D3436;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
 }
 
 .verified-badge-inline .dot {
-  width: 9px;
-  height: 9px;
-  background: #4caf50;
-  border-radius: 50%;
-  box-shadow: 0 0 0 0 rgba(76,175,80,0.7);
-  animation: pulse 1.5s infinite;
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10B981;
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.6); }
-  70% { box-shadow: 0 0 0 8px rgba(76,175,80,0); }
-  100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+.shloka-welcome-hero h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 900;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+    line-height: 1.1;
 }
 
+.shloka-welcome-hero .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* --- RECORD HIGHLIGHT --- */
 .record-highlight {
-  margin: 30px 0;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-  border-radius: 12px;
+    margin-bottom: 80px;
 }
 
 .record-card {
-  max-width: 850px;
-  margin: auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .record-card h2 {
-  color: #D84315;
-  margin-bottom: 10px;
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
 }
 
 .video-wrapper {
-  position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 20px 0;
+    position: relative;
+    padding-bottom: 56.25%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin: 30px 0;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .video-wrapper iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.record-quote {
-  font-style: italic;
-  color: #555;
-  margin: 15px 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .watch-btn {
-  display: inline-block;
-  padding: 12px 26px;
-  background: #D84315;
-  color: #fff;
-  border-radius: 30px;
-  font-weight: bold;
-  text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
 }
 
 .watch-btn:hover {
-  background: #bf360c;
+    background: var(--primary-dark);
+    transform: translateY(-2px);
 }
 
-/* ================= END COURSES PAGE ================= */
+/* --- SHLOKA LIST --- */
+.shloka-container {
+    padding-bottom: 100px;
+}
+
+.adhyay-group {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.adhyay-title {
+    padding: 25px 35px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: #FAFAFA;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--primary-dark);
+}
+
+.adhyay-title::after {
+    content: '\f107';
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    transition: transform 0.3s;
+}
+
+.adhyay-group[open] .adhyay-title::after {
+    transform: rotate(180deg);
+}
+
+.shloka-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 25px;
+    padding: 35px;
+}
+
+.shloka-item-card {
+    background: #fff;
+    border-radius: var(--radius-md);
+    border: 1px solid #F1F2F6;
+    transition: all 0.3s ease;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+.shloka-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06);
+    border-color: var(--border);
+}
+
+.card-video-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.card-content h3 {
+    font-size: 1.1rem;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.shloka-text {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.shloka-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #F1F2F6;
+}
+
+.shloka-action-button {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.shloka-action-button:hover {
+    background: var(--bg-main);
+}
+
+.shloka-action-button:disabled {
+    background: #FDECEA;
+    color: var(--primary);
+    border-color: transparent;
+    cursor: default;
+}
+
+/* --- ABOUT SECTION --- */
+.about {
+    padding: 40px 0 80px;
+}
+
+.about h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 40px;
+    color: var(--primary-dark);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: 20px 20px 0px var(--accent);
+}
+
+.about-text {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+/* --- ARTWORK GALLERY --- */
+.gallery h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 50px;
+    color: var(--primary-dark);
+}
+
+.carousel-container {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* --- FOOTER --- */
+footer {
+    background: var(--primary-dark);
+    color: #fff;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* --- MOBILE --- */
+@media (max-width: 900px) {
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+
+    .about-image {
+        margin-bottom: 40px;
+    }
+
+    .shloka-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-links {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        padding: 20px;
+        flex-direction: column;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .menu-links.active {
+        display: flex;
+    }
+
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--primary);
+        cursor: pointer;
+    }
+
+    .top-navbar {
+        height: 60px;
+    }
+}

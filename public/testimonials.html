@@ -1,482 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H5L4Y0WRMW"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-H5L4Y0WRMW');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Testimonials | Warrior Aaradhya</title>
-    <meta name="description" content="Listen to Aaradhya Soni, an inspiring SMA Type 2 warrior, recite Bhagavad Gita shlokas. Explore her journey and view her beautiful artwork gallery.">
-    <meta name="keywords" content="Aaradhya Soni, Gita Shlokas, Bhagavad Gita, SMA Type 2, LearnGeeta, Artwork Gallery, Gita Recitation">
-    <script type="application/ld+json">
-    {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Aaradhya Soni - The SMA Warrior",
-    "alternateName": "Warrior Aaradhya",
-    "url": "https://warrioraaradhya.in"
-    }
-    </script>
+    <title>Community Impact | Warrior Aaradhya</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    
     <style>
-        /* (Testimonial slider wala CSS code yahaan hai) */
-        .testimonialSwiper {
-          width: 100%;
-          max-width: 800px; 
-          margin: 0 auto;
-          height: 420px;
-          padding-bottom: 50px; 
+        .testimonials-hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%);
         }
-        .testimonialSwiper .swiper-slide {
-          background: none;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 10px;
+
+        .testimonial-slider-wrap {
+            max-width: 900px;
+            margin: 0 auto 80px;
         }
-        .testimonial-card-new {
-          background: #ffffff;
-          border-radius: 12px;
-          border: 1px solid #e0e0e0;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
-          padding: 30px;
-          padding-top: 40px;
-          height: 340px; 
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          position: relative;
-          text-align: center;
-          box-sizing: border-box;
+
+        .testimonial-card-premium {
+            background: #fff;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 1px solid var(--border);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
         }
-        .testimonial-card-new .quote-icon {
-          position: absolute;
-          top: -10px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 80px;
-          color: #D84315;
-          line-height: 1;
-          opacity: 0.15;
-          font-family: Georgia, serif;
+
+        .quote-mark {
+            font-size: 80px;
+            line-height: 1;
+            color: var(--primary);
+            opacity: 0.1;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: serif;
         }
-        .testimonial-card-new .quote-text {
-          font-size: 1.1rem;
-          font-style: italic;
-          color: #333;
-          line-height: 1.6;
-          margin: 0;
-          z-index: 2;
-          flex-grow: 1; 
-          display: flex;
-          align-items: flex-start; /* FIX: Text ko upar se start karein */
-          justify-content: center;
-          overflow-y: auto; 
-          padding-right: 5px;
+
+        .testimonial-text {
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--text-main);
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
         }
-        .testimonial-card-new .author-details {
-          margin-top: 20px;
-          z-index: 2;
-          flex-shrink: 0;
+
+        .testimonial-author {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
         }
-        .testimonial-card-new .author-name {
-          font-weight: 700;
-          font-size: 1rem;
-          color: #D84315;
-          display: block;
+
+        .form-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            max-width: 600px;
+            margin: 0 auto;
         }
-        .testimonialSwiper .swiper-button-next,
-        .testimonialSwiper .swiper-button-prev {
-          color: #D84315;
+
+        .form-group {
+            margin-bottom: 20px;
         }
-        .testimonialSwiper .swiper-pagination-bullet-active {
-          background: #D84315;
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
         }
     </style>
-
 </head>
+
 <body>
-    
+
     <nav class="top-navbar">
         <div class="container nav-container">
-            <div class="logo">
-                <a href="index.html" style="text-decoration: none; color: #D84315;">Warrior Aaradhya</a>
-            </div>
-            
-            <button class="menu-toggle" id="menu-toggle-button">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            
-            <div class="menu-links" id="menu-links-container">
-                <button class="main-tab-button" data-tab="tab-shlokas">Home (Shlokas)</button>
-                <button class="main-tab-button" data-tab="tab-about">About Aaradhya</button>
-                <button class="main-tab-button" data-tab="tab-gallery">Artwork Gallery</button>
-                <button class="main-tab-button" data-tab="tab-blog">Blog</button>
-                
-                <button class="main-tab-button active" data-tab="tab-testimonials">Testimonials</button>
-                
-                <a href="japcounter.html" class="main-tab-button">Jap Counter</a>
+            <div class="logo"><a href="index.html">Warrior Aaradhya</a></div>
+            <div class="menu-links">
+                <a href="index.html" class="main-tab-button">Home</a>
+                <a href="testimonials.html" class="main-tab-button active">Impact</a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="main-tab-panels">
-
-            <div id="tab-shlokas" class="main-tab-content">
-                
-                <header class="shloka-welcome-hero">
-                    <h1>Shrimad Bhagavad Gita</h1>
-                    <p class="subtitle">Shloka Recitation by Aaradhya Soni</p>
-                </header>
-                
-                <main class="shloka-list-container">
-                    <div id="shloka-container">
-                        <p>Loading shlokas...</p>
-                    </div>
-                </main>
-            </div>
-
-            <div id="tab-about" class="main-tab-content">
-                <section class="about">
-                    <h2>About Aaradhya</h2>
-                    <div class="about-content">
-                        <div class="about-image">
-                            <img src="https://placehold.co/400x400/FFF8E1/BFA080?text=Aaradhya" alt="Aaradhya Soni" id="about-image-src">
-                        </div>
-                        <div class="about-text" id="about-text-content">
-                            <p>Loading details...</p> 
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div id="tab-gallery" class="main-tab-content">
-                <section class="gallery">
-                    <h2>Aaradhya's Artwork Gallery</h2>
-                    <div class="carousel-container" id="gallery-carousel-container">
-                        <p>Loading gallery...</p>
-                    </div>
-                </section>
-            </div>
-            
-            <div id="tab-blog" class="main-tab-content">
-                <section class="blog-container">
-                    <h2>Blog</h2>
-                    <div id="blog-posts-container">
-                        <p>Loading blog posts...</p>
-                    </div>
-                </section>
-            </div>
-
-            <div id="tab-testimonials" class="main-tab-content active">
-                <section class="testimonials-container">
-                    <h2>Testimonials</h2>
-                    <div class="add-testimonial-toggle">
-                        <button id="add-yours-button">Add Your Testimonial</button>
-                    </div>
-                    <div class="testimonial-submission-form" id="public-testimonial-form-container" style="display:none;">
-                        <h3>Share your thoughts!</h3>
-                        <p>Your testimonial will be visible after admin approval.</p>
-                        <form id="public-testimonial-form">
-                            <input type="text" id="public-author-name" placeholder="Your Name" required>
-                            <textarea id="public-author-quote" rows="4" placeholder="Your Message" required></textarea>
-                            <button type="submit" id="public-submit-button">Submit for Review</button>
-                            <button type="button" id="public-cancel-button" class="cancel-button">Cancel</button>
-                        </form>
-                        <p id="testimonial-thanks" style="display:none; text-align:center; color: green; font-weight: bold;">Thank you! Your testimonial has been submitted.</p>
-                    </div>
-                    <hr class="section-divider">
-                    <div id="testimonials-list-container">
-                        <p>Loading testimonials...</p>
-                    </div>
-                </section>
-            </div>
-
+    <header class="testimonials-hero">
+        <div class="container">
+            <h1>Voices of Inspiration</h1>
+            <p class="subtitle">How Aaradhya's journey is touching hearts globally</p>
         </div>
-    </div> <footer class="footer">
-        <p>Contact: Aaradhya Soni</p>
-        <p>Email: warrioraaradhya111@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 Vedang Soni. All Rights Reserved.</p>
+    </header>
+
+    <div class="container">
+        <div class="testimonial-slider-wrap">
+            <div class="swiper testimonialSwiper">
+                <div class="swiper-wrapper" id="testimonials-list">
+                    <!-- JS Injected -->
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+
+        <section style="padding-bottom: 100px;">
+            <div class="form-card">
+                <h2 style="text-align: center; margin-bottom: 10px;">Share Your Thoughts</h2>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Describe how Aaradhya's
+                    story has influenced you.</p>
+                <form id="public-testimonial-form">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="public-author-name" placeholder="E.g. Rajesh Kumar" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Message</label>
+                        <textarea id="public-author-quote" rows="4" placeholder="Your heartfelt words..."
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submit-btn">Submit for Review</button>
+                    <p id="thanks-msg"
+                        style="display:none; text-align:center; color:#10B981; margin-top:15px; font-weight:700;">Thank
+                        you! Your words mean world to us.</p>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">&copy; 2025 Warrior Aaradhya. Spreading Light.</div>
     </footer>
 
-    <script>
-        
-        // --- FUNCTIONS 1-7 (Data Loaders - Inki definition zaroori hai) ---
-        function createShlokaItem(shloka) {
-            const item = document.createElement('div');
-            item.className = 'shloka-item-card';
-            item.id = `shloka-${shloka.adhyay}-${shloka.shloka}`;
-            const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
-            const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
-            const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
-            const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            item.innerHTML = `
-                <div class="card-video-container">
-                    ${createVideo(shloka.video_id).innerHTML}
-                </div>
-                <div class="card-content">
-                    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
-                    <p class="shloka-text">${formattedText}</p>
-                    <div class="shloka-actions">
-                        <button class="shloka-action-button like-button" data-id="${shloka._id}" data-type="shloka" ${isLiked ? 'disabled' : ''}>
-                            ❤️ <span class="like-count">${shloka.likes || 0}</span>
-                        </button>
-                        <button class="shloka-action-button share-button" 
-                                data-url="${shareUrl}" 
-                                data-title="${shareTitle}" 
-                                data-text="${shareText}">
-                            🔗 Share
-                        </button>
-                    </div>
-                </div>`;
-            return item;
-        }
-        async function loadAboutSection() {
-            // Yeh function is page par call nahi hoga
-        }
-        async function loadGroupedShlokas() {
-            // Yeh function is page par call nahi hoga
-        }
-        async function loadArtworkGallery() {
-            // Yeh function is page par call nahi hoga
-        }
-        function setupCarouselListeners(totalSlides) {
-            // Yeh function is page par call nahi hoga
-        }
-        async function loadBlogPosts() {
-            // Yeh function is page par call nahi hoga
-        }
-
-        // --- FUNCTION 8: Load Testimonials (Yeh Yahaan Zaroori Hai) ---
-        async function loadTestimonials() {
-            const container = document.getElementById('testimonials-list-container');
-            if (!container) return;
-            container.innerHTML = '<p>Loading testimonials...</p>';
-            try {
-                const response = await fetch('/api/testimonials?cache_buster=' + new Date().getTime());
-                const testimonials = await response.json();
-                
-                if (testimonials.length === 0) {
-                    container.innerHTML = '<p>No testimonials added yet.</p>';
-                    return;
-                }
-                
-                container.innerHTML = ''; 
-
-                const swiperContainer = document.createElement('div');
-                swiperContainer.className = 'swiper testimonialSwiper';
-                const swiperWrapper = document.createElement('div');
-                swiperWrapper.className = 'swiper-wrapper';
-
-                testimonials.forEach(testimonial => {
-                    const slide = document.createElement('div');
-                    slide.className = 'swiper-slide';
-                    
-                    slide.innerHTML = `
-                    <div class="testimonial-card-new">
-                      <span class="quote-icon">“</span>
-                      <p class="quote-text">
-                        ${testimonial.quote.replace(/\n/g, '<br>')}
-                      </p>
-                      <div class="author-details">
-                        <span class="author-name">- ${testimonial.author}</span>
-                      </div>
-                    </div>
-                    `;
-                    swiperWrapper.appendChild(slide);
-                });
-
-                swiperContainer.appendChild(swiperWrapper);
-                
-                swiperContainer.innerHTML += `
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
-                `;
-                
-                container.appendChild(swiperContainer);
-
-                new Swiper(".testimonialSwiper", {
-                    slidesPerView: 1,
-                    spaceBetween: 30,
-                    loop: true, 
-                    autoplay: {
-                       delay: 5000,
-                       disableOnInteraction: false,
-                    },
-                    navigation: {
-                        nextEl: ".swiper-button-next",
-                        prevEl: ".swiper-button-prev",
-                    },
-                    pagination: {
-                        el: ".swiper-pagination",
-                        clickable: true,
-                    },
-                });
-
-            } catch (err) {
-                console.error("Error loading testimonials:", err);
-                container.innerHTML = '<p>Could not load testimonials.</p>';
-            }
-        }
-        
-        // --- Like/Share Functions (Definition zaroori hai) ---
-        async function handleShareClick(button) {
-            const urlToShare = button.dataset.url;
-            const title = button.dataset.title;
-            const text = button.dataset.text;
-            if (navigator.share) {
-                try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
-                catch (err) { console.error('Share failed:', err); }
-            } else {
-                try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
-                catch (err) { alert('Failed to copy link.'); }
-            }
-        }
-        async function handleLikeClick(button) {
-            const id = button.dataset.id;
-            const type = button.dataset.type;
-            const key = `liked_${type}_${id}`;
-            if (localStorage.getItem(key)) { return; }
-            button.disabled = true;
-            try {
-                const response = await fetch(`/api/${type}/like/${id}`, { method: 'POST' });
-                const data = await response.json();
-                if (data.success) {
-                    button.querySelector('.like-count').textContent = data.likes;
-                    localStorage.setItem(key, 'true');
-                } else {
-                    button.disabled = false;
-                }
-            } catch (err) {
-                button.disabled = false;
-            }
-        }
-
-        
-        // --- PAGE INITIALIZATION & TAB SWITCHING ---
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // (Sabhi Hash (#) wale function hata diye gaye hain)
-            
-            const tabButtons = document.querySelectorAll('.main-tab-button');
-            const tabContents = document.querySelectorAll('.main-tab-content');
-            const menuToggle = document.getElementById('menu-toggle-button');
-            const menuLinks = document.getElementById('menu-links-container');
-
-            menuToggle.addEventListener('click', () => {
-                menuLinks.classList.toggle('active');
-                menuToggle.classList.toggle('active');
-            });
-
-            // --- [ASLI FIX] REDIRECT TO INDEX CODE ---
-            tabButtons.forEach(tab => {
-                if(tab.tagName === 'BUTTON') {
-                    // Agar koi button click karta hai
-                    tab.addEventListener('click', () => {
-                        // Toh use seedha index.html par bhej do
-                        // (Wahaan jaakar default 'Home' tab khul jaayega)
-                        window.location.href = 'index.html'; 
-                    });
-                }
-                // Note: <a> tags (Testimonials, JapCounter) ko yeh code ignore kar dega
-            });
-            // --- [FIX END] ---
-            
-            // Is page par sirf testimonials load karo
-            loadTestimonials(); 
-
-            // --- Testimonial Form Handler (Yeh Yahaan Zaroori Hai) ---
-            const addButton = document.getElementById('add-yours-button');
-            const formContainer = document.getElementById('public-testimonial-form-container');
-            const publicForm = document.getElementById('public-testimonial-form');
-            const cancelButton = document.getElementById('public-cancel-button');
-            const thanksMessage = document.getElementById('testimonial-thanks');
-            
-            if(addButton) { // Check kar lo ki elements maujood hain
-                addButton.addEventListener('click', () => { formContainer.style.display = 'block'; addButton.style.display = 'none'; thanksMessage.style.display = 'none'; });
-                cancelButton.addEventListener('click', () => { formContainer.style.display = 'none'; addButton.style.display = 'block'; publicForm.reset(); });
-                
-                publicForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const author = document.getElementById('public-author-name').value;
-                    const quote = document.getElementById('public-author-quote').value;
-                    if (!author || !quote) { alert('Please fill in both fields.'); return; }
-                    try {
-                        const response = await fetch('/api/testimonials', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ author, quote })
-                        });
-                        if (response.ok) {
-                            publicForm.reset();
-                            formContainer.style.display = 'none';
-                            thanksMessage.style.display = 'block';
-                        } else { alert('Error submitting. Please try again.'); }
-                    } catch (err) { alert('Error connecting to server.'); }
-                });
-            }
-
-            // --- Event Listeners (Like/Share) ---
-            const mainPanels = document.querySelector('.main-tab-panels');
-            mainPanels.addEventListener('click', async (e) => {
-                // (Is page par like/share button nahi hain, 
-                //  lekin error se bachne ke liye code rakhna theek hai)
-                const shareButton = e.target.closest('.share-button');
-                if (shareButton) {
-                    handleShareClick(shareButton);
-                }
-                const likeButton = e.target.closest('.like-button');
-                if (likeButton) {
-                    handleLikeClick(likeButton);
-                }
-            });
-
-        });
-    </script>
-    
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
     <script>
-      // Service Worker (PWA) ko register karein
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('Service Worker रजिस्टर हो गया:', registration);
-            })
-            .catch(error => {
-              console.log('Service Worker रजिस्ट्रेशन फ़ेल हो गया:', error);
+        async function loadTestimonials() {
+            const res = await fetch('/api/testimonials?cache_buster=' + Date.now());
+            const list = await res.json();
+            const box = document.getElementById('testimonials-list');
+            box.innerHTML = '';
+            list.forEach(t => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `
+                    <div class="testimonial-card-premium">
+                        <span class="quote-mark">“</span>
+                        <p class="testimonial-text">${t.quote}</p>
+                        <div class="testimonial-author">— ${t.author}</div>
+                    </div>`;
+                box.appendChild(slide);
             });
-        });
-      }
-    
-      // Browser ko automatic prompt dikhane se roko
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('Install prompt roka gaya');
-        e.preventDefault();
-      });
-    </SCRIpt>
-    
+            new Swiper(".testimonialSwiper", {
+                loop: true,
+                autoplay: { delay: 4000 },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" }
+            });
+        }
+
+        document.getElementById('public-testimonial-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true; btn.innerText = 'Submitting...';
+            const r = await fetch('/api/testimonials', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ author: document.getElementById('public-author-name').value, quote: document.getElementById('public-author-quote').value })
+            });
+            if (r.ok) {
+                document.getElementById('public-testimonial-form').reset();
+                document.getElementById('thanks-msg').style.display = 'block';
+                btn.innerText = 'Submitted';
+            }
+        };
+
+        window.onload = loadTestimonials;
+    </script>
 </body>
+
 </html>
-    
