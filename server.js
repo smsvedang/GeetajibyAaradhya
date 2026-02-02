@@ -982,6 +982,14 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
+// --- Security Headers Middleware ---
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
+
 // --- Server Start ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

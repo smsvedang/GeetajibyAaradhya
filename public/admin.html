@@ -7,11 +7,6 @@
 
     <link rel="icon" href="/favicon.png">
     <link rel="stylesheet" href="admin-style.css">
-
-    <!-- HARDENING -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
 </head>
 <body>
 
@@ -292,6 +287,25 @@
             </form>
         </div>
     </div>
+</div>
+
+<!-- BLOG -->
+<div id="blog-modal" class="modal-overlay">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3>Blog</h3>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('blog-modal')">X</button>
+    </div>
+    <div class="modal-body">
+      <form id="blog-form">
+        <input id="b-title" class="form-control" placeholder="Title">
+        <input id="b-img" class="form-control" placeholder="Image URL" style="margin-top:10px">
+        <textarea id="b-content" class="form-control" placeholder="Content"
+          style="margin-top:10px;min-height:150px"></textarea>
+        <button class="btn btn-primary" style="margin-top:10px;width:100%">Save</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <!-- ARTWORK -->
@@ -601,6 +615,36 @@ async function deleteArtwork(id) {
         body: JSON.stringify({ password: adminPassword })
     });
     loadArtwork();
+}
+
+/* =====================================================
+   COURSES (DELETE)
+===================================================== */
+async function loadCourses() {
+  const box = qs('course-list-container');
+  box.innerHTML = '';
+
+  const courses = await fetch('/api/courses').then(r => r.json());
+
+  courses.forEach(c => {
+    box.innerHTML += `
+      <div class="data-card" style="margin-bottom:1rem">
+        <div class="card-header">
+          <b>${c.title}</b>
+          <div>
+            <button class="btn btn-danger btn-sm"
+              onclick="deleteCourse('${c._id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function deleteCourse(id) {
+  if (!confirm('Delete course?')) return;
+  await fetch('/api/courses/' + id, { method: 'DELETE' });
+  loadCourses();
 }
 
 /* =====================================================
