@@ -351,279 +351,344 @@
 </div>
 <script>
 /* =====================================================
-   GLOBAL STATE
+   SAFE HELPERS
 ===================================================== */
-let adminPassword = '';
-
 const qs = (id) => document.getElementById(id);
+const qsa = (q) => document.querySelectorAll(q);
+
+let ADMIN_PASSWORD = '';
 
 /* =====================================================
-   MODAL HELPERS
+   MODALS
 ===================================================== */
 function openModal(id) {
-    qs(id).classList.add('open');
+  const el = qs(id);
+  if (el) el.classList.add('open');
 }
 function closeModal(id) {
-    qs(id).classList.remove('open');
+  const el = qs(id);
+  if (el) el.classList.remove('open');
 }
 
 /* =====================================================
-   AUTH (BASIC HARDENING)
+   LOGIN
 ===================================================== */
 qs('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const pwd = qs('password').value.trim();
-    if (!pwd) return alert('Password required');
+  e.preventDefault();
 
-    const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd })
-    });
+  const pwd = qs('password').value.trim();
+  if (!pwd) return alert('Password required');
 
-    if (!res.ok) return alert('Wrong password');
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  });
 
-    adminPassword = pwd;
-    qs('login-section').style.display = 'none';
-    qs('admin-layout').style.display = 'grid';
-    switchTab('dashboard');
+  if (!res.ok) return alert('Wrong password');
+
+  ADMIN_PASSWORD = pwd;
+  qs('login-section').style.display = 'none';
+  qs('admin-layout').style.display = 'grid';
+  switchTab('dashboard');
 });
 
 /* =====================================================
-   NAVIGATION
+   NAVIGATION (NO UNDEFINED CALLS)
 ===================================================== */
 function switchTab(tab) {
-    document.querySelectorAll('.view-section')
-        .forEach(v => v.classList.remove('active'));
+  qsa('.view-section').forEach(v => v.classList.remove('active'));
 
-    qs('view-' + tab).classList.add('active');
-    qs('page-title').innerText =
-        tab.charAt(0).toUpperCase() + tab.slice(1);
+  const view = qs('view-' + tab);
+  if (!view) return;
 
-    ({
-        dashboard: loadDashboard,
-        shlokas: loadShlokas,
-        blogs: loadBlogs,
-        artwork: loadArtwork,
-        testimonials: loadTestimonials,
-        courses: loadCourses,
-        quizzes: loadQuizzes,
-        certificates: loadCertificates,
-        settings: loadSettings
-    })[tab]?.();
+  view.classList.add('active');
+  qs('page-title').innerText = tab.toUpperCase();
+
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'shlokas') loadShlokas();
+  if (tab === 'blogs') loadBlogs();
+  if (tab === 'artwork') loadArtwork();
+  if (tab === 'testimonials') loadTestimonials();
+  if (tab === 'courses') loadCourses();
+  if (tab === 'quizzes') loadQuizzes();
+  if (tab === 'certificates') loadCertificates();
+  if (tab === 'settings') loadSettings();
 }
 
 /* =====================================================
    DASHBOARD
 ===================================================== */
 async function loadDashboard() {
-    const grid = qs('stats-grid');
-    grid.innerHTML = '';
+  const grid = qs('stats-grid');
+  grid.innerHTML = '';
 
-    const endpoints = ['shlokas','blog','artwork','testimonials','courses'];
-    const results = await Promise.all(
-        endpoints.map(e => fetch('/api/' + e).then(r => r.json()))
-    );
+  const endpoints = {
+    Shlokas: '/api/shlokas',
+    Blogs: '/api/blog',
+    Artwork: '/api/artwork',
+    Testimonials: '/api/testimonials/all',
+    Courses: '/api/courses'
+  };
 
-    const labels = ['Shlokas','Blogs','Artwork','Testimonials','Courses'];
-
-    labels.forEach((l,i) => {
-        grid.innerHTML += `
-            <div class="stat-card">
-                <div class="stat-head">${l}</div>
-                <div class="stat-value">${results[i].length}</div>
-            </div>`;
-    });
+  for (const [label, url] of Object.entries(endpoints)) {
+    const data = await fetch(url).then(r => r.json());
+    grid.innerHTML += `
+      <div class="stat-card">
+        <div class="stat-head">${label}</div>
+        <div class="stat-value">${data.length || 0}</div>
+      </div>`;
+  }
 }
 
 /* =====================================================
-   SHLOKAS (ADD / EDIT / DELETE)
+   SHLOKAS
 ===================================================== */
-function openShloka(data = null) {
-    qs('form-shloka').reset();
-    qs('shloka-id').value = '';
-    if (data) {
-        qs('shloka-id').value = data._id;
-        qs('s-adhyay').value = data.adhyay;
-        qs('s-shloka').value = data.shloka;
-        qs('s-text').value = data.text || '';
-        qs('s-video').value = data.videoId || '';
-    }
-    openModal('modal-shloka');
+function openShloka(s = null) {
+  qs('form-shloka').reset();
+  qs('shloka-id').value = s?._id || '';
+  qs('s-adhyay').value = s?.adhyay || '';
+  qs('s-shloka').value = s?.shloka || '';
+  qs('s-text').value = s?.text || '';
+  qs('s-video').value = s?.video_id || '';
+  openModal('modal-shloka');
 }
 
 qs('form-shloka').addEventListener('submit', async e => {
-    e.preventDefault();
-    const id = qs('shloka-id').value;
+  e.preventDefault();
 
-    const payload = {
-        adhyay: qs('s-adhyay').value,
-        shloka: qs('s-shloka').value,
-        text: qs('s-text').value,
-        videoId: qs('s-video').value,
-        password: adminPassword
-    };
+  const id = qs('shloka-id').value;
+  const payload = {
+    adhyay: qs('s-adhyay').value,
+    shloka: qs('s-shloka').value,
+    text: qs('s-text').value,
+    video_id: qs('s-video').value,
+    password: ADMIN_PASSWORD
+  };
 
-    await fetch('/api/shlokas' + (id ? '/' + id : ''), {
-        method: id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
+  await fetch('/api/shlokas' + (id ? '/' + id : ''), {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
 
-    closeModal('modal-shloka');
-    loadShlokas();
+  closeModal('modal-shloka');
+  loadShlokas();
 });
 
 async function loadShlokas() {
-    const tb = qs('table-shlokas');
-    tb.innerHTML = '';
-    const data = await fetch('/api/shlokas').then(r => r.json());
+  const tb = qs('table-shlokas');
+  tb.innerHTML = '';
+  const data = await fetch('/api/shlokas').then(r => r.json());
 
-    data.forEach(s => {
-        tb.innerHTML += `
-        <tr>
-            <td>${s.adhyay}</td>
-            <td>${s.shloka}</td>
-            <td>${(s.text||'').slice(0,40)}</td>
-            <td style="text-align:right">
-                <button class="btn btn-secondary btn-sm"
-                    onclick='openShloka(${JSON.stringify(s)})'>Edit</button>
-                <button class="btn btn-danger btn-sm"
-                    onclick="deleteShloka('${s._id}')">Delete</button>
-            </td>
-        </tr>`;
-    });
+  data.forEach(s => {
+    tb.innerHTML += `
+      <tr>
+        <td>${s.adhyay}</td>
+        <td>${s.shloka}</td>
+        <td>${(s.text||'').slice(0,40)}</td>
+        <td style="text-align:right">
+          <button class="btn btn-secondary btn-sm"
+            onclick='openShloka(${JSON.stringify(s)})'>Edit</button>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteShloka('${s._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
 }
 
 async function deleteShloka(id) {
-    if (!confirm('Delete shloka?')) return;
-    await fetch('/api/shlokas/' + id, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword })
-    });
-    loadShlokas();
+  if (!confirm('Delete shloka?')) return;
+  await fetch('/api/shlokas/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: ADMIN_PASSWORD })
+  });
+  loadShlokas();
 }
-
 /* =====================================================
-   BLOGS (ADD / DELETE)
+   BLOGS
 ===================================================== */
-function openBlog() {
-    qs('blog-form').reset();
-    openModal('blog-modal');
+function openBlog(b = null) {
+  qs('blog-form').reset();
+  if (b) {
+    qs('b-title').value = b.title || '';
+    qs('b-img').value = b.imageUrl || '';
+    qs('b-content').value = b.content || '';
+  }
+  openModal('blog-modal');
 }
 
-qs('blog-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    await fetch('/api/blog', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            title: qs('b-title').value,
-            imageUrl: qs('b-img').value,
-            content: qs('b-content').value,
-            password: adminPassword
-        })
-    });
-    closeModal('blog-modal');
-    loadBlogs();
+qs('blog-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  await fetch('/api/blog', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: qs('b-title').value,
+      imageUrl: qs('b-img').value,
+      content: qs('b-content').value,
+      password: ADMIN_PASSWORD
+    })
+  });
+
+  closeModal('blog-modal');
+  loadBlogs();
 });
 
 async function loadBlogs() {
-    const tb = qs('table-blogs');
-    tb.innerHTML = '';
-    const data = await fetch('/api/blog').then(r => r.json());
+  const tb = qs('table-blogs');
+  tb.innerHTML = '';
+  const blogs = await fetch('/api/blog').then(r => r.json());
 
-    data.forEach(b => {
-        tb.innerHTML += `
-        <tr>
-            <td>${b.title}</td>
-            <td>${new Date(b.createdAt).toLocaleDateString()}</td>
-            <td style="text-align:right">
-                <button class="btn btn-danger btn-sm"
-                    onclick="deleteBlog('${b._id}')">Delete</button>
-            </td>
-        </tr>`;
-    });
+  blogs.forEach(b => {
+    tb.innerHTML += `
+      <tr>
+        <td>${b.title}</td>
+        <td>${new Date(b.createdAt).toLocaleDateString()}</td>
+        <td style="text-align:right">
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteBlog('${b._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
 }
 
 async function deleteBlog(id) {
-    await fetch('/api/blog/' + id, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword })
-    });
-    loadBlogs();
+  await fetch('/api/blog/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: ADMIN_PASSWORD })
+  });
+  loadBlogs();
 }
 
 /* =====================================================
-   ARTWORK (ADD / EDIT / DELETE)
+   ARTWORK
 ===================================================== */
-function openArtwork(data = null) {
-    qs('form-artwork').reset();
-    qs('artwork-id').value = '';
-    if (data) {
-        qs('artwork-id').value = data._id;
-        qs('art-title').value = data.title;
-        qs('art-img').value = data.imageUrl;
-    }
-    openModal('modal-artwork');
+function openArtwork(a = null) {
+  qs('form-artwork').reset();
+  qs('artwork-id').value = a?._id || '';
+  qs('art-title').value = a?.title || '';
+  qs('art-img').value = a?.imageUrl || '';
+  openModal('modal-artwork');
 }
 
 qs('form-artwork').addEventListener('submit', async e => {
-    e.preventDefault();
-    const id = qs('artwork-id').value;
+  e.preventDefault();
+  const id = qs('artwork-id').value;
 
-    await fetch('/api/artwork' + (id ? '/' + id : ''), {
-        method: id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            title: qs('art-title').value,
-            imageUrl: qs('art-img').value,
-            password: adminPassword
-        })
-    });
+  await fetch('/api/artwork' + (id ? '/' + id : ''), {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: qs('art-title').value,
+      imageUrl: qs('art-img').value,
+      password: ADMIN_PASSWORD
+    })
+  });
 
-    closeModal('modal-artwork');
-    loadArtwork();
+  closeModal('modal-artwork');
+  loadArtwork();
 });
 
 async function loadArtwork() {
-    const tb = qs('table-artwork');
-    tb.innerHTML = '';
-    const data = await fetch('/api/artwork').then(r => r.json());
+  const tb = qs('table-artwork');
+  tb.innerHTML = '';
+  const art = await fetch('/api/artwork').then(r => r.json());
 
-    data.forEach(a => {
-        tb.innerHTML += `
-        <tr>
-            <td><img src="${a.imageUrl}" style="height:40px"></td>
-            <td>${a.title}</td>
-            <td style="text-align:right">
-                <button class="btn btn-secondary btn-sm"
-                    onclick='openArtwork(${JSON.stringify(a)})'>Edit</button>
-                <button class="btn btn-danger btn-sm"
-                    onclick="deleteArtwork('${a._id}')">Delete</button>
-            </td>
-        </tr>`;
-    });
+  art.forEach(a => {
+    tb.innerHTML += `
+      <tr>
+        <td><img src="${a.imageUrl}" style="height:40px"></td>
+        <td>${a.title}</td>
+        <td style="text-align:right">
+          <button class="btn btn-secondary btn-sm"
+            onclick='openArtwork(${JSON.stringify(a)})'>Edit</button>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteArtwork('${a._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
 }
 
 async function deleteArtwork(id) {
-    await fetch('/api/artwork/' + id, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword })
-    });
-    loadArtwork();
+  await fetch('/api/artwork/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: ADMIN_PASSWORD })
+  });
+  loadArtwork();
 }
 
 /* =====================================================
-   COURSES (DELETE)
+   TESTIMONIALS
+===================================================== */
+function openTestimonial(t = null) {
+  qs('form-testimonial').reset();
+  qs('testi-id').value = t?._id || '';
+  qs('testi-name').value = t?.author || '';
+  qs('testi-msg').value = t?.quote || '';
+  qs('testi-status').value = t?.status || 'pending';
+  openModal('modal-testimonial');
+}
+
+qs('form-testimonial').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = qs('testi-id').value;
+
+  await fetch('/api/testimonials' + (id ? '/' + id : ''), {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      author: qs('testi-name').value,
+      quote: qs('testi-msg').value,
+      status: qs('testi-status').value,
+      password: ADMIN_PASSWORD
+    })
+  });
+
+  closeModal('modal-testimonial');
+  loadTestimonials();
+});
+
+async function loadTestimonials() {
+  const tb = qs('table-testimonials');
+  tb.innerHTML = '';
+  const t = await fetch('/api/testimonials/all').then(r => r.json());
+
+  t.forEach(ti => {
+    tb.innerHTML += `
+      <tr>
+        <td>${ti.author}</td>
+        <td>${ti.quote.slice(0,40)}</td>
+        <td>${ti.status}</td>
+        <td style="text-align:right">
+          <button class="btn btn-secondary btn-sm"
+            onclick='openTestimonial(${JSON.stringify(ti)})'>Edit</button>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteTestimonial('${ti._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+async function deleteTestimonial(id) {
+  await fetch('/api/testimonials/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: ADMIN_PASSWORD })
+  });
+  loadTestimonials();
+}
+
+/* =====================================================
+   COURSES
 ===================================================== */
 async function loadCourses() {
   const box = qs('course-list-container');
   box.innerHTML = '';
-
   const courses = await fetch('/api/courses').then(r => r.json());
 
   courses.forEach(c => {
@@ -631,13 +696,10 @@ async function loadCourses() {
       <div class="data-card" style="margin-bottom:1rem">
         <div class="card-header">
           <b>${c.title}</b>
-          <div>
-            <button class="btn btn-danger btn-sm"
-              onclick="deleteCourse('${c._id}')">Delete</button>
-          </div>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteCourse('${c._id}')">Delete</button>
         </div>
-      </div>
-    `;
+      </div>`;
   });
 }
 
@@ -648,89 +710,82 @@ async function deleteCourse(id) {
 }
 
 /* =====================================================
-   TESTIMONIALS (ADD / EDIT / DELETE)
+   QUIZZES (🔥 FIXED)
 ===================================================== */
-function openTestimonial(data = null) {
-    qs('form-testimonial').reset();
-    qs('testi-id').value = '';
-    if (data) {
-        qs('testi-id').value = data._id;
-        qs('testi-name').value = data.author;
-        qs('testi-msg').value = data.quote;
-        qs('testi-status').value = data.status;
-    }
-    openModal('modal-testimonial');
+async function loadQuizzes() {
+  const tb = qs('table-quizzes');
+  tb.innerHTML = '';
+  const quizzes = await fetch('/api/quiz').then(r => r.json());
+
+  quizzes.forEach(q => {
+    tb.innerHTML += `
+      <tr>
+        <td>${q.course?.title || '—'}</td>
+        <td>${q.passPercentage}%</td>
+        <td style="text-align:right">
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteQuiz('${q._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
 }
 
-qs('form-testimonial').addEventListener('submit', async e => {
-    e.preventDefault();
-    const id = qs('testi-id').value;
-
-    await fetch('/api/testimonials' + (id ? '/' + id : ''), {
-        method: id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            author: qs('testi-name').value,
-            quote: qs('testi-msg').value,
-            status: qs('testi-status').value,
-            password: adminPassword
-        })
-    });
-
-    closeModal('modal-testimonial');
-    loadTestimonials();
-});
-
-async function loadTestimonials() {
-    const tb = qs('table-testimonials');
-    tb.innerHTML = '';
-    const data = await fetch('/api/testimonials').then(r => r.json());
-
-    data.forEach(t => {
-        tb.innerHTML += `
-        <tr>
-            <td>${t.author}</td>
-            <td>${t.quote.slice(0,40)}</td>
-            <td>${t.status}</td>
-            <td style="text-align:right">
-                <button class="btn btn-secondary btn-sm"
-                    onclick='openTestimonial(${JSON.stringify(t)})'>Edit</button>
-                <button class="btn btn-danger btn-sm"
-                    onclick="deleteTestimonial('${t._id}')">Delete</button>
-            </td>
-        </tr>`;
-    });
+async function deleteQuiz(id) {
+  await fetch('/api/quiz/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: ADMIN_PASSWORD })
+  });
+  loadQuizzes();
 }
 
-async function deleteTestimonial(id) {
-    await fetch('/api/testimonials/' + id, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword })
-    });
-    loadTestimonials();
+/* =====================================================
+   CERTIFICATES
+===================================================== */
+async function loadCertificates() {
+  const tb = qs('table-certs');
+  tb.innerHTML = '';
+  const certs = await fetch('/api/certificates').then(r => r.json());
+
+  certs.forEach(c => {
+    tb.innerHTML += `
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.courseTitle}</td>
+        <td>${c.status}</td>
+        <td style="text-align:right">
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteCertificate('${c._id}')">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+async function deleteCertificate(id) {
+  await fetch('/api/certificates/' + id, { method: 'DELETE' });
+  loadCertificates();
 }
 
 /* =====================================================
    SETTINGS
 ===================================================== */
 async function loadSettings() {
-    const data = await fetch('/api/about').then(r => r.json());
-    qs('abt-img').value = data.imageUrl || '';
-    qs('abt-content').value = data.content || '';
+  const data = await fetch('/api/about').then(r => r.json());
+  qs('abt-img').value = data.imageUrl || '';
+  qs('abt-content').value = data.content || '';
 }
 
 qs('settings-form').addEventListener('submit', async e => {
-    e.preventDefault();
-    await fetch('/api/about', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            newText: qs('abt-content').value,
-            newImageUrl: qs('abt-img').value,
-            password: adminPassword
-        })
-    });
-    alert('Saved');
+  e.preventDefault();
+  await fetch('/api/about', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      newText: qs('abt-content').value,
+      newImageUrl: qs('abt-img').value,
+      password: ADMIN_PASSWORD
+    })
+  });
+  alert('Saved');
 });
 </script>
