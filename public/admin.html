@@ -1,830 +1,688 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaradhya Geetaji | Enterprise Admin</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <!-- CSS -->
-    <link rel="stylesheet" href="admin-style.css">
-    <!-- Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+    <title>Aaradhya Geetaji | Admin Panel</title>
 
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="admin-style.css">
+</head>
 <body>
 
-    <!-- ================= AUTHENTICATION ================= -->
-    <div id="login-section">
-        <div class="login-card">
-            <h2>Admin Portal</h2>
-            <p>Authorized personnel only. Please sign in.</p>
-            <form id="login-form">
-                <div class="form-group">
-                    <input type="password" id="password" class="form-control" placeholder="Enter security key..."
-                        required>
+<!-- ================= LOGIN ================= -->
+<div id="login-section">
+    <div class="login-card">
+        <h2>Admin Login</h2>
+        <p>Authorized access only</p>
+
+        <form id="login-form">
+            <input 
+                type="password" 
+                id="password" 
+                class="form-control" 
+                placeholder="Admin Password" 
+                required
+            >
+            <button class="btn btn-primary" style="width:100%;margin-top:1rem">
+                Login
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ================= ADMIN LAYOUT ================= -->
+<div id="admin-layout" class="admin-layout" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">⚡ AdminOS</div>
+
+        <div class="nav-scroll">
+
+            <div class="nav-group">
+                <div class="nav-label">Overview</div>
+                <div class="nav-item active" onclick="switchTab('dashboard')">
+                    Dashboard
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%">Authenticate</button>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">CMS</div>
+                <div class="nav-item" onclick="switchTab('shlokas')">Shlokas</div>
+                <div class="nav-item" onclick="switchTab('blogs')">Blogs</div>
+                <div class="nav-item" onclick="switchTab('artwork')">Artwork</div>
+                <div class="nav-item" onclick="switchTab('testimonials')">Testimonials</div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">LMS</div>
+                <div class="nav-item" onclick="switchTab('courses')">Courses</div>
+                <div class="nav-item" onclick="switchTab('quizzes')">Quizzes</div>
+                <div class="nav-item" onclick="switchTab('certificates')">Certificates</div>
+                <div class="nav-item" onclick="switchTab('students')">Students</div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-label">System</div>
+                <div class="nav-item" onclick="switchTab('settings')">Settings</div>
+            </div>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="location.reload()">Logout</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-wrapper">
+
+        <header class="top-header">
+            <div class="page-title" id="page-title">
+                Dashboard
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            <!-- ================= DASHBOARD ================= -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="stats-grid" id="stats-grid"></div>
+
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Pending Actions</h3>
+                    </div>
+                    <div class="modal-body" id="dashboard-alerts">
+                        <!-- JS fills -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SHLOKAS ================= -->
+            <div id="view-shlokas" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Shlokas</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openShlokaModal()">+ Add Shloka</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Adhyay</th>
+                                    <th>Shloka</th>
+                                    <th>Text</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-shlokas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= BLOGS ================= -->
+            <div id="view-blogs" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Blogs</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openBlogModal()">+ New Blog</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-blogs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ARTWORK ================= -->
+            <div id="view-artwork" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Artwork Gallery</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Preview</th>
+                                    <th>Title</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-artwork"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= COURSES ================= -->
+            <div id="view-courses" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Courses</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openCourseForm()">+ New Course</button>
+                    </div>
+
+                    <div id="course-list-container" style="padding:1.5rem;"></div>
+                </div>
+            </div>
+
+            <!-- ================= QUIZZES ================= -->
+            <div id="view-quizzes" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quizzes</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openQuizForm()">+ Create Quiz</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Pass %</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-quizzes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= CERTIFICATES ================= -->
+            <div id="view-certificates" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Certificates</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Course</th>
+                                    <th>Status</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-certs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= STUDENTS ================= -->
+            <div id="view-students" class="view-section">
+                <div class="data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Students</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mobile</th>
+                                    <th>Progress</th>
+                                    <th>Quiz</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-students"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SETTINGS ================= -->
+            <div id="view-settings" class="view-section">
+                <div class="form-grid-2">
+
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">About Page</h3>
+                        </div>
+                        <div class="modal-body">
+                            <form id="settings-form">
+                                <div class="form-group">
+                                    <label class="form-label">Image URL</label>
+                                    <input id="abt-img" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Content</label>
+                                    <textarea id="abt-content" class="form-control" style="min-height:150px"></textarea>
+                                </div>
+
+                                <button class="btn btn-primary">Save</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="data-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Push Notification</h3>
+                        </div>
+                        <div class="modal-body">
+                            <input id="push-title" class="form-control" placeholder="Title">
+                            <textarea id="push-msg" class="form-control" placeholder="Message"
+                                style="margin-top:10px"></textarea>
+                            <button class="btn btn-primary" style="margin-top:10px" onclick="sendPush()">
+                                Send Push
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div> <!-- content-scroll -->
+    </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- SHLOKA MODAL -->
+<div class="modal-overlay" id="shloka-modal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>Shloka</h3>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('shloka-modal')">X</button>
+        </div>
+        <div class="modal-body">
+            <form id="shloka-form">
+                <input type="hidden" id="shloka-id">
+
+                <div class="form-grid-2">
+                    <input id="s-adhyay" class="form-control" placeholder="Adhyay" required>
+                    <input id="s-shloka" class="form-control" placeholder="Shloka" required>
+                </div>
+
+                <textarea id="s-text" class="form-control" placeholder="Text"
+                    style="margin-top:10px"></textarea>
+
+                <input id="s-vid" class="form-control" placeholder="YouTube Video ID"
+                    style="margin-top:10px">
+
+                <button class="btn btn-primary" style="margin-top:10px;width:100%">Save</button>
             </form>
         </div>
     </div>
+</div>
 
-    <!-- ================= ADMIN LAYOUT ================= -->
-    <div id="admin-layout" class="admin-layout" style="display:none;">
-
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="brand">
-                <span>⚡</span> AdminOS
-            </div>
-
-            <div class="nav-scroll">
-
-                <div class="nav-group">
-                    <div class="nav-label">Overview</div>
-                    <div class="nav-item active" onclick="switchTab('dashboard')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                        Dashboard
-                    </div>
-                </div>
-
-                <div class="nav-group">
-                    <div class="nav-label">Content Management (CMS)</div>
-                    <div class="nav-item" onclick="switchTab('shlokas')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                        Shlokas
-                    </div>
-                    <div class="nav-item" onclick="switchTab('blogs')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Blog Posts
-                    </div>
-                    <div class="nav-item" onclick="switchTab('artwork')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        Artwork Gallery
-                    </div>
-                    <div class="nav-item" onclick="switchTab('testimonials')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        Testimonials
-                    </div>
-                </div>
-
-                <div class="nav-group">
-                    <div class="nav-label">Learning System (LMS)</div>
-                    <div class="nav-item" onclick="switchTab('courses')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                        Courses
-                    </div>
-                    <div class="nav-item" onclick="switchTab('quizzes')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                        Quizzes
-                    </div>
-                    <div class="nav-item" onclick="switchTab('certificates')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="7"></circle>
-                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                        </svg>
-                        Certificates
-                    </div>
-                </div>
-
-                <div class="nav-group">
-                    <div class="nav-label">User Management</div>
-                    <div class="nav-item" onclick="switchTab('students')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        Student Roster
-                    </div>
-                </div>
-
-                <div class="nav-group">
-                    <div class="nav-label">System</div>
-                    <div class="nav-item" onclick="switchTab('settings')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path
-                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                            </path>
-                        </svg>
-                        Settings & Push
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="sidebar-footer">
-                <button class="logout-btn" onclick="location.reload()">Sign Out</button>
-            </div>
-        </aside>
-
-        <!-- MAIN WRAPPER -->
-        <main class="main-wrapper">
-            <header class="top-header">
-                <div class="page-title" id="page-title">Dashboard Overview</div>
-                <div style="font-size:0.9rem; color:var(--text-muted);">
-                    Authenticated as Admin
-                </div>
-            </header>
-
-            <div class="content-scroll">
-
-                <!-- VIEW: DASHBOARD -->
-                <div id="view-dashboard" class="view-section active">
-                    <div class="stats-grid" id="stats-grid">
-                        <!-- Populated by JS -->
-                    </div>
-
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Pending Approvals</h3>
-                        </div>
-                        <div class="modal-body" id="dashboard-alerts">
-                            <!-- JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: SHLOKAS -->
-                <div id="view-shlokas" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">All Shlokas Database</h3>
-                            <button class="btn btn-primary btn-sm" onclick="openShlokaModal()">+ New Shloka</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Adhyay</th>
-                                        <th>Shloka</th>
-                                        <th>Content Preview</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-shlokas"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: BLOGS -->
-                <div id="view-blogs" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Blog Management</h3>
-                            <button class="btn btn-primary btn-sm" onclick="openBlogModal()">+ Write Post</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Date</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-blogs"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: ARTWORK -->
-                <div id="view-artwork" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Gallery Items</h3>
-                            <form id="artwork-quick-add" style="display:flex; gap:10px;">
-                                <input id="art-title" placeholder="Title" class="form-control" style="width:150px">
-                                <input id="art-url" placeholder="Image URL" class="form-control" style="width:200px">
-                                <button type="submit" class="btn btn-primary btn-sm">Quick Add</button>
-                            </form>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Preview</th>
-                                        <th>Title</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-artwork"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: STUDENTS (NEW) -->
-                <div id="view-students" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Student Registry</h3>
-                            <button class="btn btn-secondary btn-sm" onclick="loadStudentData()">Refresh Data</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Mobile / ID</th>
-                                        <th>Progress</th>
-                                        <th>Quizzes</th>
-                                        <th>Last Active</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-students"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: COURSES -->
-                <div id="view-courses" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Course Offerings</h3>
-                            <button class="btn btn-primary btn-sm" onclick="openCourseForm()">+ New Course</button>
-                        </div>
-                        <div id="course-list-container" style="padding:1.5rem;"></div>
-                    </div>
-
-                    <!-- Course Form (Inline for now) -->
-                    <div id="course-editor" class="data-card" style="display:none; border-color:var(--brand-primary);">
-                        <div class="card-header" style="background:var(--slate-50)">
-                            <h3 class="card-title">Course Editor</h3>
-                            <button class="btn btn-secondary btn-sm" onclick="closeCourseForm()">Cancel</button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="course-form">
-                                <input type="hidden" id="course-id">
-                                <div class="form-group"><label class="form-label">Title</label><input id="course-title"
-                                        class="form-control" required></div>
-                                <div class="form-group"><label class="form-label">Description</label><textarea
-                                        id="course-desc" class="form-control" required></textarea></div>
-                                <div class="form-group"><label class="form-label">Image URL</label><input
-                                        id="course-img" class="form-control"></div>
-
-                                <div class="form-group"
-                                    style="background:var(--slate-50); padding:1rem; border-radius:6px;">
-                                    <label class="form-label">Select Adhyay to Link Shlokas</label>
-                                    <select id="course-adhyay" class="form-control" style="margin-bottom:10px"></select>
-                                    <div id="course-shloka-select"
-                                        style="max-height:150px; overflow-y:auto; border:1px solid #ddd; padding:10px; background:white;">
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary">Save Course</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: QUIZZES -->
-                <div id="view-quizzes" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Quiz Management</h3>
-                            <button class="btn btn-primary btn-sm" onclick="openQuizForm()">Create Quiz</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Course</th>
-                                        <th>Pass %</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-quizzes"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Inline Quiz Form -->
-                    <div id="quiz-editor" class="data-card" style="display:none;">
-                        <div class="card-header">
-                            <h3 class="card-title">Quiz Editor</h3><button class="btn btn-secondary"
-                                onclick="document.getElementById('quiz-editor').style.display='none'">Close</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group"><label class="form-label">Course</label><select id="quiz-course-sel"
-                                    class="form-control"></select></div>
-                            <div class="form-group"><label class="form-label">Pass %</label><input type="number"
-                                    id="quiz-pass" class="form-control" value="50"></div>
-                            <div id="quiz-q-container"></div>
-                            <button class="btn btn-secondary btn-sm" id="add-q-btn">+ Add Question</button>
-                            <hr>
-                            <button class="btn btn-primary" id="save-quiz-btn">Save Quiz</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: CERTIFICATES -->
-                <div id="view-certificates" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Certificate Requests</h3>
-                            <button class="btn btn-secondary btn-sm"
-                                onclick="document.getElementById('manual-cert-form').style.display='block'">Manual
-                                Issue</button>
-                        </div>
-                        <div id="manual-cert-form"
-                            style="display:none; padding:1.5rem; background:var(--slate-50); border-bottom:1px solid #eee;">
-                            <h4>Issue New Certificate</h4>
-                            <div class="form-grid-2">
-                                <input id="c-name" placeholder="Name" class="form-control">
-                                <input id="c-mobile" placeholder="Mobile" class="form-control">
-                                <input id="c-email" placeholder="Email" class="form-control">
-                                <select id="c-course" class="form-control"></select>
-                            </div>
-                            <button class="btn btn-primary btn-sm" style="margin-top:10px;"
-                                onclick="issueCert()">Generate</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Course</th>
-                                        <th>Status</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-certs"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: TESTIMONIALS -->
-                <div id="view-testimonials" class="view-section">
-                    <div class="data-card">
-                        <div class="card-header">
-                            <h3 class="card-title">User Reviews</h3>
-                        </div>
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Author</th>
-                                        <th>Experience</th>
-                                        <th>Status</th>
-                                        <th style="text-align:right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-testimonials"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: SETTINGS -->
-                <div id="view-settings" class="view-section">
-                    <div class="form-grid-2">
-                        <div class="data-card">
-                            <div class="card-header">
-                                <h3 class="card-title">About Page Config</h3>
-                            </div>
-                            <div class="modal-body">
-                                <form id="settings-form">
-                                    <div class="form-group"><label class="form-label">Image URL</label><input
-                                            id="abt-img" class="form-control"></div>
-                                    <div class="form-group"><label class="form-label">Content</label><textarea
-                                            id="abt-content" class="form-control" style="min-height:150px"></textarea>
-                                    </div>
-                                    <button class="btn btn-primary" type="submit">Update Site</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="data-card" style="border-color:var(--brand-primary)">
-                            <div class="card-header">
-                                <h3 class="card-title">Push Notification Console</h3>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group"><label class="form-label">Title</label><input id="push-title"
-                                        class="form-control"></div>
-                                <div class="form-group"><label class="form-label">Message</label><textarea id="push-msg"
-                                        class="form-control"></textarea></div>
-                                <button class="btn btn-primary" onclick="sendPush()">BROADCAST TO ALL</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    <!-- ================= MODALS ================= -->
-
-    <!-- SHLOKA MODAL -->
-    <div class="modal-overlay" id="shloka-modal">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3>Shloka Editor</h3>
-                <button class="btn btn-secondary btn-sm" onclick="closeModal('shloka-modal')">X</button>
-            </div>
-            <div class="modal-body">
-                <form id="shloka-form">
-                    <input type="hidden" id="shloka-id">
-                    <div class="form-grid-2">
-                        <div class="form-group"><label class="form-label">Adhyay</label><input type="number"
-                                id="s-adhyay" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">Shloka</label><input type="number"
-                                id="s-shloka" class="form-control" required></div>
-                    </div>
-                    <div class="form-group"><label class="form-label">Text Details</label><textarea id="s-text"
-                            class="form-control" style="min-height:100px"></textarea></div>
-                    <div class="form-group"><label class="form-label">YouTube Video ID</label><input id="s-vid"
-                            class="form-control"></div>
-                    <button type="submit" class="btn btn-primary" style="width:100%">Save Changes</button>
-                </form>
-            </div>
+<!-- BLOG MODAL -->
+<div class="modal-overlay" id="blog-modal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>Blog</h3>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('blog-modal')">X</button>
+        </div>
+        <div class="modal-body">
+            <form id="blog-form">
+                <input id="b-title" class="form-control" placeholder="Title" required>
+                <input id="b-img" class="form-control" placeholder="Image URL" style="margin-top:10px">
+                <textarea id="b-content" class="form-control" placeholder="Content"
+                    style="margin-top:10px;min-height:200px"></textarea>
+                <button class="btn btn-primary" style="margin-top:10px">Publish</button>
+            </form>
         </div>
     </div>
+</div>
+<script>
+/* ======================================================
+   GLOBAL STATE
+====================================================== */
+let adminPassword = '';
 
-    <!-- BLOG MODAL -->
-    <div class="modal-overlay" id="blog-modal">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3>Blog Post</h3><button class="btn btn-secondary btn-sm" onclick="closeModal('blog-modal')">X</button>
+/* ======================================================
+   HELPERS
+====================================================== */
+function qs(id) {
+    return document.getElementById(id);
+}
+
+function closeModal(id) {
+    qs(id).classList.remove('open');
+}
+
+function openModal(id) {
+    qs(id).classList.add('open');
+}
+
+/* ======================================================
+   AUTH
+====================================================== */
+qs('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const pwd = qs('password').value;
+
+    try {
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pwd })
+        });
+
+        if (!res.ok) {
+            alert('Wrong password');
+            return;
+        }
+
+        adminPassword = pwd;
+        qs('login-section').style.display = 'none';
+        qs('admin-layout').style.display = 'grid';
+
+        switchTab('dashboard');
+    } catch (err) {
+        alert('Server error');
+    }
+});
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+function switchTab(tab) {
+    document.querySelectorAll('.view-section')
+        .forEach(v => v.classList.remove('active'));
+
+    qs('view-' + tab).classList.add('active');
+    qs('page-title').innerText =
+        tab.charAt(0).toUpperCase() + tab.slice(1);
+
+    if (tab === 'dashboard') loadDashboard();
+    if (tab === 'shlokas') loadShlokas();
+    if (tab === 'blogs') loadBlogs();
+    if (tab === 'artwork') loadArtwork();
+    if (tab === 'courses') loadCourses();
+    if (tab === 'quizzes') loadQuizzes();
+    if (tab === 'certificates') loadCertificates();
+    if (tab === 'students') loadStudents();
+    if (tab === 'settings') loadSettings();
+}
+
+/* ======================================================
+   DASHBOARD
+====================================================== */
+async function loadDashboard() {
+    const grid = qs('stats-grid');
+    grid.innerHTML = '';
+
+    const [s, b, a, c, q] = await Promise.all([
+        fetch('/api/shlokas').then(r => r.json()),
+        fetch('/api/blog').then(r => r.json()),
+        fetch('/api/artwork').then(r => r.json()),
+        fetch('/api/courses').then(r => r.json()),
+        fetch('/api/quiz').then(r => r.json())
+    ]);
+
+    const stats = [
+        ['Shlokas', s.length],
+        ['Blogs', b.length],
+        ['Artwork', a.length],
+        ['Courses', c.length],
+        ['Quizzes', q.length]
+    ];
+
+    stats.forEach(item => {
+        grid.innerHTML += `
+            <div class="stat-card">
+                <div class="stat-head">${item[0]}</div>
+                <div class="stat-value">${item[1]}</div>
+            </div>`;
+    });
+}
+
+/* ======================================================
+   SHLOKAS
+====================================================== */
+async function loadShlokas() {
+    const tb = qs('table-shlokas');
+    tb.innerHTML = '';
+
+    const data = await fetch('/api/shlokas').then(r => r.json());
+
+    data.forEach(s => {
+        tb.innerHTML += `
+        <tr>
+            <td>${s.adhyay}</td>
+            <td>${s.shloka}</td>
+            <td>${(s.text || '').slice(0, 40)}</td>
+            <td style="text-align:right">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteShloka('${s._id}')">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+async function deleteShloka(id) {
+    if (!confirm('Delete shloka?')) return;
+
+    await fetch('/api/shlokas/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
+
+    loadShlokas();
+}
+
+/* ======================================================
+   BLOGS
+====================================================== */
+async function loadBlogs() {
+    const tb = qs('table-blogs');
+    tb.innerHTML = '';
+
+    const data = await fetch('/api/blog').then(r => r.json());
+
+    data.forEach(b => {
+        tb.innerHTML += `
+        <tr>
+            <td>${b.title}</td>
+            <td>${new Date(b.createdAt).toLocaleDateString()}</td>
+            <td style="text-align:right">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteBlog('${b._id}')">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+async function deleteBlog(id) {
+    await fetch('/api/blog/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
+
+    loadBlogs();
+}
+
+/* ======================================================
+   ARTWORK
+====================================================== */
+async function loadArtwork() {
+    const tb = qs('table-artwork');
+    tb.innerHTML = '';
+
+    const data = await fetch('/api/artwork').then(r => r.json());
+
+    data.forEach(a => {
+        tb.innerHTML += `
+        <tr>
+            <td><img src="${a.imageUrl}" style="height:40px"></td>
+            <td>${a.title}</td>
+            <td style="text-align:right">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteArtwork('${a._id}')">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+async function deleteArtwork(id) {
+    await fetch('/api/artwork/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
+
+    loadArtwork();
+}
+
+/* ======================================================
+   COURSES
+====================================================== */
+async function loadCourses() {
+    const box = qs('course-list-container');
+    box.innerHTML = '';
+
+    const data = await fetch('/api/courses').then(r => r.json());
+
+    data.forEach(c => {
+        box.innerHTML += `
+        <div class="data-card" style="margin-bottom:1rem">
+            <div class="card-header">
+                <b>${c.title}</b>
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteCourse('${c._id}')">Delete</button>
             </div>
-            <div class="modal-body">
-                <form id="blog-form">
-                    <div class="form-group"><label class="form-label">Title</label><input id="b-title"
-                            class="form-control" required></div>
-                    <div class="form-group"><label class="form-label">Cover Image</label><input id="b-img"
-                            class="form-control"></div>
-                    <div class="form-group"><label class="form-label">Content</label><textarea id="b-content"
-                            class="form-control" style="min-height:200px"></textarea></div>
-                    <button type="submit" class="btn btn-primary">Publish</button>
-                </form>
-            </div>
-        </div>
-    </div>
+        </div>`;
+    });
+}
 
-    <script>
-        // ================= APP STATE =================
-        let adminPassword = '';
-        let currentTab = 'dashboard';
+async function deleteCourse(id) {
+    if (!confirm('Delete course?')) return;
+    await fetch('/api/courses/' + id, { method: 'DELETE' });
+    loadCourses();
+}
 
-        // ================= AUTH =================
-        document.getElementById('login-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const pwd = document.getElementById('password').value;
-            try {
-                const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd }) });
-                const d = await r.json();
-                if (d.success) {
-                    adminPassword = pwd;
-                    document.getElementById('login-section').style.display = 'none';
-                    document.getElementById('admin-layout').style.display = 'grid';
-                    initApp();
-                } else alert('Access Denied');
-            } catch { alert('Network Error'); }
-        });
+/* ======================================================
+   QUIZZES
+====================================================== */
+async function loadQuizzes() {
+    const tb = qs('table-quizzes');
+    tb.innerHTML = '';
 
-        function initApp() { switchTab('dashboard'); }
+    const data = await fetch('/api/quiz').then(r => r.json());
 
-        // ================= NAVIGATION =================
-        function switchTab(tabId) {
-            currentTab = tabId;
-            // UI Update
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            // Find the clicked element (naive approach or event passing) - simplifying
-            // We just update all views visibility
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tabId).classList.add('active');
+    data.forEach(q => {
+        tb.innerHTML += `
+        <tr>
+            <td>${q.course?.title || '—'}</td>
+            <td>${q.passPercentage}%</td>
+            <td style="text-align:right">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteQuiz('${q._id}')">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
 
-            // Set Header
-            const titles = {
-                'dashboard': 'Executive Overview',
-                'shlokas': 'Shloka Database',
-                'blogs': 'Blog Management',
-                'artwork': 'Artwork Gallery',
-                'courses': 'Course Catalog',
-                'quizzes': 'Assessments & Quizzes',
-                'certificates': 'Certification Center',
-                'students': 'Student Roster',
-                'testimonials': 'Reviews & Feedback',
-                'settings': 'System Configuration'
-            };
-            document.getElementById('page-title').textContent = titles[tabId] || 'Admin';
+async function deleteQuiz(id) {
+    await fetch('/api/quiz/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword })
+    });
 
-            // Load Data
-            if (tabId === 'dashboard') loadStats();
-            if (tabId === 'shlokas') loadShlokas();
-            if (tabId === 'blogs') loadBlogs();
-            if (tabId === 'artwork') loadArtwork();
-            if (tabId === 'courses') loadCourses();
-            if (tabId === 'quizzes') loadQuizzes();
-            if (tabId === 'certificates') loadCertificates();
-            if (tabId === 'students') loadStudentData();
-            if (tabId === 'testimonials') loadTestimonials();
-            if (tabId === 'settings') loadSettings();
-        }
+    loadQuizzes();
+}
 
-        // ================= DASHBOARD =================
-        async function loadStats() {
-            try {
-                // Fallback to individual calls if /api/admin/stats not ready, but we updated server so it should work
-                const res = await fetch('/api/admin/stats');
-                const data = await res.json();
+/* ======================================================
+   CERTIFICATES
+====================================================== */
+async function loadCertificates() {
+    const tb = qs('table-certs');
+    tb.innerHTML = '';
 
-                if (data.stats) {
-                    const grid = document.getElementById('stats-grid');
-                    grid.innerHTML = '';
-                    data.stats.forEach(s => {
-                        grid.innerHTML += `
-                        <div class="stat-card">
-                            <div class="stat-head"><span>${s.label}</span><div class="stat-icon">${s.icon}</div></div>
-                            <div class="stat-value">${s.value}</div>
-                        </div>`;
-                    });
-                }
-            } catch (e) { console.error(e); }
-        }
+    const data = await fetch('/api/certificates').then(r => r.json());
 
-        // ================= SHLOKAS =================
-        async function loadShlokas() {
-            const res = await fetch('/api/shlokas');
-            const data = await res.json();
-            const tb = document.getElementById('table-shlokas');
-            tb.innerHTML = '';
-            data.forEach(s => {
-                tb.innerHTML += `<tr>
-                    <td><b>${s.adhyay}</b></td>
-                    <td>${s.shloka}</td>
-                    <td><span style="color:#666">${s.text ? s.text.substring(0, 50) + '...' : '—'}</span></td>
-                    <td style="text-align:right">
-                        <button class="btn btn-secondary btn-sm" onclick='editShloka(${JSON.stringify(s)})'>Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="delShloka('${s._id}')">Delete</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        function openShlokaModal() {
-            document.getElementById('shloka-form').reset();
-            document.getElementById('shloka-id').value = '';
-            document.getElementById('shloka-modal').classList.add('open');
-        }
-        function closeShlokaModal() { document.getElementById('shloka-modal').classList.remove('open'); }
-        window.editShloka = (s) => {
-            document.getElementById('shloka-id').value = s._id;
-            document.getElementById('s-adhyay').value = s.adhyay;
-            document.getElementById('s-shloka').value = s.shloka;
-            document.getElementById('s-text').value = s.text || '';
-            document.getElementById('s-vid').value = s.video_id || '';
-            document.getElementById('shloka-modal').classList.add('open');
-        }
-        document.getElementById('shloka-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const id = document.getElementById('shloka-id').value;
-            const payload = {
-                adhyay: document.getElementById('s-adhyay').value,
-                shloka: document.getElementById('s-shloka').value,
-                text: document.getElementById('s-text').value,
-                video_id: document.getElementById('s-vid').value,
-                password: adminPassword
-            };
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? '/api/shlokas/' + id : '/api/shlokas';
-            await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            closeModal('shloka-modal');
-            loadShlokas();
-        });
-        window.delShloka = async id => {
-            if (confirm('Confirm deletion?')) {
-                await fetch('/api/shlokas/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) });
-                loadShlokas();
-            }
-        };
+    data.forEach(c => {
+        tb.innerHTML += `
+        <tr>
+            <td>${c.name}</td>
+            <td>${c.courseTitle}</td>
+            <td>${c.status}</td>
+            <td style="text-align:right">
+                <button class="btn btn-danger btn-sm"
+                    onclick="deleteCert('${c._id}')">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
 
-        // ================= STUDENTS =================
-        async function loadStudentData() {
-            const tb = document.getElementById('table-students');
-            tb.innerHTML = '<tr><td colspan="4">Loading data...</td></tr>';
+async function deleteCert(id) {
+    await fetch('/api/certificates/' + id, { method: 'DELETE' });
+    loadCertificates();
+}
 
-            try {
-                const res = await fetch('/api/admin/detailed-students');
-                const data = await res.json();
-                tb.innerHTML = '';
+/* ======================================================
+   STUDENTS
+====================================================== */
+function loadStudents() {
+    qs('table-students').innerHTML =
+        '<tr><td colspan="3">Progress is tracked automatically</td></tr>';
+}
 
-                data.forEach(s => {
-                    const date = new Date(s.lastActive).toLocaleDateString();
-                    tb.innerHTML += `<tr>
-                        <td><b>${s._id}</b></td>
-                        <td>${s.coursesEnrolled} Courses</td>
-                        <td><span class="badge badge-success">${s.quizzesPassed} Passed</span></td>
-                        <td>${date}</td>
-                    </tr>`;
-                });
-            } catch { tb.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>'; }
-        }
+/* ======================================================
+   SETTINGS
+====================================================== */
+async function loadSettings() {
+    const data = await fetch('/api/about').then(r => r.json());
+    qs('abt-img').value = data.imageUrl || '';
+    qs('abt-content').value = data.content || '';
+}
 
-        // ================= ARTWORK =================
-        document.getElementById('artwork-quick-add').addEventListener('submit', async e => {
-            e.preventDefault();
-            const payload = {
-                title: document.getElementById('art-title').value,
-                imageUrl: document.getElementById('art-url').value,
-                password: adminPassword
-            };
-            await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            document.getElementById('artwork-quick-add').reset();
-            loadArtwork();
-        });
-        async function loadArtwork() {
-            const res = await fetch('/api/artwork');
-            const data = await res.json();
-            const tb = document.getElementById('table-artwork');
-            tb.innerHTML = '';
-            data.forEach(a => {
-                tb.innerHTML += `<tr>
-                    <td><img src="${a.imageUrl}" style="height:40px; border-radius:4px;"></td>
-                    <td>${a.title}</td>
-                    <td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="delArt('${a._id}')">Delete</button></td>
-                </tr>`;
-            });
-        }
-        window.delArt = async id => {
-            if (confirm('Delete?')) { await fetch('/api/artwork/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadArtwork(); }
-        };
+qs('settings-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // ================= COURSES =================
-        async function loadCourses() {
-            const res = await fetch('/api/courses');
-            const data = await res.json();
-            const c = document.getElementById('course-list-container');
-            c.innerHTML = '';
-            data.forEach(x => {
-                c.innerHTML += `<div style="border:1px solid #eee; padding:1rem; margin-bottom:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                    <div><b>${x.title}</b><br><small class="text-muted">Adhyay ${x.adhyay}</small></div>
-                    <button class="btn btn-danger btn-sm" onclick="delCourse('${x._id}')">Delete</button>
-                </div>`;
-            });
-        }
-        function openCourseForm() { document.getElementById('course-editor').style.display = 'block'; loadAdhyayOptions(); }
-        function closeCourseForm() { document.getElementById('course-editor').style.display = 'none'; }
+    await fetch('/api/about', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            newText: qs('abt-content').value,
+            newImageUrl: qs('abt-img').value,
+            password: adminPassword
+        })
+    });
 
-        async function loadAdhyayOptions() {
-            const shlokas = await fetch('/api/shlokas').then(r => r.json());
-            const adhyays = [...new Set(shlokas.map(s => s.adhyay))];
-            const sel = document.getElementById('course-adhyay');
-            sel.innerHTML = '<option value="">Select Adhyay</option>';
-            adhyays.forEach(a => sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`);
+    alert('Saved');
+});
 
-            sel.onchange = () => {
-                const box = document.getElementById('course-shloka-select');
-                box.innerHTML = '';
-                shlokas.filter(s => s.adhyay == sel.value).forEach(s => {
-                    box.innerHTML += `<div style="padding:2px;"><input type="checkbox" value="${s._id}"> Shloka ${s.shloka}</div>`;
-                });
-            };
-        }
-        document.getElementById('course-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const sel = [];
-            document.querySelectorAll('#course-shloka-select input:checked').forEach(i => sel.push(i.value));
-            const payload = {
-                title: document.getElementById('course-title').value,
-                description: document.getElementById('course-desc').value,
-                adhyay: document.getElementById('course-adhyay').value,
-                shlokas: sel,
-                imageUrl: document.getElementById('course-img').value,
-                password: adminPassword
-            };
-            await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            closeCourseForm();
-            loadCourses();
-        });
-        window.delCourse = async id => { if (confirm('Del?')) { await fetch('/api/courses/' + id, { method: 'DELETE' }); loadCourses(); } };
+/* ======================================================
+   PUSH
+====================================================== */
+async function sendPush() {
+    await fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: qs('push-title').value,
+            body: qs('push-msg').value,
+            password: adminPassword
+        })
+    });
 
-        // ================= CERTIFICATES =================
-        async function loadCertificates() {
-            const res = await fetch('/api/certificates');
-            const data = await res.json();
-            window._certs = data;
-            const tb = document.getElementById('table-certs');
-            tb.innerHTML = '';
-            data.forEach(c => {
-                const statusBadge = c.status === 'pending' ? '<span class="badge badge-warning">Pending</span>' : '<span class="badge badge-success">Approved</span>';
-                const action = c.status === 'pending' ? `<button class="btn btn-primary btn-sm" onclick="approveCert('${c._id}')">Approve</button>` : `<button class="btn btn-secondary btn-sm" onclick="downloadCert('${c._id}')">Download</button>`;
-
-                tb.innerHTML += `<tr>
-                    <td><b>${c.name}</b><br><small>${c.mobile}</small></td>
-                    <td>${c.courseTitle}</td>
-                    <td>${statusBadge}</td>
-                    <td style="text-align:right">${action} <button class="btn btn-danger btn-sm" onclick="delCert('${c._id}')">Del</button></td>
-                </tr>`;
-            });
-        }
-        window.approveCert = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); };
-        window.delCert = async id => { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); };
-        window.downloadCert = id => {
-            const cert = window._certs.find(x => x._id == id);
-            const url = `/api/certificate?name=${encodeURIComponent(cert.name)}&mobile=${encodeURIComponent(cert.mobile)}&email=${encodeURIComponent(cert.email || '')}&courseTitle=${encodeURIComponent(cert.courseTitle)}&lang=${cert.language || 'en'}`;
-            window.open(url, '_blank');
-        }
-
-        // ================= HELPERS =================
-        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-        async function loadTestimonials() {
-            const res = await fetch('/api/testimonials/all');
-            const data = await res.json();
-            const tb = document.getElementById('table-testimonials');
-            tb.innerHTML = '';
-            data.forEach(t => {
-                const isPending = t.status === 'pending';
-                const s = isPending ? '<span class="badge badge-warning">Pending</span>' : '<span class="badge badge-success">Live</span>';
-                const act = isPending ? `<button class="btn btn-primary btn-sm" onclick="approveTest('${t._id}')">Approve</button>` : '';
-                tb.innerHTML += `<tr><td>${t.author}</td><td><small>${t.quote.substring(0, 50)}</small></td><td>${s}</td><td style="text-align:right">${act} <button class="btn btn-danger btn-sm" onclick="delTest('${t._id}')">Del</button></td></tr>`;
-            });
-        }
-        window.approveTest = async id => { await fetch('/api/testimonials/approve/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); };
-        window.delTest = async id => { await fetch('/api/testimonials/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); };
-
-        async function loadBlogs() {
-            const res = await fetch('/api/blog');
-            const data = await res.json();
-            const tb = document.getElementById('table-blogs');
-            tb.innerHTML = '';
-            data.forEach(b => {
-                tb.innerHTML += `<tr><td>${b.title}</td><td>${new Date(b.createdAt).toLocaleDateString()}</td><td style="text-align:right"><button class="btn btn-danger btn-sm" onclick="delBlog('${b._id}')">Del</button></td></tr>`;
-            });
-        }
-        window.delBlog = async id => { await fetch('/api/blog/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadBlogs(); };
-        function openBlogModal() { document.getElementById('blog-modal').classList.add('open'); }
-        document.getElementById('blog-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const payload = {
-                title: document.getElementById('b-title').value,
-                content: document.getElementById('b-content').value,
-                imageUrl: document.getElementById('b-img').value,
-                password: adminPassword
-            };
-            await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            closeModal('blog-modal'); loadBlogs();
-        });
-
-        async function loadSettings() {
-            const r = await fetch('/api/about');
-            const d = await r.json();
-            document.getElementById('abt-content').value = d.content || '';
-            document.getElementById('abt-img').value = d.imageUrl || '';
-        }
-        document.getElementById('settings-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            await fetch('/api/about', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
-                    newText: document.getElementById('abt-content').value,
-                    newImageUrl: document.getElementById('abt-img').value,
-                    password: adminPassword
-                })
-            });
-            alert('Saved');
-        });
-        async function sendPush() {
-            if (!confirm('Broadcast?')) return;
-            await fetch('/api/push/send', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
-                    title: document.getElementById('push-title').value,
-                    body: document.getElementById('push-msg').value
-                })
-            });
-            alert('Sent');
-        }
-
-    </script>
-</body>
-
-</html>
+    alert('Push sent');
+}
+</script>
