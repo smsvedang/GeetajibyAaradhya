@@ -1,158 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="admin-style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="admin-style.css">
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ========== LOGIN ========== -->
 <section id="login-section">
   <div class="login-card">
     <h2>Admin Login</h2>
     <form id="login-form">
-      <input id="password" type="password" class="form-control" placeholder="Admin Password" required />
+      <input id="password" type="password" class="form-control" placeholder="Admin Password" required>
       <button class="btn btn-primary" style="width:100%;margin-top:1rem">Login</button>
     </form>
   </div>
 </section>
 
-<!-- ADMIN -->
+<!-- ========== ADMIN LAYOUT ========== -->
 <div id="admin-layout" class="admin-layout" style="display:none">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">⚡ Admin</div>
-    <div class="nav-scroll">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">⚡ Admin Panel</div>
+
+  <div class="nav-scroll">
+    <div class="nav-group">
+      <div class="nav-label">Overview</div>
       <div class="nav-item active" onclick="switchTab('dashboard')">Dashboard</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">CMS</div>
+      <div class="nav-item" onclick="switchTab('shlokas')">Shlokas</div>
+      <div class="nav-item" onclick="switchTab('blogs')">Blogs</div>
+      <div class="nav-item" onclick="switchTab('artwork')">Artwork</div>
+      <div class="nav-item" onclick="switchTab('testimonials')">Testimonials</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">LMS</div>
       <div class="nav-item" onclick="switchTab('courses')">Courses</div>
       <div class="nav-item" onclick="switchTab('quizzes')">Quizzes</div>
       <div class="nav-item" onclick="switchTab('certificates')">Certificates</div>
       <div class="nav-item" onclick="switchTab('students')">Students</div>
     </div>
-    <div class="sidebar-footer">
-      <button class="logout-btn" onclick="location.reload()">Logout</button>
-    </div>
-  </aside>
 
-  <!-- MAIN -->
-  <main class="main-wrapper">
-    <header class="top-header">
-      <div id="page-title" class="page-title">Dashboard</div>
-    </header>
-
-    <div class="content-scroll">
-
-      <!-- DASHBOARD -->
-      <section id="view-dashboard" class="view-section active">
-        <div id="stats-grid" class="stats-grid"></div>
-      </section>
-
-      <!-- COURSES -->
-      <section id="view-courses" class="view-section">
-        <button class="btn btn-primary" onclick="openCourseModal()">+ Add Course</button>
-        <div id="course-list" style="margin-top:1rem"></div>
-      </section>
-
-      <!-- QUIZZES -->
-      <section id="view-quizzes" class="view-section">
-        <button class="btn btn-primary" onclick="openQuizModal()">+ Create Quiz</button>
-        <table style="margin-top:1rem">
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Pass %</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="quiz-table"></tbody>
-        </table>
-      </section>
-
-      <!-- CERTIFICATES -->
-      <section id="view-certificates" class="view-section">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Course</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="cert-table"></tbody>
-        </table>
-      </section>
-
-      <!-- STUDENTS -->
-      <section id="view-students" class="view-section">
-        <table>
-          <thead>
-            <tr>
-              <th>Mobile</th>
-              <th>Courses</th>
-              <th>Quizzes Passed</th>
-            </tr>
-          </thead>
-          <tbody id="student-table"></tbody>
-        </table>
-      </section>
-
-    </div>
-  </main>
-</div>
-
-<!-- ================= MODALS ================= -->
-
-<!-- COURSE MODAL -->
-<div id="course-modal" class="modal-overlay">
-  <div class="modal-dialog">
-    <div class="modal-header">
-      <h3>Course</h3>
-      <button class="btn btn-secondary btn-sm" onclick="closeModal('course-modal')">X</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="course-id">
-      <input id="course-title" class="form-control" placeholder="Course Title">
-      <input id="course-adhyay" class="form-control" placeholder="Adhyay" style="margin-top:10px">
-      <textarea id="course-desc" class="form-control" placeholder="Description" style="margin-top:10px"></textarea>
-      <input id="course-img" class="form-control" placeholder="Image URL" style="margin-top:10px">
-      <button class="btn btn-primary" style="margin-top:10px;width:100%" onclick="saveCourse()">Save</button>
+    <div class="nav-group">
+      <div class="nav-label">System</div>
+      <div class="nav-item" onclick="switchTab('settings')">Settings</div>
     </div>
   </div>
-</div>
 
-<!-- QUIZ MODAL (MCQ EDITOR) -->
-<div id="quiz-modal" class="modal-overlay">
-  <div class="modal-dialog" style="max-width:700px">
-    <div class="modal-header">
-      <h3>Quiz Editor</h3>
-      <button class="btn btn-secondary btn-sm" onclick="closeModal('quiz-modal')">X</button>
-    </div>
-    <div class="modal-body">
-
-      <input type="hidden" id="quiz-id">
-
-      <select id="quiz-course" class="form-control"></select>
-      <input id="quiz-pass" class="form-control" placeholder="Pass Percentage" style="margin-top:10px">
-
-      <hr style="margin:15px 0">
-
-      <div id="question-list"></div>
-
-      <button class="btn btn-secondary" onclick="addQuestion()">+ Add Question</button>
-
-      <button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="saveQuiz()">
-        Save Quiz
-      </button>
-    </div>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="location.reload()">Logout</button>
   </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-wrapper">
+<header class="top-header">
+  <div id="page-title" class="page-title">Dashboard</div>
+</header>
+
+<div class="content-scroll">
+
+<section id="view-dashboard" class="view-section active">
+  <div id="stats-grid" class="stats-grid"></div>
+</section>
+
+<section id="view-shlokas" class="view-section">
+  <button class="btn btn-primary" onclick="openShloka()">+ Add Shloka</button>
+  <table><tbody id="table-shlokas"></tbody></table>
+</section>
+
+<section id="view-blogs" class="view-section">
+  <button class="btn btn-primary" onclick="openBlog()">+ Add Blog</button>
+  <table><tbody id="table-blogs"></tbody></table>
+</section>
+
+<section id="view-artwork" class="view-section">
+  <button class="btn btn-primary" onclick="openArtwork()">+ Add Artwork</button>
+  <table><tbody id="table-artwork"></tbody></table>
+</section>
+
+<section id="view-testimonials" class="view-section">
+  <button class="btn btn-primary" onclick="openTestimonial()">+ Add Testimonial</button>
+  <table><tbody id="table-testimonials"></tbody></table>
+</section>
+
+<section id="view-courses" class="view-section">
+  <button class="btn btn-primary" onclick="openCourse()">+ Add Course</button>
+  <div id="course-list"></div>
+</section>
+
+<section id="view-quizzes" class="view-section">
+  <button class="btn btn-primary" onclick="openQuiz()">+ Create Quiz</button>
+  <table><tbody id="quiz-table"></tbody></table>
+</section>
+
+<section id="view-certificates" class="view-section">
+  <table><tbody id="cert-table"></tbody></table>
+</section>
+
+<section id="view-students" class="view-section">
+  <table><tbody id="student-table"></tbody></table>
+</section>
+
+<section id="view-settings" class="view-section">
+  <textarea id="about-text" class="form-control"></textarea>
+  <button class="btn btn-primary" onclick="saveAbout()">Save</button>
+</section>
+
+</div>
+</main>
 </div>
 
 <script>
-/* helpers */
 const qs = id => document.getElementById(id)
 const qsa = q => document.querySelectorAll(q)
 let ADMIN_PASSWORD = ''
@@ -161,234 +127,291 @@ let ADMIN_PASSWORD = ''
 </body>
 </html>
 <script>
-/* =====================================
+/* =========================
    API HELPER
-===================================== */
+========================= */
 async function api(url, method='GET', body=null){
   const opt = { method, headers:{'Content-Type':'application/json'} }
   if(body) opt.body = JSON.stringify(body)
-  const res = await fetch(url, opt)
-  return res.json()
+  const r = await fetch(url, opt)
+  return r.json()
 }
 
-/* =====================================
-   MODALS
-===================================== */
-function openModal(id){ qs(id).classList.add('open') }
-function closeModal(id){ qs(id).classList.remove('open') }
-
-/* =====================================
+/* =========================
    LOGIN
-===================================== */
-qs('login-form').onsubmit = async e=>{
+========================= */
+qs('login-form').onsubmit = async e => {
   e.preventDefault()
   ADMIN_PASSWORD = qs('password').value
+
   const r = await fetch('/api/login',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({password:ADMIN_PASSWORD})
+    body:JSON.stringify({ password: ADMIN_PASSWORD })
   })
+
   if(!r.ok) return alert('Wrong password')
-  qs('login-section').style.display='none'
-  qs('admin-layout').style.display='grid'
+
+  qs('login-section').style.display = 'none'
+  qs('admin-layout').style.display = 'grid'
   switchTab('dashboard')
 }
 
-/* =====================================
-   NAV
-===================================== */
+/* =========================
+   SIDEBAR NAV
+========================= */
 function switchTab(tab){
-  qsa('.view-section').forEach(v=>v.classList.remove('active'))
-  qs('view-'+tab).classList.add('active')
+  qsa('.view-section').forEach(v => v.classList.remove('active'))
+  qs('view-' + tab).classList.add('active')
   qs('page-title').innerText = tab.toUpperCase()
 
-  const loaders={
-    dashboard:loadDashboard,
-    courses:loadCourses,
-    quizzes:loadQuizzes,
-    certificates:loadCertificates,
-    students:loadStudents
+  const loaders = {
+    dashboard: loadDashboard,
+    shlokas: loadShlokas,
+    blogs: loadBlogs,
+    artwork: loadArtwork,
+    testimonials: loadTestimonials,
+    courses: loadCourses,
+    quizzes: loadQuizzes,
+    certificates: loadCertificates,
+    students: loadStudents,
+    settings: loadSettings
   }
   loaders[tab]?.()
 }
 
-/* =====================================
+/* =========================
    DASHBOARD
-===================================== */
+========================= */
 async function loadDashboard(){
   const grid = qs('stats-grid')
-  grid.innerHTML=''
-  const stats={
+  grid.innerHTML = ''
+
+  const map = {
+    Shlokas:'/api/shlokas',
+    Blogs:'/api/blog',
+    Artwork:'/api/artwork',
     Courses:'/api/courses',
-    Quizzes:'/api/quiz',
     Certificates:'/api/certificates'
   }
-  for(const k in stats){
-    const d = await api(stats[k])
-    grid.innerHTML+=`
+
+  for(const k in map){
+    const d = await api(map[k])
+    grid.innerHTML += `
       <div class="stat-card">
         <div class="stat-head">${k}</div>
-        <div class="stat-value">${d.length||0}</div>
+        <div class="stat-value">${d.length || 0}</div>
       </div>`
   }
 }
 
-/* =====================================
-   COURSES (MODAL BASED)
-===================================== */
-function openCourseModal(c=null){
-  qs('course-id').value = c?._id || ''
-  qs('course-title').value = c?.title || ''
-  qs('course-adhyay').value = c?.adhyay || ''
-  qs('course-desc').value = c?.description || ''
-  qs('course-img').value = c?.imageUrl || ''
-  openModal('course-modal')
-}
+/* =========================
+   SHLOKAS
+========================= */
+function openShloka(s=null){
+  const a = prompt('Adhyay', s?.adhyay || '')
+  if(!a) return
+  const sh = prompt('Shloka', s?.shloka || '')
+  const t = prompt('Text', s?.text || '')
+  const v = prompt('YouTube ID', s?.video_id || '')
 
-async function saveCourse(){
-  const id = qs('course-id').value
-  await api('/api/courses'+(id?'/'+id:''), id?'PUT':'POST',{
-    title:qs('course-title').value,
-    adhyay:qs('course-adhyay').value,
-    description:qs('course-desc').value,
-    imageUrl:qs('course-img').value,
-    shlokas:[],
+  api('/api/shlokas' + (s?'/'+s._id:''), s?'PUT':'POST',{
+    adhyay:a, shloka:sh, text:t, video_id:v,
     password:ADMIN_PASSWORD
-  })
-  closeModal('course-modal')
-  loadCourses()
+  }).then(loadShlokas)
 }
 
-async function loadCourses(){
-  const box = qs('course-list')
-  box.innerHTML=''
-  const data = await api('/api/courses')
-  data.forEach(c=>{
-    box.innerHTML+=`
-      <div class="data-card">
-        <div class="card-header">
-          <b>${c.title}</b>
-          <div>
-            <button class="btn btn-secondary btn-sm" onclick='openCourseModal(${JSON.stringify(c)})'>Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c._id}')">Delete</button>
-          </div>
-        </div>
-      </div>`
-  })
-}
-
-function deleteCourse(id){
-  if(!confirm('Delete course?'))return
-  fetch('/api/courses/'+id,{method:'DELETE'}).then(loadCourses)
-}
-
-/* =====================================
-   QUIZ + MCQ EDITOR
-===================================== */
-let QUESTIONS = []
-
-function openQuizModal(q=null){
-  qs('quiz-id').value = q?._id || ''
-  qs('quiz-pass').value = q?.passPercentage || 50
-  QUESTIONS = q?.questions ? JSON.parse(JSON.stringify(q.questions)) : []
-  loadCourseDropdown()
-  renderQuestions()
-  openModal('quiz-modal')
-}
-
-async function loadCourseDropdown(){
-  const sel = qs('quiz-course')
-  sel.innerHTML=''
-  const courses = await api('/api/courses')
-  courses.forEach(c=>{
-    sel.innerHTML+=`<option value="${c._id}">${c.title}</option>`
-  })
-}
-
-function addQuestion(){
-  QUESTIONS.push({
-    question:'',
-    options:['','','',''],
-    correctIndex:0
-  })
-  renderQuestions()
-}
-
-function removeQuestion(i){
-  QUESTIONS.splice(i,1)
-  renderQuestions()
-}
-
-function renderQuestions(){
-  const box = qs('question-list')
-  box.innerHTML=''
-  QUESTIONS.forEach((q,i)=>{
-    box.innerHTML+=`
-      <div class="data-card">
-        <div class="card-header">
-          <b>Question ${i+1}</b>
-          <button class="btn btn-danger btn-sm" onclick="removeQuestion(${i})">Remove</button>
-        </div>
-        <div class="modal-body">
-          <input class="form-control" placeholder="Question"
-            value="${q.question}"
-            onchange="QUESTIONS[${i}].question=this.value">
-
-          ${q.options.map((o,oi)=>`
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <input class="form-control"
-                placeholder="Option ${oi+1}"
-                value="${o}"
-                onchange="QUESTIONS[${i}].options[${oi}]=this.value">
-              <input type="radio" name="c${i}" ${q.correctIndex===oi?'checked':''}
-                onchange="QUESTIONS[${i}].correctIndex=${oi}">
-            </div>
-          `).join('')}
-        </div>
-      </div>`
-  })
-}
-
-async function saveQuiz(){
-  await api('/api/quiz','POST',{
-    course:qs('quiz-course').value,
-    passPercentage:qs('quiz-pass').value,
-    questions:QUESTIONS,
-    password:ADMIN_PASSWORD
-  })
-  closeModal('quiz-modal')
-  loadQuizzes()
-}
-
-async function loadQuizzes(){
-  const tb = qs('quiz-table')
-  tb.innerHTML=''
-  const data = await api('/api/quiz')
-  data.forEach(q=>{
-    tb.innerHTML+=`
+async function loadShlokas(){
+  const tb = qs('table-shlokas')
+  tb.innerHTML = ''
+  const d = await api('/api/shlokas')
+  d.forEach(s=>{
+    tb.innerHTML += `
       <tr>
-        <td>${q.course?.title||q.course}</td>
-        <td>${q.passPercentage}%</td>
+        <td>${s.adhyay}</td>
+        <td>${s.shloka}</td>
         <td>
-          <button class="btn btn-danger btn-sm" onclick="deleteQuiz('${q._id}')">Delete</button>
+          <button onclick='openShloka(${JSON.stringify(s)})'>Edit</button>
+          <button onclick="deleteShloka('${s._id}')">Delete</button>
         </td>
       </tr>`
   })
 }
-
-function deleteQuiz(id){
-  api('/api/quiz/'+id,'DELETE',{password:ADMIN_PASSWORD}).then(loadQuizzes)
+function deleteShloka(id){
+  api('/api/shlokas/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadShlokas)
 }
 
-/* =====================================
-   CERTIFICATES
-===================================== */
+/* =========================
+   BLOGS
+========================= */
+function openBlog(b=null){
+  const t = prompt('Title', b?.title || '')
+  if(!t) return
+  const c = prompt('Content', b?.content || '')
+  const i = prompt('Image URL', b?.imageUrl || '')
+
+  api('/api/blog'+(b?'/'+b._id:''), b?'PUT':'POST',{
+    title:t, content:c, imageUrl:i,
+    password:ADMIN_PASSWORD
+  }).then(loadBlogs)
+}
+
+async function loadBlogs(){
+  const tb = qs('table-blogs')
+  tb.innerHTML = ''
+  const d = await api('/api/blog')
+  d.forEach(b=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${b.title}</td>
+        <td>
+          <button onclick='openBlog(${JSON.stringify(b)})'>Edit</button>
+          <button onclick="deleteBlog('${b._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+function deleteBlog(id){
+  api('/api/blog/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadBlogs)
+}
+
+/* =========================
+   ARTWORK
+========================= */
+function openArtwork(a=null){
+  const t = prompt('Title', a?.title || '')
+  if(!t) return
+  const i = prompt('Image URL', a?.imageUrl || '')
+
+  api('/api/artwork'+(a?'/'+a._id:''), a?'PUT':'POST',{
+    title:t, imageUrl:i,
+    password:ADMIN_PASSWORD
+  }).then(loadArtwork)
+}
+
+async function loadArtwork(){
+  const tb = qs('table-artwork')
+  tb.innerHTML = ''
+  const d = await api('/api/artwork')
+  d.forEach(a=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${a.title}</td>
+        <td>
+          <button onclick='openArtwork(${JSON.stringify(a)})'>Edit</button>
+          <button onclick="deleteArtwork('${a._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+function deleteArtwork(id){
+  api('/api/artwork/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadArtwork)
+}
+
+/* =========================
+   TESTIMONIALS
+========================= */
+function openTestimonial(t=null){
+  const n = prompt('Name', t?.author || '')
+  const q = prompt('Quote', t?.quote || '')
+  const s = prompt('Status', t?.status || 'pending')
+
+  api('/api/testimonials'+(t?'/'+t._id:''), t?'PUT':'POST',{
+    author:n, quote:q, status:s,
+    password:ADMIN_PASSWORD
+  }).then(loadTestimonials)
+}
+
+async function loadTestimonials(){
+  const tb = qs('table-testimonials')
+  tb.innerHTML = ''
+  const d = await api('/api/testimonials/all')
+  d.forEach(t=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${t.author}</td>
+        <td>${t.status}</td>
+        <td>
+          <button onclick='openTestimonial(${JSON.stringify(t)})'>Edit</button>
+          <button onclick="deleteTestimonial('${t._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+function deleteTestimonial(id){
+  api('/api/testimonials/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadTestimonials)
+}
+
+/* =========================
+   COURSES
+========================= */
+function openCourse(c=null){
+  const t = prompt('Title', c?.title || '')
+  if(!t) return
+  const a = prompt('Adhyay', c?.adhyay || '')
+  const d = prompt('Description', c?.description || '')
+  const i = prompt('Image URL', c?.imageUrl || '')
+
+  api('/api/courses'+(c?'/'+c._id:''), c?'PUT':'POST',{
+    title:t, adhyay:a, description:d, imageUrl:i,
+    shlokas:[], password:ADMIN_PASSWORD
+  }).then(loadCourses)
+}
+
+async function loadCourses(){
+  const box = qs('course-list')
+  box.innerHTML = ''
+  const d = await api('/api/courses')
+  d.forEach(c=>{
+    box.innerHTML += `
+      <div>
+        <b>${c.title}</b>
+        <button onclick='openCourse(${JSON.stringify(c)})'>Edit</button>
+        <button onclick="deleteCourse('${c._id}')">Delete</button>
+      </div>`
+  })
+}
+function deleteCourse(id){
+  fetch('/api/courses/'+id,{method:'DELETE'})
+    .then(loadCourses)
+}
+
+/* =========================
+   QUIZZES (LIST ONLY)
+========================= */
+async function loadQuizzes(){
+  const tb = qs('quiz-table')
+  tb.innerHTML = ''
+  const d = await api('/api/quiz')
+  d.forEach(q=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${q.course?.title || q.course}</td>
+        <td>${q.passPercentage}%</td>
+        <td>
+          <button onclick="deleteQuiz('${q._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+function deleteQuiz(id){
+  api('/api/quiz/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadQuizzes)
+}
+
+/* =========================
+   CERTIFICATES (DOWNLOAD IN PART 3)
+========================= */
 async function loadCertificates(){
   const tb = qs('cert-table')
-  tb.innerHTML=''
-  const data = await api('/api/certificates')
-  data.forEach(c=>{
-    tb.innerHTML+=`
+  tb.innerHTML = ''
+  const d = await api('/api/certificates')
+  d.forEach(c=>{
+    tb.innerHTML += `
       <tr>
         <td>${c.name}</td>
         <td>${c.courseTitle}</td>
@@ -401,26 +424,157 @@ async function loadCertificates(){
   })
 }
 function approveCert(id){
-  api('/api/certificates/approve/'+id,'PUT').then(loadCertificates)
+  api('/api/certificates/approve/'+id,'PUT')
+    .then(loadCertificates)
 }
 function deleteCert(id){
-  api('/api/certificates/'+id,'DELETE').then(loadCertificates)
+  api('/api/certificates/'+id,'DELETE')
+    .then(loadCertificates)
 }
 
-/* =====================================
+/* =========================
    STUDENTS
-===================================== */
+========================= */
 async function loadStudents(){
   const tb = qs('student-table')
-  tb.innerHTML=''
-  const data = await api('/api/admin/detailed-students')
-  data.forEach(s=>{
-    tb.innerHTML+=`
+  tb.innerHTML = ''
+  const d = await api('/api/admin/detailed-students')
+  d.forEach(s=>{
+    tb.innerHTML += `
       <tr>
         <td>${s._id}</td>
         <td>${s.coursesEnrolled}</td>
         <td>${s.quizzesPassed}</td>
       </tr>`
   })
+}
+
+/* =========================
+   SETTINGS
+========================= */
+async function loadSettings(){
+  const a = await api('/api/about')
+  qs('about-text').value = a.content || ''
+}
+function saveAbout(){
+  api('/api/about','POST',{
+    newText:qs('about-text').value,
+    password:ADMIN_PASSWORD
+  }).then(()=>alert('Saved'))
+}
+</script>
+<script>
+/* ==================================================
+   QUIZ MCQ EDITOR (ADD / EDIT)
+================================================== */
+
+let QUIZ_QUESTIONS = []
+
+// Open Quiz Editor (Add / Edit)
+async function openQuiz(q=null){
+  // reuse existing modal-less flow (simple + stable)
+  // If you want modal UI later, yahi logic reuse hoga
+  const course = prompt('Course ID', q?.course?._id || q?.course || '')
+  if(!course) return
+
+  const pass = prompt('Pass Percentage', q?.passPercentage || 50)
+
+  QUIZ_QUESTIONS = q?.questions
+    ? JSON.parse(JSON.stringify(q.questions))
+    : []
+
+  // Add questions interactively
+  let addMore = true
+  while(addMore){
+    const ques = prompt('Question (Cancel to stop)')
+    if(!ques) break
+
+    const options = []
+    for(let i=1;i<=4;i++){
+      options.push(prompt(`Option ${i}`) || '')
+    }
+    const correctIndex = Number(prompt('Correct option index (0-3)',0))
+
+    QUIZ_QUESTIONS.push({
+      question: ques,
+      options,
+      correctIndex
+    })
+  }
+
+  // Save quiz
+  await api('/api/quiz','POST',{
+    course,
+    passPercentage: pass,
+    questions: QUIZ_QUESTIONS,
+    password: ADMIN_PASSWORD
+  })
+
+  alert('Quiz saved')
+  loadQuizzes()
+}
+
+/* ==================================================
+   QUIZ LIST (EDIT + DELETE)
+================================================== */
+async function loadQuizzes(){
+  const tb = qs('quiz-table')
+  tb.innerHTML = ''
+  const d = await api('/api/quiz')
+
+  d.forEach(q=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${q.course?.title || q.course}</td>
+        <td>${q.passPercentage}%</td>
+        <td>
+          <button onclick='openQuiz(${JSON.stringify(q)})'>Edit</button>
+          <button onclick="deleteQuiz('${q._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+
+/* ==================================================
+   CERTIFICATE DOWNLOAD BUTTON
+================================================== */
+async function loadCertificates(){
+  const tb = qs('cert-table')
+  tb.innerHTML = ''
+  const d = await api('/api/certificates')
+
+  d.forEach(c=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.courseTitle}</td>
+        <td>${c.status}</td>
+        <td>
+          ${c.status === 'approved'
+            ? `<button onclick="downloadCertificate('${c.mobile}','${c.courseTitle}')">
+                Download
+               </button>`
+            : ''
+          }
+          <button onclick="approveCert('${c._id}')">Approve</button>
+          <button onclick="deleteCert('${c._id}')">Delete</button>
+        </td>
+      </tr>`
+  })
+}
+
+function downloadCertificate(mobile, courseTitle){
+  const url =
+    `/api/certificate?mobile=${encodeURIComponent(mobile)}&courseTitle=${encodeURIComponent(courseTitle)}`
+  window.open(url, '_blank')
+}
+
+/* ==================================================
+   FINAL SAFETY CHECKS (OPTIONAL BUT GOOD)
+================================================== */
+function deleteQuiz(id){
+  if(!confirm('Delete quiz?')) return
+  api('/api/quiz/'+id,'DELETE',{password:ADMIN_PASSWORD})
+    .then(loadQuizzes)
 }
 </script>
