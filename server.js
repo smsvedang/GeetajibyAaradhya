@@ -1,7 +1,7 @@
 /* --- Aaradhya Geetaji - Final Server Code (Admin Enhanced) --- */
 const express = require('express');
 const mongoose = require('mongoose');
-const Progress = require('./models/Progress'); 
+const Progress = require('./models/Progress');
 const bodyParser = require('body-parser');
 const path = require('path');
 const Certificate = require('./models/Certificate');
@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- MongoDB Connection ---
-const dbURI = process.env.MONGO_URI; 
+const dbURI = process.env.MONGO_URI;
 mongoose.connect(dbURI)
     .then(() => console.log('MongoDB से जुड़ गए!'))
     .catch(err => console.error('MongoDB Connection Error:', err));
@@ -61,10 +61,10 @@ const Blog = mongoose.model('Blog', blogSchema);
 const testimonialSchema = new mongoose.Schema({
     author: { type: String, required: true },
     quote: { type: String, required: true },
-    status: { 
-        type: String, 
-        enum: ['pending', 'approved'], 
-        default: 'pending' 
+    status: {
+        type: String,
+        enum: ['pending', 'approved'],
+        default: 'pending'
     },
     createdAt: { type: Date, default: Date.now }
 });
@@ -113,44 +113,44 @@ if (!admin.apps.length) {
 
 // ===== AUTO PUSH HELPER FUNCTION =====
 async function sendAutoPush(title, body) {
-  try {
-    const tokens = await PushToken.find();
-    if (!tokens.length) {
-      console.log('⚠️ No push tokens');
-      return;
-    }
-
-    for (const t of tokens) {
-      try {
-        await admin.messaging().send({
-          token: t.token,
-          notification: { title, body },
-          webpush: {
-            notification: {
-              title,
-              body,
-              icon: 'https://warrioraaradhya.in/favicon.png',
-              data: { url: 'https://warrioraaradhya.in' }
-            }
-          }
-        });
-      } catch (err) {
-
-        // 🔴 THIS IS THE KEY FIX
-        if (
-          err.code === 'messaging/registration-token-not-registered' ||
-          err.errorInfo?.code === 'messaging/registration-token-not-registered'
-        ) {
-          console.log('🗑 Removing dead token');
-          await PushToken.deleteOne({ token: t.token });
-        } else {
-          console.error('Push error:', err.message);
+    try {
+        const tokens = await PushToken.find();
+        if (!tokens.length) {
+            console.log('⚠️ No push tokens');
+            return;
         }
-      }
+
+        for (const t of tokens) {
+            try {
+                await admin.messaging().send({
+                    token: t.token,
+                    notification: { title, body },
+                    webpush: {
+                        notification: {
+                            title,
+                            body,
+                            icon: 'https://warrioraaradhya.in/favicon.png',
+                            data: { url: 'https://warrioraaradhya.in' }
+                        }
+                    }
+                });
+            } catch (err) {
+
+                // 🔴 THIS IS THE KEY FIX
+                if (
+                    err.code === 'messaging/registration-token-not-registered' ||
+                    err.errorInfo?.code === 'messaging/registration-token-not-registered'
+                ) {
+                    console.log('🗑 Removing dead token');
+                    await PushToken.deleteOne({ token: t.token });
+                } else {
+                    console.error('Push error:', err.message);
+                }
+            }
+        }
+    } catch (err) {
+        console.error('sendAutoPush fatal:', err.message);
     }
-  } catch (err) {
-    console.error('sendAutoPush fatal:', err.message);
-  }
 }
 
 // --- API Routes ---
@@ -184,7 +184,7 @@ app.get('/api/shloka/:id', async (req, res) => {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        
+
         const shloka = await Shloka.findById(req.params.id);
         if (!shloka) {
             return res.status(404).json({ message: 'Shloka not found' });
@@ -230,13 +230,13 @@ app.post('/api/shlokas', async (req, res) => {
         });
         await newShloka.save();
 
-// 🔔 auto push (NON-BLOCKING)
-sendAutoPush(
-  'New Gita Shloka Added 🙏',
-  `Adhyay ${newShloka.adhyay}, Shloka ${newShloka.shloka}`
-).catch(err => console.error('Auto push failed:', err.message));
+        // 🔔 auto push (NON-BLOCKING)
+        sendAutoPush(
+            'New Gita Shloka Added 🙏',
+            `Adhyay ${newShloka.adhyay}, Shloka ${newShloka.shloka}`
+        ).catch(err => console.error('Auto push failed:', err.message));
 
-res.json(newShloka);
+        res.json(newShloka);
 
     } catch (err) {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
@@ -281,8 +281,8 @@ app.get('/api/about', async (req, res) => {
         res.setHeader('Expires', '0');
         let about = await SiteContent.findOne({ key: 'aboutText' });
         if (!about) {
-            about = new SiteContent({ 
-                key: 'aboutText', 
+            about = new SiteContent({
+                key: 'aboutText',
                 content: 'Welcome! Please update this text in the admin panel.',
                 imageUrl: 'placeholder.jpg'
             });
@@ -302,7 +302,7 @@ app.post('/api/about', async (req, res) => {
         await SiteContent.findOneAndUpdate(
             { key: 'aboutText' },
             { content: newText, imageUrl: newImageUrl },
-            { upsert: true } 
+            { upsert: true }
         );
         res.json({ success: true, message: 'About section updated!' });
     } catch (err) {
@@ -330,7 +330,7 @@ app.get('/api/artwork/:id', async (req, res) => {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        
+
         const artwork = await Artwork.findById(req.params.id);
         if (!artwork) {
             return res.status(404).json({ message: 'Artwork not found' });
@@ -372,9 +372,9 @@ app.post('/api/artwork', async (req, res) => {
         });
         await newArtwork.save();
         await sendAutoPush(
-  'New Artwork Added 🎨',
-  newArtwork.title
-);
+            'New Artwork Added 🎨',
+            newArtwork.title
+        );
         res.status(201).json(newArtwork);
     } catch (err) {
         res.status(500).json({ message: 'Artwork jodne mein error' });
@@ -413,7 +413,7 @@ app.get('/api/blog/:id', async (req, res) => {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        
+
         const post = await Blog.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ message: 'Blog post not found' });
@@ -456,9 +456,9 @@ app.post('/api/blog', async (req, res) => {
         });
         await newPost.save();
         await sendAutoPush(
-  'New Blog Published ✍️',
-  newPost.title
-);
+            'New Blog Published ✍️',
+            newPost.title
+        );
         res.status(201).json(newPost);
     } catch (err) {
         res.status(500).json({ message: 'Post jodne mein error' });
@@ -522,7 +522,7 @@ app.get('/api/courses/:id', async (req, res) => {
     const course = await Course
         .findById(req.params.id)
         .populate('shlokas');
-        if (!course) return res.status(404).json({ error: 'Course not found' });
+    if (!course) return res.status(404).json({ error: 'Course not found' });
     res.json(course);
 });
 app.get('/api/courses', async (req, res) => {
@@ -548,9 +548,9 @@ app.post('/api/courses', async (req, res) => {
         });
         await course.save();
         await sendAutoPush(
-  'New Course Launched 📚',
-  `${course.title} (Adhyay ${course.adhyay}) – Complete it and get certified!`
-);
+            'New Course Launched 📚',
+            `${course.title} (Adhyay ${course.adhyay}) – Complete it and get certified!`
+        );
 
         res.status(201).json(course);
     } catch (err) {
@@ -900,6 +900,9 @@ app.get('/api/push/count', async (req, res) => {
 });
 
 app.post('/api/push/send', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { title, body } = req.body;
     const tokens = await PushToken.find();
 
@@ -911,7 +914,7 @@ app.post('/api/push/send', async (req, res) => {
                 notification: { title, body }
             });
             sent++;
-        } catch {}
+        } catch { }
     }
 
     res.json({ success: true, sent });
@@ -924,14 +927,14 @@ app.get('/api/admin/detailed-students', async (req, res) => {
     try {
         // Aggregate unique users from data
         const students = await Progress.aggregate([
-            { 
-              $group: { 
-                 _id: "$mobile",
-                 coursesEnrolled: { $sum: 1 },
-                 quizzesPassed: { $sum: { $cond: ["$quizPassed", 1, 0] } },
-                 avgScore: { $avg: "$quizScore" },
-                 lastActive: { $max: "$updatedAt" }
-              }
+            {
+                $group: {
+                    _id: "$mobile",
+                    coursesEnrolled: { $sum: 1 },
+                    quizzesPassed: { $sum: { $cond: ["$quizPassed", 1, 0] } },
+                    avgScore: { $avg: "$quizScore" },
+                    lastActive: { $max: "$updatedAt" }
+                }
             },
             { $sort: { lastActive: -1 } }
         ]);
@@ -946,10 +949,10 @@ app.get('/api/admin/detailed-students', async (req, res) => {
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const [
-            shlokaCount, 
-            courseCount, 
-            blogCount, 
-            artCount, 
+            shlokaCount,
+            courseCount,
+            blogCount,
+            artCount,
             pendingTestimonials,
             pendingCerts,
             uniqueStudents
@@ -978,16 +981,16 @@ app.get('/api/admin/stats', async (req, res) => {
         });
     } catch (err) {
         console.error("Stats error", err);
-        res.json({ stats: [], alerts: {testimonials:0, certificates:0} });
+        res.json({ stats: [], alerts: { testimonials: 0, certificates: 0 } });
     }
 });
 
 // --- Security Headers Middleware ---
 app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'no-referrer');
-  next();
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    next();
 });
 
 // --- Server Start ---
