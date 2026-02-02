@@ -1,57 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="admin-style.css">
+<meta charset="UTF-8">
+<title>Admin Panel – Warrior Aaradhya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="admin-style.css">
 </head>
 <body>
 
-<!-- ========== LOGIN ========== -->
+<!-- ================= LOGIN ================= -->
 <section id="login-section">
   <div class="login-card">
     <h2>Admin Login</h2>
+    <p>Authorized access only</p>
+
     <form id="login-form">
-      <input id="password" type="password" class="form-control" placeholder="Admin Password" required>
-      <button class="btn btn-primary" style="width:100%;margin-top:1rem">Login</button>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        placeholder="Admin Password"
+        required
+      />
+      <button class="btn btn-primary" style="width:100%;margin-top:1rem">
+        Login
+      </button>
     </form>
   </div>
 </section>
 
-<!-- ========== ADMIN LAYOUT ========== -->
+<!-- ================= ADMIN LAYOUT ================= -->
 <div id="admin-layout" class="admin-layout" style="display:none">
 
-<!-- SIDEBAR -->
+<!-- ========== SIDEBAR ========== -->
 <aside class="sidebar">
-  <div class="brand">⚡ Admin Panel</div>
+  <div class="brand">⚡ ADMIN PANEL</div>
 
   <div class="nav-scroll">
+
     <div class="nav-group">
       <div class="nav-label">Overview</div>
-      <div class="nav-item active" onclick="switchTab('dashboard')">Dashboard</div>
+      <div class="nav-item active" data-tab="dashboard">Analytics</div>
     </div>
 
     <div class="nav-group">
-      <div class="nav-label">CMS</div>
-      <div class="nav-item" onclick="switchTab('shlokas')">Shlokas</div>
-      <div class="nav-item" onclick="switchTab('blogs')">Blogs</div>
-      <div class="nav-item" onclick="switchTab('artwork')">Artwork</div>
-      <div class="nav-item" onclick="switchTab('testimonials')">Testimonials</div>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-label">LMS</div>
-      <div class="nav-item" onclick="switchTab('courses')">Courses</div>
-      <div class="nav-item" onclick="switchTab('quizzes')">Quizzes</div>
-      <div class="nav-item" onclick="switchTab('certificates')">Certificates</div>
-      <div class="nav-item" onclick="switchTab('students')">Students</div>
+      <div class="nav-label">Content</div>
+      <div class="nav-item" data-tab="shlokas">Shlokas</div>
+      <div class="nav-item" data-tab="blogs">Blogs</div>
+      <div class="nav-item" data-tab="artwork">Artwork</div>
+      <div class="nav-item" data-tab="testimonials">Testimonials</div>
     </div>
 
     <div class="nav-group">
       <div class="nav-label">System</div>
-      <div class="nav-item" onclick="switchTab('settings')">Settings</div>
+      <div class="nav-item" data-tab="push">Push Notifications</div>
+      <div class="nav-item" data-tab="backup">Backup / Export</div>
     </div>
+
   </div>
 
   <div class="sidebar-footer">
@@ -59,133 +65,226 @@
   </div>
 </aside>
 
-<!-- MAIN -->
+<!-- ========== MAIN ========== -->
 <main class="main-wrapper">
+
 <header class="top-header">
-  <div id="page-title" class="page-title">Dashboard</div>
+  <div id="page-title" class="page-title">Analytics</div>
 </header>
 
 <div class="content-scroll">
 
+<!-- ================= ANALYTICS DASHBOARD ================= -->
 <section id="view-dashboard" class="view-section active">
-  <div id="stats-grid" class="stats-grid"></div>
+
+  <div class="stats-grid" id="stats-grid">
+    <!-- JS se cards aayenge -->
+  </div>
+
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Recent Activity (Auto)</div>
+    </div>
+
+    <div style="padding:1.5rem;color:#64748b;font-size:0.9rem">
+      ✔ New shloka → push auto<br>
+      ✔ New blog → push auto<br>
+      ✔ Likes → tracked automatically<br>
+      ✔ Certificates → auto generated
+    </div>
+  </div>
+
 </section>
 
+<!-- ================= SHLOKAS ================= -->
 <section id="view-shlokas" class="view-section">
-  <button class="btn btn-primary" onclick="openShloka()">+ Add Shloka</button>
-  <table><tbody id="table-shlokas"></tbody></table>
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Shlokas</div>
+      <button class="btn btn-primary" onclick="addShloka()">+ Add Shloka</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Adhyay</th>
+          <th>Shloka</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="shloka-table"></tbody>
+    </table>
+  </div>
 </section>
 
+<!-- ================= BLOGS ================= -->
 <section id="view-blogs" class="view-section">
-  <button class="btn btn-primary" onclick="openBlog()">+ Add Blog</button>
-  <table><tbody id="table-blogs"></tbody></table>
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Blogs</div>
+      <button class="btn btn-primary" onclick="addBlog()">+ Add Blog</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="blog-table"></tbody>
+    </table>
+  </div>
 </section>
 
+<!-- ================= ARTWORK ================= -->
 <section id="view-artwork" class="view-section">
-  <button class="btn btn-primary" onclick="openArtwork()">+ Add Artwork</button>
-  <table><tbody id="table-artwork"></tbody></table>
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Artwork</div>
+      <button class="btn btn-primary" onclick="addArtwork()">+ Add Artwork</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Likes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="artwork-table"></tbody>
+    </table>
+  </div>
 </section>
 
+<!-- ================= TESTIMONIALS ================= -->
 <section id="view-testimonials" class="view-section">
-  <button class="btn btn-primary" onclick="openTestimonial()">+ Add Testimonial</button>
-  <table><tbody id="table-testimonials"></tbody></table>
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Testimonials</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="testimonial-table"></tbody>
+    </table>
+  </div>
+</section>
+<!-- ================= PUSH NOTIFICATIONS ================= -->
+<section id="view-push" class="view-section">
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Send Push Notification</div>
+    </div>
+
+    <div style="padding:1.5rem">
+      <input
+        id="push-title"
+        class="form-control"
+        placeholder="Notification title"
+      />
+
+      <textarea
+        id="push-body"
+        class="form-control"
+        placeholder="Notification message"
+        style="margin-top:1rem"
+      ></textarea>
+
+      <button
+        class="btn btn-primary"
+        style="margin-top:1rem"
+        onclick="sendPush()"
+      >
+        🚀 Send Notification
+      </button>
+
+      <p id="push-status" style="margin-top:0.75rem;font-size:0.85rem"></p>
+    </div>
+  </div>
 </section>
 
-<section id="view-courses" class="view-section">
-  <button class="btn btn-primary" onclick="openCourse()">+ Add Course</button>
-  <div id="course-list"></div>
-</section>
+<!-- ================= BACKUP / EXPORT ================= -->
+<section id="view-backup" class="view-section">
+  <div class="data-card">
+    <div class="card-header">
+      <div class="card-title">Backup / Export Data</div>
+    </div>
 
-<section id="view-quizzes" class="view-section">
-  <button class="btn btn-primary" onclick="openQuiz()">+ Create Quiz</button>
-  <table><tbody id="quiz-table"></tbody></table>
-</section>
+    <div style="padding:1.5rem">
+      <p style="color:#64748b;font-size:0.9rem">
+        Download complete database data in JSON format.
+      </p>
 
-<section id="view-certificates" class="view-section">
-  <table><tbody id="cert-table"></tbody></table>
-</section>
-
-<section id="view-students" class="view-section">
-  <table><tbody id="student-table"></tbody></table>
-</section>
-
-<section id="view-settings" class="view-section">
-  <textarea id="about-text" class="form-control"></textarea>
-  <button class="btn btn-primary" onclick="saveAbout()">Save</button>
+      <button class="btn btn-primary" onclick="exportData()">
+        ⬇ Export All Data
+      </button>
+    </div>
+  </div>
 </section>
 
 </div>
 </main>
 </div>
 
+<!-- ================= CORE SCRIPT ================= -->
 <script>
+/* ========= HELPERS ========= */
 const qs = id => document.getElementById(id)
 const qsa = q => document.querySelectorAll(q)
 let ADMIN_PASSWORD = ''
-</script>
 
-</body>
-</html>
-<script>
-/* =========================
-   API HELPER
-========================= */
 async function api(url, method='GET', body=null){
   const opt = { method, headers:{'Content-Type':'application/json'} }
   if(body) opt.body = JSON.stringify(body)
   const r = await fetch(url, opt)
+  if(!r.ok) throw new Error('API error')
   return r.json()
 }
 
-/* =========================
-   LOGIN
-========================= */
+/* ========= LOGIN ========= */
 qs('login-form').onsubmit = async e => {
   e.preventDefault()
   ADMIN_PASSWORD = qs('password').value
 
-  const r = await fetch('/api/login',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ password: ADMIN_PASSWORD })
-  })
-
-  if(!r.ok) return alert('Wrong password')
-
-  qs('login-section').style.display = 'none'
-  qs('admin-layout').style.display = 'grid'
-  switchTab('dashboard')
-}
-
-/* =========================
-   SIDEBAR NAV
-========================= */
-function switchTab(tab){
-  qsa('.view-section').forEach(v => v.classList.remove('active'))
-  qs('view-' + tab).classList.add('active')
-  qs('page-title').innerText = tab.toUpperCase()
-
-  const loaders = {
-    dashboard: loadDashboard,
-    shlokas: loadShlokas,
-    blogs: loadBlogs,
-    artwork: loadArtwork,
-    testimonials: loadTestimonials,
-    courses: loadCourses,
-    quizzes: loadQuizzes,
-    certificates: loadCertificates,
-    students: loadStudents,
-    settings: loadSettings
+  try{
+    await api('/api/login','POST',{password:ADMIN_PASSWORD})
+    qs('login-section').style.display='none'
+    qs('admin-layout').style.display='grid'
+    loadAnalytics()
+  }catch{
+    alert('Wrong password')
   }
-  loaders[tab]?.()
 }
 
-/* =========================
-   DASHBOARD
-========================= */
-async function loadDashboard(){
+/* ========= SIDEBAR ========= */
+qsa('.nav-item').forEach(item=>{
+  item.onclick = ()=>{
+    qsa('.nav-item').forEach(n=>n.classList.remove('active'))
+    item.classList.add('active')
+
+    const tab = item.dataset.tab
+    qsa('.view-section').forEach(v=>v.classList.remove('active'))
+    qs('view-'+tab).classList.add('active')
+
+    qs('page-title').innerText = tab.toUpperCase()
+
+    if(tab==='dashboard') loadAnalytics()
+  }
+})
+
+/* ========= ANALYTICS ========= */
+async function loadAnalytics(){
   const grid = qs('stats-grid')
-  grid.innerHTML = ''
+  grid.innerHTML=''
 
   const map = {
     Shlokas:'/api/shlokas',
@@ -200,381 +299,238 @@ async function loadDashboard(){
     grid.innerHTML += `
       <div class="stat-card">
         <div class="stat-head">${k}</div>
-        <div class="stat-value">${d.length || 0}</div>
+        <div class="stat-value">${d.length}</div>
       </div>`
   }
 }
-
-/* =========================
-   SHLOKAS
-========================= */
-function openShloka(s=null){
-  const a = prompt('Adhyay', s?.adhyay || '')
-  if(!a) return
-  const sh = prompt('Shloka', s?.shloka || '')
-  const t = prompt('Text', s?.text || '')
-  const v = prompt('YouTube ID', s?.video_id || '')
-
-  api('/api/shlokas' + (s?'/'+s._id:''), s?'PUT':'POST',{
-    adhyay:a, shloka:sh, text:t, video_id:v,
-    password:ADMIN_PASSWORD
-  }).then(loadShlokas)
-}
-
+</script>
+<script>
+/* ================= SHLOKAS ================= */
 async function loadShlokas(){
-  const tb = qs('table-shlokas')
-  tb.innerHTML = ''
-  const d = await api('/api/shlokas')
-  d.forEach(s=>{
-    tb.innerHTML += `
+  const tb = qs('shloka-table')
+  tb.innerHTML=''
+  const data = await api('/api/shlokas')
+
+  data.forEach(s=>{
+    tb.innerHTML+=`
       <tr>
         <td>${s.adhyay}</td>
         <td>${s.shloka}</td>
         <td>
-          <button onclick='openShloka(${JSON.stringify(s)})'>Edit</button>
+          <button onclick="editShloka('${s._id}')">Edit</button>
           <button onclick="deleteShloka('${s._id}')">Delete</button>
         </td>
       </tr>`
   })
 }
+
+function addShloka(){
+  const adhyay = prompt('Adhyay number')
+  const shloka = prompt('Shloka number')
+  const text = prompt('Shloka text')
+  const video = prompt('YouTube Video ID')
+  if(!adhyay||!shloka||!video) return
+
+  api('/api/shlokas','POST',{
+    adhyay, shloka, text, video_id:video,
+    password:ADMIN_PASSWORD
+  }).then(loadShlokas)
+}
+
+function editShloka(id){
+  api('/api/shloka/'+id).then(s=>{
+    const text = prompt('Edit text',s.text||'')
+    api('/api/shlokas/'+id,'PUT',{
+      adhyay:s.adhyay,
+      shloka:s.shloka,
+      text,
+      video_id:s.video_id,
+      password:ADMIN_PASSWORD
+    }).then(loadShlokas)
+  })
+}
+
 function deleteShloka(id){
+  if(!confirm('Delete shloka?'))return
   api('/api/shlokas/'+id,'DELETE',{password:ADMIN_PASSWORD})
     .then(loadShlokas)
 }
 
-/* =========================
-   BLOGS
-========================= */
-function openBlog(b=null){
-  const t = prompt('Title', b?.title || '')
-  if(!t) return
-  const c = prompt('Content', b?.content || '')
-  const i = prompt('Image URL', b?.imageUrl || '')
-
-  api('/api/blog'+(b?'/'+b._id:''), b?'PUT':'POST',{
-    title:t, content:c, imageUrl:i,
-    password:ADMIN_PASSWORD
-  }).then(loadBlogs)
-}
-
+/* ================= BLOGS ================= */
 async function loadBlogs(){
-  const tb = qs('table-blogs')
-  tb.innerHTML = ''
-  const d = await api('/api/blog')
-  d.forEach(b=>{
-    tb.innerHTML += `
+  const tb = qs('blog-table')
+  tb.innerHTML=''
+  const data = await api('/api/blog')
+
+  data.forEach(b=>{
+    tb.innerHTML+=`
       <tr>
         <td>${b.title}</td>
+        <td>${new Date(b.createdAt).toLocaleDateString('en-IN')}</td>
         <td>
-          <button onclick='openBlog(${JSON.stringify(b)})'>Edit</button>
           <button onclick="deleteBlog('${b._id}')">Delete</button>
         </td>
       </tr>`
   })
 }
+
+function addBlog(){
+  const title = prompt('Title')
+  const content = prompt('Content')
+  const image = prompt('Image URL')
+  if(!title||!content)return
+
+  api('/api/blog','POST',{
+    title, content, imageUrl:image,
+    password:ADMIN_PASSWORD
+  }).then(loadBlogs)
+}
+
 function deleteBlog(id){
+  if(!confirm('Delete blog?'))return
   api('/api/blog/'+id,'DELETE',{password:ADMIN_PASSWORD})
     .then(loadBlogs)
 }
 
-/* =========================
-   ARTWORK
-========================= */
-function openArtwork(a=null){
-  const t = prompt('Title', a?.title || '')
-  if(!t) return
-  const i = prompt('Image URL', a?.imageUrl || '')
-
-  api('/api/artwork'+(a?'/'+a._id:''), a?'PUT':'POST',{
-    title:t, imageUrl:i,
-    password:ADMIN_PASSWORD
-  }).then(loadArtwork)
-}
-
+/* ================= ARTWORK ================= */
 async function loadArtwork(){
-  const tb = qs('table-artwork')
-  tb.innerHTML = ''
-  const d = await api('/api/artwork')
-  d.forEach(a=>{
-    tb.innerHTML += `
+  const tb = qs('artwork-table')
+  tb.innerHTML=''
+  const data = await api('/api/artwork')
+
+  data.forEach(a=>{
+    tb.innerHTML+=`
       <tr>
         <td>${a.title}</td>
+        <td>${a.likes||0}</td>
         <td>
-          <button onclick='openArtwork(${JSON.stringify(a)})'>Edit</button>
           <button onclick="deleteArtwork('${a._id}')">Delete</button>
         </td>
       </tr>`
   })
 }
+
+function addArtwork(){
+  const title = prompt('Artwork title')
+  const image = prompt('Image URL')
+  if(!title||!image)return
+
+  api('/api/artwork','POST',{
+    title,imageUrl:image,
+    password:ADMIN_PASSWORD
+  }).then(loadArtwork)
+}
+
 function deleteArtwork(id){
+  if(!confirm('Delete artwork?'))return
   api('/api/artwork/'+id,'DELETE',{password:ADMIN_PASSWORD})
     .then(loadArtwork)
 }
 
-/* =========================
-   TESTIMONIALS
-========================= */
-function openTestimonial(t=null){
-  const n = prompt('Name', t?.author || '')
-  const q = prompt('Quote', t?.quote || '')
-  const s = prompt('Status', t?.status || 'pending')
-
-  api('/api/testimonials'+(t?'/'+t._id:''), t?'PUT':'POST',{
-    author:n, quote:q, status:s,
-    password:ADMIN_PASSWORD
-  }).then(loadTestimonials)
-}
-
+/* ================= TESTIMONIALS ================= */
 async function loadTestimonials(){
-  const tb = qs('table-testimonials')
-  tb.innerHTML = ''
-  const d = await api('/api/testimonials/all')
-  d.forEach(t=>{
-    tb.innerHTML += `
+  const tb = qs('testimonial-table')
+  tb.innerHTML=''
+  const data = await api('/api/testimonials/all')
+
+  data.forEach(t=>{
+    tb.innerHTML+=`
       <tr>
         <td>${t.author}</td>
         <td>${t.status}</td>
         <td>
-          <button onclick='openTestimonial(${JSON.stringify(t)})'>Edit</button>
+          <button onclick="approveTestimonial('${t._id}')">Approve</button>
           <button onclick="deleteTestimonial('${t._id}')">Delete</button>
         </td>
       </tr>`
   })
 }
-function deleteTestimonial(id){
-  api('/api/testimonials/'+id,'DELETE',{password:ADMIN_PASSWORD})
-    .then(loadTestimonials)
-}
 
-/* =========================
-   COURSES
-========================= */
-function openCourse(c=null){
-  const t = prompt('Title', c?.title || '')
-  if(!t) return
-  const a = prompt('Adhyay', c?.adhyay || '')
-  const d = prompt('Description', c?.description || '')
-  const i = prompt('Image URL', c?.imageUrl || '')
-
-  api('/api/courses'+(c?'/'+c._id:''), c?'PUT':'POST',{
-    title:t, adhyay:a, description:d, imageUrl:i,
-    shlokas:[], password:ADMIN_PASSWORD
-  }).then(loadCourses)
-}
-
-async function loadCourses(){
-  const box = qs('course-list')
-  box.innerHTML = ''
-  const d = await api('/api/courses')
-  d.forEach(c=>{
-    box.innerHTML += `
-      <div>
-        <b>${c.title}</b>
-        <button onclick='openCourse(${JSON.stringify(c)})'>Edit</button>
-        <button onclick="deleteCourse('${c._id}')">Delete</button>
-      </div>`
-  })
-}
-function deleteCourse(id){
-  fetch('/api/courses/'+id,{method:'DELETE'})
-    .then(loadCourses)
-}
-
-/* =========================
-   QUIZZES (LIST ONLY)
-========================= */
-async function loadQuizzes(){
-  const tb = qs('quiz-table')
-  tb.innerHTML = ''
-  const d = await api('/api/quiz')
-  d.forEach(q=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${q.course?.title || q.course}</td>
-        <td>${q.passPercentage}%</td>
-        <td>
-          <button onclick="deleteQuiz('${q._id}')">Delete</button>
-        </td>
-      </tr>`
-  })
-}
-function deleteQuiz(id){
-  api('/api/quiz/'+id,'DELETE',{password:ADMIN_PASSWORD})
-    .then(loadQuizzes)
-}
-
-/* =========================
-   CERTIFICATES (DOWNLOAD IN PART 3)
-========================= */
-async function loadCertificates(){
-  const tb = qs('cert-table')
-  tb.innerHTML = ''
-  const d = await api('/api/certificates')
-  d.forEach(c=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${c.name}</td>
-        <td>${c.courseTitle}</td>
-        <td>${c.status}</td>
-        <td>
-          <button onclick="approveCert('${c._id}')">Approve</button>
-          <button onclick="deleteCert('${c._id}')">Delete</button>
-        </td>
-      </tr>`
-  })
-}
-function approveCert(id){
-  api('/api/certificates/approve/'+id,'PUT')
-    .then(loadCertificates)
-}
-function deleteCert(id){
-  api('/api/certificates/'+id,'DELETE')
-    .then(loadCertificates)
-}
-
-/* =========================
-   STUDENTS
-========================= */
-async function loadStudents(){
-  const tb = qs('student-table')
-  tb.innerHTML = ''
-  const d = await api('/api/admin/detailed-students')
-  d.forEach(s=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${s._id}</td>
-        <td>${s.coursesEnrolled}</td>
-        <td>${s.quizzesPassed}</td>
-      </tr>`
-  })
-}
-
-/* =========================
-   SETTINGS
-========================= */
-async function loadSettings(){
-  const a = await api('/api/about')
-  qs('about-text').value = a.content || ''
-}
-function saveAbout(){
-  api('/api/about','POST',{
-    newText:qs('about-text').value,
+function approveTestimonial(id){
+  api('/api/testimonials/'+id,'PUT',{
+    status:'approved',
     password:ADMIN_PASSWORD
-  }).then(()=>alert('Saved'))
+  }).then(loadTestimonials)
 }
+
+function deleteTestimonial(id){
+  if(!confirm('Delete testimonial?'))return
+  api('/api/testimonials/'+id,'DELETE',{
+    password:ADMIN_PASSWORD
+  }).then(loadTestimonials)
+}
+
+/* ========= TAB LOAD HOOK ========= */
+const cmsLoaders={
+  shlokas:loadShlokas,
+  blogs:loadBlogs,
+  artwork:loadArtwork,
+  testimonials:loadTestimonials
+}
+
+qsa('.nav-item').forEach(i=>{
+  i.addEventListener('click',()=>{
+    const tab=i.dataset.tab
+    cmsLoaders[tab]?.()
+  })
+})
 </script>
 <script>
-/* ==================================================
-   QUIZ MCQ EDITOR (ADD / EDIT)
-================================================== */
+/* ================= PUSH ================= */
+async function sendPush(){
+  const title = qs('push-title').value.trim()
+  const body  = qs('push-body').value.trim()
+  const status = qs('push-status')
 
-let QUIZ_QUESTIONS = []
-
-// Open Quiz Editor (Add / Edit)
-async function openQuiz(q=null){
-  // reuse existing modal-less flow (simple + stable)
-  // If you want modal UI later, yahi logic reuse hoga
-  const course = prompt('Course ID', q?.course?._id || q?.course || '')
-  if(!course) return
-
-  const pass = prompt('Pass Percentage', q?.passPercentage || 50)
-
-  QUIZ_QUESTIONS = q?.questions
-    ? JSON.parse(JSON.stringify(q.questions))
-    : []
-
-  // Add questions interactively
-  let addMore = true
-  while(addMore){
-    const ques = prompt('Question (Cancel to stop)')
-    if(!ques) break
-
-    const options = []
-    for(let i=1;i<=4;i++){
-      options.push(prompt(`Option ${i}`) || '')
-    }
-    const correctIndex = Number(prompt('Correct option index (0-3)',0))
-
-    QUIZ_QUESTIONS.push({
-      question: ques,
-      options,
-      correctIndex
-    })
+  if(!title || !body){
+    status.innerText = '⚠️ Title and message required'
+    return
   }
 
-  // Save quiz
-  await api('/api/quiz','POST',{
-    course,
-    passPercentage: pass,
-    questions: QUIZ_QUESTIONS,
-    password: ADMIN_PASSWORD
-  })
+  status.innerText = 'Sending...'
 
-  alert('Quiz saved')
-  loadQuizzes()
+  try{
+    await api('/api/push/send','POST',{
+      title,
+      body,
+      password:ADMIN_PASSWORD
+    })
+    status.innerText = '✅ Notification sent'
+    qs('push-title').value=''
+    qs('push-body').value=''
+  }catch{
+    status.innerText = '❌ Failed to send notification'
+  }
 }
 
-/* ==================================================
-   QUIZ LIST (EDIT + DELETE)
-================================================== */
-async function loadQuizzes(){
-  const tb = qs('quiz-table')
-  tb.innerHTML = ''
-  const d = await api('/api/quiz')
+/* ================= BACKUP / EXPORT ================= */
+async function exportData(){
+  const data = {}
 
-  d.forEach(q=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${q.course?.title || q.course}</td>
-        <td>${q.passPercentage}%</td>
-        <td>
-          <button onclick='openQuiz(${JSON.stringify(q)})'>Edit</button>
-          <button onclick="deleteQuiz('${q._id}')">Delete</button>
-        </td>
-      </tr>`
-  })
-}
+  const endpoints = {
+    shlokas:'/api/shlokas',
+    blogs:'/api/blog',
+    artwork:'/api/artwork',
+    courses:'/api/courses',
+    certificates:'/api/certificates'
+  }
 
-/* ==================================================
-   CERTIFICATE DOWNLOAD BUTTON
-================================================== */
-async function loadCertificates(){
-  const tb = qs('cert-table')
-  tb.innerHTML = ''
-  const d = await api('/api/certificates')
+  for(const key in endpoints){
+    data[key] = await api(endpoints[key])
+  }
 
-  d.forEach(c=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${c.name}</td>
-        <td>${c.courseTitle}</td>
-        <td>${c.status}</td>
-        <td>
-          ${c.status === 'approved'
-            ? `<button onclick="downloadCertificate('${c.mobile}','${c.courseTitle}')">
-                Download
-               </button>`
-            : ''
-          }
-          <button onclick="approveCert('${c._id}')">Approve</button>
-          <button onclick="deleteCert('${c._id}')">Delete</button>
-        </td>
-      </tr>`
-  })
-}
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    { type:'application/json' }
+  )
 
-function downloadCertificate(mobile, courseTitle){
-  const url =
-    `/api/certificate?mobile=${encodeURIComponent(mobile)}&courseTitle=${encodeURIComponent(courseTitle)}`
-  window.open(url, '_blank')
-}
-
-/* ==================================================
-   FINAL SAFETY CHECKS (OPTIONAL BUT GOOD)
-================================================== */
-function deleteQuiz(id){
-  if(!confirm('Delete quiz?')) return
-  api('/api/quiz/'+id,'DELETE',{password:ADMIN_PASSWORD})
-    .then(loadQuizzes)
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 </script>
+</body>
+</html>
