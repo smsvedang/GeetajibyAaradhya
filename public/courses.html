@@ -11,13 +11,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="courses.css">
 
     <style>
         .learning-hero {
             padding: 120px 0 60px;
             text-align: center;
             background: linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 30px 0;
         }
 
         .course-card-premium {
@@ -28,6 +34,8 @@
             transition: 0.3s;
             border: 1px solid var(--border);
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
 
         .course-card-premium:hover {
@@ -38,13 +46,15 @@
         .course-image-box {
             width: 100%;
             aspect-ratio: 16/9;
-            background: #f0f0f0;
+            background: #f0f0f0 no-repeat center;
             background-size: cover;
-            background-position: center;
         }
 
         .course-info {
             padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .course-info h3 {
@@ -56,11 +66,10 @@
         .course-info p {
             font-size: 0.95rem;
             color: var(--text-muted);
-            height: 3em;
-            overflow: hidden;
+            margin-bottom: 20px;
+            flex: 1;
         }
 
-        /* Netflix Style Detail */
         .course-detail-view {
             padding-top: 100px;
             animation: fadeIn 0.5s ease;
@@ -82,7 +91,7 @@
 
         .status-badge {
             display: inline-block;
-            padding: 5px 12px;
+            padding: 5px 15px;
             border-radius: 50px;
             font-size: 0.8rem;
             font-weight: 700;
@@ -90,13 +99,36 @@
         }
 
         .status-pending {
-            background: #FFF3E0;
-            color: #E65100;
+            background: #f0f0f0;
+            color: #666;
         }
 
         .status-done {
             background: #E8F5E9;
             color: #2E7D32;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .detail-hero {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .detail-video-main {
+                order: -1;
+            }
         }
     </style>
 </head>
@@ -106,11 +138,12 @@
     <nav class="top-navbar">
         <div class="container nav-container">
             <div class="logo"><a href="index.html">Warrior Aaradhya</a></div>
-            <div class="menu-links">
+            <div class="menu-links" style="display: flex;">
                 <a href="index.html" class="main-tab-button">Home</a>
-                <a href="courses.html" class="main-tab-button active">Learning Center</a>
-                <button class="main-tab-button" id="back-btn" style="display:none; background:#eee;"><i
-                        class="fas fa-arrow-left"></i> All Courses</button>
+                <button class="main-tab-button" id="back-btn"
+                    style="display:none; background:#eee; border-radius: 10px;">
+                    <i class="fas fa-arrow-left"></i> All Courses
+                </button>
             </div>
         </div>
     </nav>
@@ -134,68 +167,121 @@
     <!-- DETAIL VIEW -->
     <div id="single-course-view" class="container course-detail-view" style="display:none;">
         <div class="detail-hero">
-            <div>
-                <h1 id="view-course-title" style="font-size: 3rem; font-weight: 900; line-height: 1;">Course Title</h1>
-                <p id="view-course-desc" style="margin: 20px 0; font-size: 1.1rem; color: var(--text-muted);"></p>
-                <div id="progress-stats" style="font-weight: 700; color: var(--primary);">0% Complete</div>
+            <div id="course-meta">
+                <h1 id="view-course-title" style="font-size: 3rem; font-weight: 900; line-height: 1.1;">Course Title
+                </h1>
+                <p id="view-course-desc"
+                    style="margin: 25px 0; font-size: 1.15rem; color: var(--text-muted); line-height: 1.6;"></p>
+                <div id="progress-stats"
+                    style="font-size: 1.2rem; font-weight: 800; color: var(--primary); background: rgba(216,67,21,0.05); display: inline-block; padding: 10px 20px; border-radius: 12px; border: 1px dashed var(--primary);">
+                    <i class="fas fa-tasks"></i> 0% Complete
+                </div>
             </div>
             <div class="detail-video-main">
-                <img id="view-course-img" src="" style="width: 100%; display: block;">
+                <img id="view-course-img" src="" style="width: 100%; aspect-ratio: 16/9; object-fit: cover;">
             </div>
         </div>
 
-        <h2 style="margin-bottom: 30px;">Curriculum</h2>
-        <div id="course-shlokas" class="shloka-grid" style="padding: 0 0 60px;">
-            <!-- JS Injected -->
+        <div style="border-top: 1px solid #eee; padding-top: 40px;">
+            <h2 style="font-size: 2rem; margin-bottom: 30px;">Curriculum Map</h2>
+            <div id="course-shlokas" class="shloka-grid" style="padding: 0; gap: 20px;">
+                <!-- JS Injected: SHLOKAS FROM courses.js -->
+            </div>
         </div>
 
-        <div id="quiz-box" class="form-card" style="display:none; text-align:center; margin-bottom: 60px;">
-            <h3>🎓 Ready for Certification?</h3>
-            <p style="margin-bottom: 20px;">You've completed all lessons. Take the quiz to earn your certificate.</p>
-            <button class="primary-btn" onclick="startQuiz()" style="width: auto; padding: 15px 40px;">Begin Final
+        <div id="quiz-box" class="record-card"
+            style="display:none; text-align:center; margin: 60px 0; background: #FFF8E1;">
+            <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h3>Assessment Ready!</h3>
+            <p style="margin-bottom: 25px; font-size: 1.1rem;">Congratulations on finishing all the lessons. Are you
+                ready for the final certification quiz?</p>
+            <button class="watch-btn" onclick="startQuiz()" style="cursor: pointer; border: none;">Begin Professional
                 Quiz</button>
         </div>
 
-        <div id="certificate-box" class="form-card" style="display:none; margin-bottom: 100px;">
-            <!-- Form Injected -->
+        <div id="certificate-box" class="record-card" style="display:none; margin-bottom: 100px;">
+            <!-- Certificate Form from courses.js -->
         </div>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="courses.js"></script>
     <script>
-        // Override some functions for the new UI
-        const oldOpenCourse = openCourse;
+        // Ensure UI stays in sync with detailed view requirements
+        const origOpen = window.openCourse;
         window.openCourse = async (id) => {
+            // Visual switch
             document.getElementById('course-list-view').style.display = 'none';
             document.getElementById('single-course-view').style.display = 'block';
-            document.getElementById('back-btn').style.display = 'flex';
+            document.getElementById('back-btn').style.display = 'block';
             window.scrollTo(0, 0);
 
-            // Standard loading logic from courses.js
+            // Fetch course details
             const res = await fetch(`/api/courses/${id}`);
-            currentCourse = await res.json();
+            const course = await res.json();
+            window.currentCourse = course; // Set global for courses.js
+            localStorage.setItem('active_course', id);
 
-            document.getElementById('view-course-title').innerText = currentCourse.title;
-            document.getElementById('view-course-desc').innerText = currentCourse.description || '';
-            document.getElementById('view-course-img').src = currentCourse.imageUrl || '/favicon.png';
+            // Update Meta
+            document.getElementById('view-course-title').innerText = course.title;
+            document.getElementById('view-course-desc').innerText = course.description || 'Embark on a spiritual journey of the soul.';
+            document.getElementById('view-course-img').src = course.imageUrl || '/favicon.png';
 
+            // IMPORTANT: Inject curriculum manually to ensure cards are created
             const shlokaBox = document.getElementById('course-shlokas');
             shlokaBox.innerHTML = '';
-            currentCourse.shlokas.forEach((s, idx) => {
-                const card = document.createElement('div');
-                card.className = 'shloka-item-card';
-                card.innerHTML = `
-                    <div class="card-video-container"><div id="player-${s._id}"></div></div>
-                    <div class="card-content">
-                        <h3>Lesson ${idx + 1}: Shloka ${s.shloka}</h3>
-                        <p class="shloka-text">${s.text.substring(0, 100)}...</p>
-                        <div id="status-${s._id}" class="status-badge status-pending">In Progress</div>
-                    </div>`;
-                shlokaBox.appendChild(card);
-            });
 
-            setTimeout(() => { initPlayers(); restoreProgress(); }, 500);
+            if (course.shlokas && course.shlokas.length > 0) {
+                course.shlokas.forEach((s, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'shloka-item-card';
+                    card.innerHTML = `
+                        <div class="card-video-container">
+                            <div id="player-${s._id}"></div>
+                        </div>
+                        <div class="card-content">
+                            <span style="color:var(--primary); font-weight:800; font-size:0.8rem; text-transform:uppercase;">Lesson ${idx + 1}</span>
+                            <h3 style="margin:5px 0 10px;">Shloka ${s.shloka}</h3>
+                            <p class="shloka-text" style="font-size:0.9rem;">${s.text ? s.text.substring(0, 120) + '...' : 'Sacred translation...'}</p>
+                            <div id="status-${s._id}" class="status-badge status-pending">
+                                <i class="fas fa-clock"></i> Pending
+                            </div>
+                        </div>`;
+                    shlokaBox.appendChild(card);
+                });
+
+                // Trigger courses.js listeners and status restoration
+                setTimeout(() => {
+                    if (window.initPlayers) window.initPlayers();
+                    if (window.restoreProgress) window.restoreProgress();
+                }, 400);
+            } else {
+                shlokaBox.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No lessons found in this course yet.</p>';
+            }
+        };
+
+        // Custom list loader to match new design
+        const origLoad = window.loadCourses;
+        window.loadCourses = async () => {
+            const res = await fetch('/api/courses');
+            const data = await res.json();
+            const list = document.getElementById('course-list');
+            list.innerHTML = '';
+            data.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'course-card-premium';
+                card.onclick = () => openCourse(c._id);
+                card.innerHTML = `
+                    <div class="course-image-box" style="background-image:url('${c.imageUrl || '/favicon.png'}')"></div>
+                    <div class="course-info">
+                        <h3>${c.title}</h3>
+                        <p>${c.description ? c.description.substring(0, 100) + '...' : 'A spiritual odyssey through the verses of the Geeta.'}</p>
+                        <div style="font-weight:700; color:var(--primary); margin-top:auto;">
+                            Explore Curriculum <i class="fas fa-arrow-right" style="font-size:0.8rem; margin-left:5px;"></i>
+                        </div>
+                    </div>`;
+                list.appendChild(card);
+            });
         };
 
         document.getElementById('back-btn').onclick = () => {
@@ -204,27 +290,14 @@
             document.getElementById('back-btn').style.display = 'none';
         };
 
-        // Redefine course card injection
-        async function loadCoursesCustom() {
-            const res = await fetch('/api/courses');
-            const data = await res.json();
-            const list = document.getElementById('course-list');
-            list.innerHTML = '';
-            data.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'course-card-premium';
-                div.onclick = () => openCourse(c._id);
-                div.innerHTML = `
-                    <div class="course-image-box" style="background-image:url('${c.imageUrl || '/favicon.png'}')"></div>
-                    <div class="course-info">
-                        <h3>${c.title}</h3>
-                        <p>${c.description || 'Spiritual journey through the Bhagavad Geeta.'}</p>
-                        <div style="margin-top:15px; font-weight:700; color:var(--primary);">Learn More <i class="fas fa-arrow-right"></i></div>
-                    </div>`;
-                list.appendChild(div);
-            });
-        }
-        window.loadCourses = loadCoursesCustom;
+        // Initialize
+        window.onload = () => {
+            loadCourses();
+            // Handle URL params if any
+            const params = new URLSearchParams(window.location.search);
+            const cid = params.get('courseId');
+            if (cid) openCourse(cid);
+        };
     </script>
 </body>
 
