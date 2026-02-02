@@ -16,7 +16,22 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
 
-    <!-- LOGIN -->
+    <!-- EDIT MODAL OVERLAY -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title">Edit Content</h2>
+                <div class="close-modal" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Dynamic form injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN SECTION -->
     <div id="login-section">
         <form id="login-form">
             <h2>Admin Login</h2>
@@ -27,7 +42,7 @@
         </form>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD SECTION -->
     <div id="admin-dashboard" class="admin-wrapper" style="display:none;">
 
         <!-- SIDEBAR -->
@@ -67,184 +82,119 @@
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN CONTENT AREA -->
         <main class="main-content">
 
-            <!-- DASHBOARD -->
+            <!-- TAB: DASHBOARD -->
             <div id="tab-dashboard" class="content-page active">
                 <h1><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
 
                 <div class="dashboard-stats">
                     <div class="stat-card">
-                        <h3>Total Shlokas</h3>
-                        <span id="stat-shlokas" class="stat-number">0</span>
+                        <h3>Shlokas</h3><span id="stat-shlokas" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Subscribers</h3>
-                        <span id="stat-subscribers" class="stat-number">0</span>
+                        <h3>Subscribers</h3><span id="stat-subscribers" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Total Likes</h3>
-                        <span id="stat-likes" class="stat-number">0</span>
+                        <h3>Likes</h3><span id="stat-likes" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Active Courses</h3>
-                        <span id="stat-courses" class="stat-number">0</span>
+                        <h3>Courses</h3><span id="stat-courses" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Pending Certs</h3>
-                        <span id="stat-certificates" class="stat-number" style="color: var(--warning);">0</span>
+                        <h3>Pending Certs</h3><span id="stat-certificates" class="stat-number"
+                            style="color: var(--warning);">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Total Students</h3>
-                        <span id="stat-students" class="stat-number">0</span>
+                        <h3>Total Students</h3><span id="stat-students" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Blog Posts</h3>
-                        <span id="stat-blog" class="stat-number">0</span>
+                        <h3>Blogs</h3><span id="stat-blog" class="stat-number">0</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Artworks</h3>
-                        <span id="stat-artwork" class="stat-number">0</span>
+                        <h3>Artworks</h3><span id="stat-artwork" class="stat-number">0</span>
                     </div>
                 </div>
 
                 <div class="dashboard-charts">
                     <div class="chart-card">
-                        <h3><i class="fas fa-chart-pie"></i> Certificates Status</h3>
-                        <canvas id="certStatusChart"></canvas>
+                        <h3>Certificates Status</h3><canvas id="certStatusChart"></canvas>
                     </div>
                     <div class="chart-card">
-                        <h3><i class="fas fa-chart-bar"></i> Certificates by Course</h3>
-                        <canvas id="certCourseChart"></canvas>
+                        <h3>Certificates by Course</h3><canvas id="certCourseChart"></canvas>
                     </div>
                 </div>
 
                 <div class="dashboard-activity">
                     <div class="activity-card">
-                        <h3><i class="fas fa-history"></i> Recent Certificates</h3>
+                        <h3>Recent Certificates</h3>
                         <ul id="recent-certificates"></ul>
                     </div>
                     <div class="activity-card">
-                        <h3><i class="fas fa-star"></i> Recent Testimonials</h3>
+                        <h3>Recent Testimonials</h3>
                         <ul id="recent-testimonials"></ul>
                     </div>
                 </div>
             </div>
 
-            <!-- SHLOKAS -->
+            <!-- TAB: SHLOKAS -->
             <div id="tab-shloka" class="content-page">
-                <h1><i class="fas fa-book-open"></i> Manage Shlokas</h1>
+                <h1>Manage Shlokas</h1>
                 <form id="shloka-form">
-                    <input type="hidden" id="shloka-id">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label>Adhyay</label>
-                            <input type="number" id="adhyay" placeholder="e.g. 1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Shloka Number</label>
-                            <input type="number" id="shloka" placeholder="e.g. 5" required>
-                        </div>
+                        <input type="number" id="adhyay" placeholder="Adhyay" required>
+                        <input type="number" id="shloka" placeholder="Shloka" required>
                     </div>
-                    <div class="form-group">
-                        <label>YouTube Video ID</label>
-                        <input id="video_url" placeholder="Enter ID from URL: youtube.com/watch?v=ID">
-                    </div>
-                    <div class="form-group">
-                        <label>Translation / Text</label>
-                        <textarea id="text" placeholder="Enter Hindi or English translation..."></textarea>
-                    </div>
-                    <button type="submit" id="shloka-submit-button">Save Shloka <i class="fas fa-save"></i></button>
-                    <button type="button" onclick="resetShlokaForm()" id="shloka-cancel-button"
-                        style="display:none; background: var(--text-muted);">Cancel</button>
+                    <input id="video_url" placeholder="YouTube Video ID">
+                    <textarea id="text" placeholder="Shloka translation..."></textarea>
+                    <button type="submit">Add New Shloka <i class="fas fa-plus"></i></button>
                 </form>
                 <div class="admin-item-list" id="shloka-list-admin"></div>
             </div>
 
-            <!-- COURSES -->
+            <!-- TAB: COURSES -->
             <div id="tab-courses" class="content-page">
-                <h1><i class="fas fa-graduation-cap"></i> Manage Courses</h1>
-                <button id="show-course-form" class="primary-btn" style="margin-bottom: 20px;">
-                    <i class="fas fa-plus"></i> Create New Course
-                </button>
+                <h1>Manage Courses</h1>
+                <button id="show-course-form" class="primary-btn" style="margin-bottom: 20px;">+ Create Course</button>
                 <div id="course-form-wrapper" style="display:none;">
                     <form id="course-form">
-                        <input type="hidden" id="course-id">
-                        <div class="form-group">
-                            <label>Course Title</label>
-                            <input id="course-title" placeholder="e.g. Gita Adhyay 1 Complete Course" required>
+                        <input id="course-title" placeholder="Course Title" required>
+                        <select id="course-adhyay" required></select>
+                        <textarea id="course-description" placeholder="Description..."></textarea>
+                        <div id="course-shloka-list"
+                            style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
                         </div>
-                        <div class="form-group">
-                            <label>Select Adhyay</label>
-                            <select id="course-adhyay" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="course-description" placeholder="What this course covers..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Select Shlokas for this Course</label>
-                            <div id="course-shloka-list"
-                                style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; border-radius: 8px;">
-                            </div>
-                        </div>
-                        <button type="submit">Save Course <i class="fas fa-check"></i></button>
+                        <button type="submit">Launch Course <i class="fas fa-rocket"></i></button>
                     </form>
                 </div>
                 <div class="admin-item-list" id="course-list"></div>
             </div>
 
-            <!-- QUIZZES -->
+            <!-- TAB: QUIZZES -->
             <div id="tab-quizzes" class="content-page">
-                <h1><i class="fas fa-vial"></i> Manage Quizzes</h1>
-                <div class="stat-card" style="margin-bottom: 30px;">
-                    <div class="form-group">
-                        <label>Select Course</label>
-                        <select id="quiz-course"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Passing Percentage (%)</label>
-                        <input type="number" id="quiz-pass" value="50">
-                    </div>
+                <h1>Manage Quizzes</h1>
+                <div class="stat-card" style="margin-bottom:30px;">
+                    <label>Pass Percentage</label>
+                    <select id="quiz-course"></select>
+                    <input type="number" id="quiz-pass" value="50">
                 </div>
-
                 <div id="quiz-questions"></div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button id="add-question" style="background: var(--secondary-gradient); color: white;">
-                        <i class="fas fa-plus-circle"></i> Add Question
-                    </button>
-                    <button id="quiz-save" class="primary-btn">
-                        <i class="fas fa-save"></i> Save Complete Quiz
-                    </button>
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button id="add-question" style="background:var(--secondary-gradient); color:white;">+ Add
+                        Question</button>
+                    <button id="quiz-save" class="primary-btn">Save Complete Quiz</button>
                 </div>
-
-                <h2 style="margin: 40px 0 20px;">Existing Quizzes</h2>
+                <h2 style="margin:30px 0 15px;">Active Quizzes</h2>
                 <div class="admin-item-list" id="quiz-list"></div>
             </div>
 
-            <!-- CERTIFICATES -->
+            <!-- TAB: CERTIFICATES -->
             <div id="tab-certificates" class="content-page">
-                <h1><i class="fas fa-certificate"></i> Manage Certificates</h1>
-                <div class="stat-card" style="margin-bottom: 30px;">
-                    <h3>Issue Manual Certificate</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                        <input id="cert-name" placeholder="Full Name">
-                        <input id="cert-mobile" placeholder="Mobile Number">
-                        <input id="cert-email" placeholder="Email (Optional)">
-                        <select id="cert-course"></select>
-                        <select id="cert-lang">
-                            <option value="hi">Hindi</option>
-                            <option value="en">English</option>
-                        </select>
-                        <button type="button" onclick="generateCertificate()" class="primary-btn">Generate &
-                            Preview</button>
-                    </div>
-                </div>
-
+                <h1>Certificates</h1>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                     <div id="certificate-pending">
-                        <h3>Pending Requests</h3>
+                        <h3>Pending Approvals</h3>
                     </div>
                     <div id="certificate-approved">
                         <h3>Approved History</h3>
@@ -252,97 +202,57 @@
                 </div>
             </div>
 
-            <!-- TESTIMONIALS -->
+            <!-- TAB: TESTIMONIALS -->
             <div id="tab-testimonials" class="content-page">
-                <h1><i class="fas fa-comment-dots"></i> Manage Testimonials</h1>
+                <h1>Testimonials</h1>
                 <form id="testimonial-form">
-                    <div class="form-group">
-                        <label>Author Name</label>
-                        <input id="testimonial-author" placeholder="John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Testimonial Text</label>
-                        <textarea id="testimonial-quote" placeholder="Spreading the wisdom..." required></textarea>
-                    </div>
-                    <button type="submit">Add Approved Testimonial <i class="fas fa-plus"></i></button>
+                    <input id="testimonial-author" placeholder="Author Name" required>
+                    <textarea id="testimonial-quote" placeholder="Testimonial..." required></textarea>
+                    <button type="submit">Add Approved Testimonial</button>
                 </form>
                 <div id="testimonial-list-pending"></div>
                 <div id="testimonial-list-approved"></div>
             </div>
 
-            <!-- BLOG -->
+            <!-- TAB: BLOG -->
             <div id="tab-blog" class="content-page">
-                <h1><i class="fas fa-pen-nib"></i> Manage Blog</h1>
+                <h1>Blog Posts</h1>
                 <form id="blog-form">
-                    <input type="hidden" id="blog-id">
-                    <div class="form-group">
-                        <label>Post Title</label>
-                        <input id="blog-title" placeholder="Blog Title" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Content (Markdown or HTML supported)</label>
-                        <textarea id="blog-content" placeholder="Write your blog post here..."></textarea>
-                    </div>
-                    <button type="submit">Publish Post <i class="fas fa-paper-plane"></i></button>
+                    <input id="blog-title" placeholder="Post Title" required>
+                    <textarea id="blog-content" placeholder="Content..."></textarea>
+                    <button type="submit">Publish Blog</button>
                 </form>
                 <div class="admin-item-list" id="blog-list-admin"></div>
             </div>
 
-            <!-- ARTWORK -->
+            <!-- TAB: ARTWORK -->
             <div id="tab-artwork" class="content-page">
-                <h1><i class="fas fa-palette"></i> Manage Artwork</h1>
+                <h1>Artwork Gallery</h1>
                 <form id="artwork-form">
-                    <div class="form-group">
-                        <label>Artwork Title</label>
-                        <input id="artwork-title" placeholder="Gita Art #1" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Image URL</label>
-                        <input id="artwork-url" placeholder="https://example.com/image.jpg" required>
-                    </div>
-                    <button type="submit">Add to Gallery <i class="fas fa-image"></i></button>
+                    <input id="artwork-title" placeholder="Artwork Name" required>
+                    <input id="artwork-url" placeholder="Image URL" required>
+                    <button type="submit">Add Artwork</button>
                 </form>
                 <div class="admin-item-list" id="artwork-list"></div>
             </div>
 
-            <!-- SITE SETTINGS -->
+            <!-- TAB: SITE SETTINGS -->
             <div id="tab-about" class="content-page">
-                <h1><i class="fas fa-cog"></i> Site Settings</h1>
-
-                <!-- PERSONAL NOTIFICATION FORM -->
-                <div class="stat-card" style="margin-bottom: 40px; border-left: 5px solid var(--primary);">
-                    <h3 style="color: var(--primary);"><i class="fas fa-paper-plane"></i> Send Personal Announcement
-                    </h3>
-                    <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">This will send a push
-                        notification to all subscribed users immediately.</p>
-                    <form id="push-form" style="box-shadow: none; border: none; padding: 0; margin: 0;">
-                        <div class="form-group">
-                            <label>Notification Title</label>
-                            <input id="push-title" placeholder="e.g. Jai Shri Krishna 🙏" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Message Body</label>
-                            <textarea id="push-body" placeholder="Enter your message here..." required></textarea>
-                        </div>
-                        <button type="submit" style="background: var(--primary-gradient); color: white;">
-                            Send to All Subscribers <i class="fas fa-broadcast-tower"></i>
-                        </button>
+                <h1>Site Settings</h1>
+                <div class="stat-card" style="margin-bottom:30px; border-left:5px solid var(--primary);">
+                    <h3>Send Broadcast Push</h3>
+                    <form id="push-form" style="box-shadow:none; border:none; padding:0;">
+                        <input id="push-title" placeholder="Title" required>
+                        <textarea id="push-body" placeholder="Message..." required></textarea>
+                        <button type="submit">Broadcast Now <i class="fas fa-broadcast-tower"></i></button>
                     </form>
                 </div>
-
                 <div class="stat-card">
-                    <h3>About Page Configuration</h3>
-                    <form id="about-form" style="box-shadow: none; border: none; padding: 0; margin-top: 20px;">
-                        <div class="form-group">
-                            <label>Header Image URL</label>
-                            <input id="about-image-url" placeholder="Image URL">
-                        </div>
-                        <div class="form-group">
-                            <label>Main Content</label>
-                            <textarea id="about-text-input"
-                                placeholder="Tell users about Aaradhya Geetaji..."></textarea>
-                        </div>
-                        <button type="submit">Update About Section <i class="fas fa-sync"></i></button>
+                    <h3>About Page</h3>
+                    <form id="about-form" style="box-shadow:none; border:none; padding:0;">
+                        <input id="about-image-url" placeholder="Hero Image URL">
+                        <textarea id="about-text-input" placeholder="About content..."></textarea>
+                        <button type="submit">Save Settings</button>
                     </form>
                 </div>
             </div>
@@ -355,731 +265,374 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            const loginForm = document.getElementById('login-form');
-            const loginSection = document.getElementById('login-section');
-            const adminDashboard = document.getElementById('admin-dashboard');
-            const sidebarButtons = document.querySelectorAll('.sidebar-button');
-            const pages = document.querySelectorAll('.content-page');
-
             let adminPassword = '';
 
-            /* --- TOAST LOGIC --- */
-            window.showToast = (message, type = 'info') => {
+            /* --- UI HELPERS --- */
+            window.showToast = (msg, type = 'info') => {
                 const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-
-                const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'exclamation-circle' : 'info-circle');
-
-                toast.innerHTML = `
-                    <i class="fas fa-${icon}"></i>
-                    <span>${message}</span>
-                `;
-
-                container.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.classList.add('fade-out');
-                    setTimeout(() => toast.remove(), 500);
-                }, 4000);
+                const t = document.createElement('div');
+                t.className = `toast ${type}`;
+                t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i> <span>${msg}</span>`;
+                container.appendChild(t);
+                setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 500); }, 4000);
             };
 
-            /* LOGIN */
-            loginForm.addEventListener('submit', async e => {
+            window.openEditModal = (title, html) => {
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-content').innerHTML = html;
+                document.getElementById('edit-modal').classList.add('active');
+            };
+
+            window.closeEditModal = () => {
+                document.getElementById('edit-modal').classList.remove('active');
+            };
+
+            /* --- LOGIN --- */
+            document.getElementById('login-form').onsubmit = async (e) => {
                 e.preventDefault();
                 const password = document.getElementById('password').value;
-
-                try {
-                    const r = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password })
-                    });
-
-                    const d = await r.json();
-                    if (!d.success) return showToast('Wrong password entered!', 'error');
-
-                    adminPassword = password;
-                    loginSection.style.display = 'none';
-                    adminDashboard.style.display = 'flex';
-
-                    showToast('Welcome back, Admin!', 'success');
-                    loadDashboard();
-                    loadAllData();
-                } catch (err) {
-                    showToast('Connection error!', 'error');
-                }
-            });
+                const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+                const d = await r.json();
+                if (!d.success) return showToast('Invalid Credentials!', 'error');
+                adminPassword = password;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'flex';
+                loadDashboard();
+                loadAllData();
+            };
 
             function loadAllData() {
-                loadTestimonials();
-                loadShlokasAdmin();
-                loadBlogPosts();
-                loadArtwork();
-                loadCoursesAdmin();
-                loadCertificates();
-                loadQuizzes();
-                loadAboutContent();
-                loadCoursesForCertificate();
-                loadCoursesForQuiz();
+                loadShlokasAdmin(); loadCoursesAdmin(); loadQuizzes(); loadCertificates();
+                loadTestimonials(); loadBlogPosts(); loadArtwork(); loadAboutContent();
+                loadAdhyayForCourses(); loadCoursesForQuiz();
             }
 
-            /* TAB SWITCH */
-            sidebarButtons.forEach(btn => {
+            /* --- TAB SWITCHING --- */
+            document.querySelectorAll('.sidebar-button').forEach(btn => {
                 btn.onclick = () => {
-                    sidebarButtons.forEach(b => b.classList.remove('active'));
-                    pages.forEach(p => p.classList.remove('active'));
-
+                    document.querySelectorAll('.sidebar-button').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
                     btn.classList.add('active');
-                    const tab = btn.dataset.tab;
-                    document.getElementById(tab).classList.add('active');
-
-                    if (tab === 'tab-dashboard') loadDashboard();
-                    if (tab === 'tab-shloka') loadShlokasAdmin();
-                    if (tab === 'tab-courses') { loadCoursesAdmin(); loadAdhyayForCourses(); }
-                    if (tab === 'tab-certificates') loadCertificates();
-                    if (tab === 'tab-quizzes') { loadCoursesForQuiz(); loadQuizzes(); }
-                    if (tab === 'tab-about') loadAboutContent();
+                    document.getElementById(btn.dataset.tab).classList.add('active');
                 };
             });
 
-            /* DASHBOARD */
+            /* --- DASHBOARD LOGIC --- */
             async function loadDashboard() {
-                const [shlokas, blogs, artwork, testimonials, courses, quizzes, certificates, pushCount, adminStats] = await Promise.all([
-                    fetch('/api/shlokas').then(r => r.json()),
-                    fetch('/api/blog').then(r => r.json()),
-                    fetch('/api/artwork').then(r => r.json()),
-                    fetch('/api/testimonials/all').then(r => r.json()),
-                    fetch('/api/courses').then(r => r.json()),
-                    fetch('/api/quiz').then(r => r.json()),
-                    fetch('/api/certificates').then(r => r.json()),
-                    fetch('/api/push/count').then(r => r.json()),
-                    fetch('/api/admin/stats').then(r => r.json())
-                ]);
+                try {
+                    const [shlokas, blogs, artwork, testimonials, courses, pushCount, adminStats, certificates] = await Promise.all([
+                        fetch('/api/shlokas').then(r => r.json()),
+                        fetch('/api/blog').then(r => r.json()),
+                        fetch('/api/artwork').then(r => r.json()),
+                        fetch('/api/testimonials/all').then(r => r.json()),
+                        fetch('/api/courses').then(r => r.json()),
+                        fetch('/api/push/count').then(r => r.json()),
+                        fetch('/api/admin/stats').then(r => r.json()),
+                        fetch('/api/certificates').then(r => r.json())
+                    ]);
 
-                document.getElementById('stat-shlokas').textContent = shlokas.length;
-                document.getElementById('stat-blog').textContent = blogs.length;
-                document.getElementById('stat-artwork').textContent = artwork.length;
-                document.getElementById('stat-courses').textContent = courses.length;
-                document.getElementById('stat-subscribers').textContent = pushCount.count || 0;
-                document.getElementById('stat-certificates').textContent = certificates.filter(c => c.status === 'pending').length;
+                    document.getElementById('stat-shlokas').textContent = shlokas.length;
+                    document.getElementById('stat-blog').textContent = blogs.length;
+                    document.getElementById('stat-artwork').textContent = artwork.length;
+                    document.getElementById('stat-courses').textContent = courses.length;
+                    document.getElementById('stat-subscribers').textContent = pushCount.count || 0;
+                    document.getElementById('stat-certificates').textContent = certificates.filter(c => c.status === 'pending').length;
+                    document.getElementById('stat-students').textContent = adminStats.stats?.find(s => s.label === 'Total Students')?.value || 0;
 
-                let likes = 0;
-                shlokas.forEach(s => likes += (s.likes || 0));
-                document.getElementById('stat-likes').textContent = likes;
+                    let likes = 0; shlokas.forEach(s => likes += (s.likes || 0));
+                    document.getElementById('stat-likes').textContent = likes;
 
-                const uniqueStudents = adminStats.stats?.find(s => s.label === 'Total Students')?.value || 0;
-                document.getElementById('stat-students').textContent = uniqueStudents;
-
-                // RECENT CERTIFICATES
-                const recentCertBox = document.getElementById('recent-certificates');
-                recentCertBox.innerHTML = '';
-                certificates.slice(0, 5).forEach(c => {
-                    recentCertBox.innerHTML += `<li><span>${c.name}</span> <span class="badge ${c.status}">${c.courseTitle}</span></li>`;
-                });
-
-                // RECENT TESTIMONIALS
-                const recentTestBox = document.getElementById('recent-testimonials');
-                recentTestBox.innerHTML = '';
-                testimonials.slice(0, 5).forEach(t => {
-                    recentTestBox.innerHTML += `<li><span>${t.author}</span> <small>${t.status}</small></li>`;
-                });
-
-                updateCharts(certificates);
+                    renderCharts(certificates);
+                } catch (e) { console.error(e); }
             }
 
-            function updateCharts(certificates) {
-                const approved = certificates.filter(c => c.status === 'approved').length;
-                const pending = certificates.filter(c => c.status === 'pending').length;
+            function renderCharts(certs) {
+                const old1 = Chart.getChart("certStatusChart"); if (old1) old1.destroy();
+                const old2 = Chart.getChart("certCourseChart"); if (old2) old2.destroy();
+
+                const app = certs.filter(c => c.status === 'approved').length;
+                const pen = certs.filter(c => c.status === 'pending').length;
 
                 new Chart(document.getElementById('certStatusChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Approved', 'Pending'],
-                        datasets: [{
-                            data: [approved, pending],
-                            backgroundColor: ['#10b981', '#f59e0b'],
-                            borderWidth: 0
-                        }]
-                    },
+                    type: 'doughnut', data: { labels: ['Approved', 'Pending'], datasets: [{ data: [app, pen], backgroundColor: ['#10b981', '#f59e0b'] }] },
                     options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
                 });
 
-                const courseMap = {};
-                certificates.forEach(c => {
-                    courseMap[c.courseTitle] = (courseMap[c.courseTitle] || 0) + 1;
-                });
-
+                const map = {}; certs.forEach(c => map[c.courseTitle] = (map[c.courseTitle] || 0) + 1);
                 new Chart(document.getElementById('certCourseChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(courseMap),
-                        datasets: [{
-                            label: 'Certificates Issue',
-                            data: Object.values(courseMap),
-                            backgroundColor: '#3b82f6',
-                            borderRadius: 8
-                        }]
-                    },
-                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                    type: 'bar', data: { labels: Object.keys(map), datasets: [{ label: 'Issued', data: Object.values(map), backgroundColor: '#3b82f6' }] }
                 });
             }
 
-            /* SHLOKAS */
+            /* --- SHLOKA MODAL EDIT --- */
             window.loadShlokasAdmin = async () => {
                 const r = await fetch('/api/shlokas');
                 const list = await r.json();
-                const box = document.getElementById('shloka-list-admin');
-                box.innerHTML = '';
+                const box = document.getElementById('shloka-list-admin'); box.innerHTML = '';
                 list.forEach(s => {
-                    const item = document.createElement('div');
-                    item.className = 'shloka-admin-item';
-                    item.innerHTML = `
-                        <div>
-                            <strong>Adhyay ${s.adhyay}, Shloka ${s.shloka}</strong>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">${s.text ? s.text.substring(0, 60) + '...' : 'No description'}</div>
-                        </div>
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div><strong>Adhyay ${s.adhyay}, Shloka ${s.shloka}</strong></div>
                         <div class="admin-buttons">
-                            <button class="edit-button" onclick='editShloka(${JSON.stringify(s)})'><i class="fas fa-edit"></i> Edit</button>
-                            <button class="delete-button" onclick="deleteShloka('${s._id}')"><i class="fas fa-trash"></i> Delete</button>
-                        </div>
-                    `;
-                    box.appendChild(item);
-                });
-            };
-
-            window.editShloka = (s) => {
-                document.getElementById('shloka-id').value = s._id;
-                document.getElementById('adhyay').value = s.adhyay;
-                document.getElementById('shloka').value = s.shloka;
-                document.getElementById('text').value = s.text || '';
-                document.getElementById('video_url').value = s.video_id || '';
-
-                document.getElementById('shloka-submit-button').innerHTML = 'Update Shloka <i class="fas fa-sync"></i>';
-                document.getElementById('shloka-cancel-button').style.display = 'inline-block';
-                document.querySelector('#tab-shloka h1').scrollIntoView({ behavior: 'smooth' });
-            };
-
-            window.resetShlokaForm = () => {
-                document.getElementById('shloka-form').reset();
-                document.getElementById('shloka-id').value = '';
-                document.getElementById('shloka-submit-button').innerHTML = 'Save Shloka <i class="fas fa-save"></i>';
-                document.getElementById('shloka-cancel-button').style.display = 'none';
-            };
-
-            document.getElementById('shloka-form').addEventListener('submit', async e => {
-                e.preventDefault();
-                const id = document.getElementById('shloka-id').value;
-                const payload = {
-                    adhyay: document.getElementById('adhyay').value,
-                    shloka: document.getElementById('shloka').value,
-                    text: document.getElementById('text').value,
-                    video_id: document.getElementById('video_url').value,
-                    password: adminPassword
-                };
-
-                const method = id ? 'PUT' : 'POST';
-                const url = id ? `/api/shlokas/${id}` : '/api/shlokas';
-
-                const res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (res.ok) {
-                    showToast(id ? 'Shloka updated successfully!' : 'New shloka added!', 'success');
-                    resetShlokaForm();
-                    loadShlokasAdmin();
-                } else {
-                    showToast('Failed to save shloka', 'error');
-                }
-            });
-
-            window.deleteShloka = async id => {
-                if (!confirm('Are you sure you want to delete this shloka?')) return;
-                const r = await fetch('/api/shlokas/' + id, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                if (r.ok) {
-                    showToast('Shloka deleted!', 'info');
-                    loadShlokasAdmin();
-                }
-            };
-
-            /* COURSES */
-            async function loadCoursesAdmin() {
-                const r = await fetch('/api/courses');
-                const courses = await r.json();
-                const box = document.getElementById('course-list');
-                box.innerHTML = '';
-
-                courses.forEach(c => {
-                    const div = document.createElement('div');
-                    div.className = 'shloka-admin-item';
-                    div.innerHTML = `
-                        <div>
-                            <strong>${c.title}</strong><br>
-                            <small>Adhyay ${c.adhyay} | ${c.shlokas?.length || 0} Shlokas</small>
-                        </div>
-                        <div class="admin-buttons">
-                            <button class="edit-button" onclick="editCourse('${c._id}')"><i class="fas fa-edit"></i></button>
-                            <button class="delete-button" onclick="deleteCourse('${c._id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
+                            <button class="edit-button" onclick='showEditShlokaModal(${JSON.stringify(s)})'><i class="fas fa-edit"></i> Edit</button>
+                            <button class="delete-button" onclick="deleteShloka('${s._id}')">Delete</button>
+                        </div>`;
                     box.appendChild(div);
                 });
-            }
-
-            window.editCourse = async (id) => {
-                const r = await fetch('/api/courses');
-                const courses = await r.json();
-                const c = courses.find(course => course._id === id);
-                if (!c) return;
-
-                document.getElementById('course-id').value = c._id;
-                document.getElementById('course-title').value = c.title;
-                document.getElementById('course-description').value = c.description || '';
-                document.getElementById('course-adhyay').value = c.adhyay;
-
-                const resShlokas = await fetch('/api/shlokas');
-                const allShlokas = await resShlokas.json();
-                const list = document.getElementById('course-shloka-list');
-                list.innerHTML = '';
-
-                allShlokas.filter(s => s.adhyay == c.adhyay).forEach(s => {
-                    const checked = c.shlokas.some(cs => cs._id === s._id) ? 'checked' : '';
-                    list.innerHTML += `
-                        <label style="display: block; margin: 5px 0;">
-                            <input type="checkbox" value="${s._id}" ${checked}> Shloka ${s.shloka}
-                        </label>
-                    `;
-                });
-
-                document.getElementById('course-form-wrapper').style.display = 'block';
-                document.getElementById('course-form-wrapper').scrollIntoView({ behavior: 'smooth' });
             };
 
-            window.deleteCourse = async (id) => {
-                if (!confirm('Delete course?')) return;
-                await fetch('/api/courses/' + id, { method: 'DELETE' });
-                showToast('Course removed', 'info');
-                loadCoursesAdmin();
-            };
-
-            document.getElementById('show-course-form').onclick = () => {
-                const f = document.getElementById('course-form-wrapper');
-                f.style.display = f.style.display === 'none' ? 'block' : 'none';
-            };
-
-            document.getElementById('course-form').addEventListener('submit', async e => {
-                e.preventDefault();
-                const id = document.getElementById('course-id').value;
-                const selected = Array.from(document.querySelectorAll('#course-shloka-list input:checked')).map(cb => cb.value);
-
-                const payload = {
-                    title: document.getElementById('course-title').value,
-                    description: document.getElementById('course-description').value,
-                    adhyay: document.getElementById('course-adhyay').value,
-                    shlokas: selected,
-                    password: adminPassword
+            window.showEditShlokaModal = (s) => {
+                const html = `
+                    <form id="modal-edit-shloka">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                            <input type="number" id="m-adhyay" value="${s.adhyay}" required>
+                            <input type="number" id="m-shloka" value="${s.shloka}" required>
+                        </div>
+                        <input id="m-video" value="${s.video_id || ''}" placeholder="Video ID">
+                        <textarea id="m-text" style="height:150px;">${s.text || ''}</textarea>
+                        <button type="submit" class="primary-btn">Update Shloka</button>
+                    </form>`;
+                openEditModal('Update Shloka', html);
+                document.getElementById('modal-edit-shloka').onsubmit = async e => {
+                    e.preventDefault();
+                    await fetch(`/api/shlokas/${s._id}`, {
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ adhyay: document.getElementById('m-adhyay').value, shloka: document.getElementById('m-shloka').value, text: document.getElementById('m-text').value, video_id: document.getElementById('m-video').value, password: adminPassword })
+                    });
+                    showToast('Shloka Updated!', 'success'); closeEditModal(); loadShlokasAdmin();
                 };
-
-                const method = id ? 'PUT' : 'POST';
-                const url = id ? `/api/courses/${id}` : '/api/courses';
-
-                const res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (res.ok) {
-                    showToast('Course saved!', 'success');
-                    document.getElementById('course-form').reset();
-                    document.getElementById('course-form-wrapper').style.display = 'none';
-                    loadCoursesAdmin();
-                }
-            });
-
-            async function loadAdhyayForCourses() {
-                const r = await fetch('/api/shlokas');
-                const sh = await r.json();
-                const adhyays = [...new Set(sh.map(s => s.adhyay))].sort((a, b) => a - b);
-                const sel = document.getElementById('course-adhyay');
-                sel.innerHTML = '<option value="">Select Adhyay</option>';
-                adhyays.forEach(a => sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`);
-            }
-
-            document.getElementById('course-adhyay').onchange = async (e) => {
-                const adhyay = e.target.value;
-                const r = await fetch('/api/shlokas');
-                const sh = await r.json();
-                const list = document.getElementById('course-shloka-list');
-                list.innerHTML = '';
-                sh.filter(s => s.adhyay == adhyay).forEach(s => {
-                    list.innerHTML += `<label style="display: block; margin: 5px 0;"><input type="checkbox" value="${s._id}"> Shloka ${s.shloka}</label>`;
-                });
             };
 
-            /* QUIZZES */
-            async function loadQuizzes() {
-                const r = await fetch('/api/quiz');
-                const data = await r.json();
-                const box = document.getElementById('quiz-list');
-                box.innerHTML = '';
-                data.forEach(q => {
-                    box.innerHTML += `
-                        <div class="shloka-admin-item">
-                            <div><strong>${q.course?.title || 'Unknown'}</strong><br><small>Pass: ${q.passPercentage}% | ${q.questions.length} Questions</small></div>
-                            <div class="admin-buttons">
-                                <button class="delete-button" onclick="deleteQuiz('${q._id}')"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
+            document.getElementById('shloka-form').onsubmit = async e => {
+                e.preventDefault();
+                await fetch('/api/shlokas', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adhyay: Number(document.getElementById('adhyay').value), shloka: Number(document.getElementById('shloka').value), text: document.getElementById('text').value, video_id: document.getElementById('video_url').value, password: adminPassword })
                 });
-            }
-
-            window.deleteQuiz = async (id) => {
-                if (!confirm('Delete quiz?')) return;
-                await fetch('/api/quiz/' + id, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                showToast('Quiz deleted', 'info');
-                loadQuizzes();
+                showToast('Shloka Added!', 'success'); loadShlokasAdmin(); e.target.reset();
             };
 
-            document.getElementById('add-question').onclick = () => {
-                const div = document.createElement('div');
-                div.className = 'form-group stat-card';
-                div.style.background = 'var(--glass-bg)';
-                div.innerHTML = `
-                    <input placeholder="Enter Question text" required style="font-weight: bold; margin-bottom: 15px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <input placeholder="Option A" required>
-                        <input placeholder="Option B" required>
-                        <input placeholder="Option C" required>
-                        <input placeholder="Option D" required>
-                    </div>
-                    <label style="margin-top: 10px;">Correct Option Index (0 for A, 1 for B, etc.)</label>
-                    <input type="number" min="0" max="3" value="0" required>
-                    <button type="button" onclick="this.parentElement.remove()" style="margin-top: 10px; background: var(--error); color: white; padding: 5px 10px; font-size: 0.8rem;">Remove</button>
-                `;
-                document.getElementById('quiz-questions').appendChild(div);
-            };
+            window.deleteShloka = async id => { if (confirm('Delete?')) { await fetch('/api/shlokas/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadShlokasAdmin(); } };
 
-            document.getElementById('quiz-save').onclick = async () => {
-                const courseId = document.getElementById('quiz-course').value;
-                if (!courseId) return showToast('Select a course first!', 'warning');
-
-                const questionDivs = document.querySelectorAll('#quiz-questions > div');
-                const questions = Array.from(questionDivs).map(div => {
-                    const inps = div.querySelectorAll('input');
-                    return {
-                        question: inps[0].value,
-                        options: [inps[1].value, inps[2].value, inps[3].value, inps[4].value],
-                        correctIndex: parseInt(inps[5].value)
-                    };
-                });
-
-                if (questions.length === 0) return showToast('Add at least one question!', 'warning');
-
-                const r = await fetch('/api/quiz', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        course: courseId,
-                        passPercentage: document.getElementById('quiz-pass').value,
-                        questions,
-                        password: adminPassword
-                    })
-                });
-
-                if (r.ok) {
-                    showToast('Quiz saved successfully!', 'success');
-                    document.getElementById('quiz-questions').innerHTML = '';
-                    loadQuizzes();
-                }
-            };
-
-            /* CERTIFICATES */
-            window.loadCertificates = async () => {
-                const r = await fetch('/api/certificates');
+            /* --- COURSE MODAL EDIT --- */
+            window.loadCoursesAdmin = async () => {
+                const r = await fetch('/api/courses');
                 const list = await r.json();
-                window._certificateCache = list;
-
-                const pending = document.getElementById('certificate-pending');
-                const approved = document.getElementById('certificate-approved');
-
-                pending.innerHTML = '<h3>Pending Requests</h3>';
-                approved.innerHTML = '<h3>Approved History</h3>';
-
+                const box = document.getElementById('course-list'); box.innerHTML = '';
                 list.forEach(c => {
-                    const div = document.createElement('div');
-                    div.className = 'shloka-admin-item';
-                    div.style.marginBottom = '10px';
-                    div.innerHTML = `
-                        <div>
-                            <strong>${c.name}</strong><br>
-                            <small>${c.courseTitle} | ${c.mobile}</small>
-                        </div>
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div><strong>${c.title}</strong></div>
                         <div class="admin-buttons">
-                            ${c.status === 'pending'
-                            ? `<button class="approve-button" onclick="approveCert('${c._id}')">Approve</button>`
-                            : `<button class="edit-button" onclick="downloadCert('${c._id}')"><i class="fas fa-download"></i></button>`
-                        }
-                            <button class="delete-button" onclick="deleteCert('${c._id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
-                    (c.status === 'pending' ? pending : approved).appendChild(div);
+                            <button class="edit-button" onclick="showEditCourseModal('${c._id}')">Edit</button>
+                            <button class="delete-button" onclick="deleteCourse('${c._id}')">Delete</button>
+                        </div>`;
+                    box.appendChild(div);
                 });
             };
 
-            window.approveCert = async (id) => {
-                await fetch('/api/certificates/approve/' + id, { method: 'PUT' });
-                showToast('Certificate Approved!', 'success');
-                loadCertificates();
+            window.showEditCourseModal = async id => {
+                const r = await fetch('/api/courses'); const courses = await r.json(); const c = courses.find(x => x._id === id);
+                const shR = await fetch('/api/shlokas'); const allS = await shR.json();
+                let checks = allS.filter(s => s.adhyay == c.adhyay).map(s => `<label style="display:block; margin:5px 0;"><input type="checkbox" value="${s._id}" ${c.shlokas.some(cs => cs._id === s._id) ? 'checked' : ''}> Shloka ${s.shloka}</label>`).join('');
+                const html = `
+                    <form id="modal-edit-course">
+                        <input id="me-title" value="${c.title}" required>
+                        <textarea id="me-desc">${c.description || ''}</textarea>
+                        <div style="max-height:150px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:8px;">${checks}</div>
+                        <button type="submit" class="primary-btn" style="margin-top:15px;">Update Course</button>
+                    </form>`;
+                openEditModal('Update Course', html);
+                document.getElementById('modal-edit-course').onsubmit = async e => {
+                    e.preventDefault();
+                    const sel = Array.from(e.target.querySelectorAll('input:checked')).map(cb => cb.value);
+                    await fetch(`/api/courses/${id}`, {
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title: document.getElementById('me-title').value, description: document.getElementById('me-desc').value, shlokas: sel, adhyay: c.adhyay, password: adminPassword })
+                    });
+                    showToast('Course Updated!', 'success'); closeEditModal(); loadCoursesAdmin();
+                };
             };
 
-            window.downloadCert = (id) => {
-                const c = window._certificateCache.find(x => x._id === id);
-                if (!c) return;
-                const url = `/api/certificate?name=${encodeURIComponent(c.name)}&mobile=${c.mobile}&courseTitle=${encodeURIComponent(c.courseTitle)}&lang=${c.language || 'hi'}`;
-                window.open(url, '_blank');
-            };
+            document.getElementById('show-course-form').onclick = () => { const w = document.getElementById('course-form-wrapper'); w.style.display = w.style.display === 'none' ? 'block' : 'none'; };
 
-            window.deleteCert = async (id) => {
-                if (!confirm('Delete this record?')) return;
-                await fetch('/api/certificates/' + id, { method: 'DELETE' });
-                showToast('Record deleted', 'info');
-                loadCertificates();
-            };
-
-            window.generateCertificate = () => {
-                const name = document.getElementById('cert-name').value;
-                const mobile = document.getElementById('cert-mobile').value;
-                const sel = document.getElementById('cert-course');
-                const course = sel.options[sel.selectedIndex]?.text;
-                const lang = document.getElementById('cert-lang').value;
-
-                if (!name || !mobile || !course) return showToast('Fill all fields!', 'warning');
-
-                const url = `/api/certificate?name=${encodeURIComponent(name)}&mobile=${mobile}&courseTitle=${encodeURIComponent(course)}&lang=${lang}`;
-                window.open(url, '_blank');
-            };
-
-            /* NOTIFICATIONS (PUSH) */
-            document.getElementById('push-form').addEventListener('submit', async e => {
+            document.getElementById('course-form').onsubmit = async e => {
                 e.preventDefault();
-                const title = document.getElementById('push-title').value;
-                const body = document.getElementById('push-body').value;
-
-                showToast('Sending broadcast...', 'info');
-
-                const r = await fetch('/api/push/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, body, password: adminPassword })
+                const sel = Array.from(document.querySelectorAll('#course-shloka-list input:checked')).map(cb => cb.value);
+                await fetch('/api/courses', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: document.getElementById('course-title').value, adhyay: document.getElementById('course-adhyay').value, description: document.getElementById('course-description').value, shlokas: sel, password: adminPassword })
                 });
-
-                if (r.ok) {
-                    const data = await r.json();
-                    showToast(`Notification sent to ${data.sent || 0} subscribers!`, 'success');
-                    document.getElementById('push-form').reset();
-                } else {
-                    showToast('Failed to send notifications', 'error');
-                }
-            });
-
-            /* TESTIMONIALS */
-            window.loadTestimonials = async () => {
-                const r = await fetch('/api/testimonials/all');
-                const list = await r.json();
-                const p = document.getElementById('testimonial-list-pending');
-                const a = document.getElementById('testimonial-list-approved');
-
-                p.innerHTML = '<h3>Pending Approval</h3>';
-                a.innerHTML = '<h3>Approved</h3>';
-
-                list.forEach(t => {
-                    const div = document.createElement('div');
-                    div.className = 'shloka-admin-item';
-                    div.style.marginBottom = '10px';
-                    div.innerHTML = `
-                        <div style="flex:1;"><strong>${t.author}</strong>: "${t.quote}"</div>
-                        <div class="admin-buttons">
-                            ${t.status === 'pending' ? `<button class="approve-button" onclick="approveTest('${t._id}')">Approve</button>` : ''}
-                            <button class="delete-button" onclick="deleteTest('${t._id}')">Delete</button>
-                        </div>
-                    `;
-                    (t.status === 'pending' ? p : a).appendChild(div);
-                });
+                showToast('Course Created!', 'success'); loadCoursesAdmin(); e.target.reset(); document.getElementById('course-form-wrapper').style.display = 'none';
             };
 
-            window.approveTest = async (id) => {
-                await fetch('/api/testimonials/approve/' + id, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                showToast('Testimonial approved!', 'success');
-                loadTestimonials();
-            };
+            window.deleteCourse = async id => { if (confirm('Delete Course?')) { await fetch('/api/courses/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadCoursesAdmin(); } };
 
-            window.deleteTest = async id => {
-                if (!confirm('Delete testimonial?')) return;
-                await fetch('/api/testimonials/' + id, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                showToast('Testimonial removed', 'info');
-                loadTestimonials();
-            };
-
-            document.getElementById('testimonial-form').addEventListener('submit', async e => {
-                e.preventDefault();
-                const r = await fetch('/api/testimonials/admin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        author: document.getElementById('testimonial-author').value,
-                        quote: document.getElementById('testimonial-quote').value,
-                        password: adminPassword
-                    })
-                });
-                if (r.ok) {
-                    showToast('Testimonial added!', 'success');
-                    document.getElementById('testimonial-form').reset();
-                    loadTestimonials();
-                }
-            });
-
-            /* BLOG */
+            /* --- BLOG MODAL EDIT --- */
             window.loadBlogPosts = async () => {
                 const r = await fetch('/api/blog');
-                const posts = await r.json();
-                const box = document.getElementById('blog-list-admin');
-                box.innerHTML = '';
-                posts.forEach(p => {
-                    box.innerHTML += `
-                        <div class="shloka-admin-item">
-                            <div><strong>${p.title}</strong></div>
-                            <div class="admin-buttons">
-                                <button class="delete-button" onclick="deleteBlog('${p._id}')">Delete</button>
-                            </div>
-                        </div>
-                    `;
+                const list = await r.json();
+                const box = document.getElementById('blog-list-admin'); box.innerHTML = '';
+                list.forEach(p => {
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div><strong>${p.title}</strong></div>
+                        <div class="admin-buttons">
+                            <button class="edit-button" onclick='showEditBlogModal(${JSON.stringify(p)})'>Edit</button>
+                            <button class="delete-button" onclick="deleteBlog('${p._id}')">Delete</button>
+                        </div>`;
+                    box.appendChild(div);
                 });
             };
 
-            window.deleteBlog = async id => {
-                await fetch('/api/blog/' + id, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                showToast('Blog post deleted', 'info');
-                loadBlogPosts();
+            window.showEditBlogModal = p => {
+                const html = `<form id="m-eb-form"><input id="me-bt" value="${p.title}" required><textarea id="me-bc" style="height:250px;">${p.content || ''}</textarea><button type="submit" class="primary-btn">Update Post</button></form>`;
+                openEditModal('Edit Blog Post', html);
+                document.getElementById('m-eb-form').onsubmit = async e => {
+                    e.preventDefault();
+                    await fetch(`/api/blog/${p._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('me-bt').value, content: document.getElementById('me-bc').value, password: adminPassword }) });
+                    showToast('Blog Updated!', 'success'); closeEditModal(); loadBlogPosts();
+                };
             };
 
-            document.getElementById('blog-form').addEventListener('submit', async e => {
+            document.getElementById('blog-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/blog', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: document.getElementById('blog-title').value,
-                        content: document.getElementById('blog-content').value,
-                        password: adminPassword
-                    })
-                });
-                showToast('Blog post published!', 'success');
-                document.getElementById('blog-form').reset();
-                loadBlogPosts();
-            });
+                await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('blog-title').value, content: document.getElementById('blog-content').value, password: adminPassword }) });
+                showToast('Blog Published!', 'success'); loadBlogPosts(); e.target.reset();
+            };
 
-            /* ARTWORK */
+            window.deleteBlog = async id => { if (confirm('Delete?')) { await fetch('/api/blog/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadBlogPosts(); } };
+
+            /* --- ARTWORK MODAL EDIT --- */
             window.loadArtwork = async () => {
                 const r = await fetch('/api/artwork');
                 const list = await r.json();
-                const box = document.getElementById('artwork-list');
-                box.innerHTML = '';
+                const box = document.getElementById('artwork-list'); box.innerHTML = '';
                 list.forEach(a => {
-                    box.innerHTML += `
-                        <div class="artwork-admin-item" style="display:flex; align-items:center; justify-content:space-between; padding:15px; background:white; border-radius:15px; margin-bottom:10px;">
-                            <img src="${a.imageUrl}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
-                            <strong style="flex:1; margin-left:15px;">${a.title}</strong>
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<img src="${a.imageUrl}" style="width:50px; border-radius:8px; margin-right:15px;"> <strong>${a.title}</strong>
+                        <div class="admin-buttons">
+                            <button class="edit-button" onclick='showEditArtModal(${JSON.stringify(a)})'>Edit</button>
                             <button class="delete-button" onclick="deleteArt('${a._id}')">Delete</button>
-                        </div>
-                    `;
+                        </div>`;
+                    box.appendChild(div);
                 });
             };
 
-            window.deleteArt = async id => {
-                await fetch('/api/artwork/' + id, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-                showToast('Artwork removed', 'info');
-                loadArtwork();
+            window.showEditArtModal = a => {
+                const html = `<form id="m-ea-form"><input id="me-at" value="${a.title}" required><input id="me-au" value="${a.imageUrl}" required><button type="submit" class="primary-btn">Update Artwork</button></form>`;
+                openEditModal('Edit Artwork', html);
+                document.getElementById('m-ea-form').onsubmit = async e => {
+                    e.preventDefault();
+                    await fetch(`/api/artwork/${a._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('me-at').value, imageUrl: document.getElementById('me-au').value, password: adminPassword }) });
+                    showToast('Artwork Updated!', 'success'); closeEditModal(); loadArtwork();
+                };
             };
 
-            document.getElementById('artwork-form').addEventListener('submit', async e => {
+            document.getElementById('artwork-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/artwork', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: document.getElementById('artwork-title').value,
-                        imageUrl: document.getElementById('artwork-url').value,
-                        password: adminPassword
-                    })
-                });
-                showToast('Artwork added!', 'success');
-                document.getElementById('artwork-form').reset();
-                loadArtwork();
-            });
+                await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('artwork-title').value, imageUrl: document.getElementById('artwork-url').value, password: adminPassword }) });
+                showToast('Artwork Added!', 'success'); loadArtwork(); e.target.reset();
+            };
 
-            /* ABOUT CONTENT */
+            window.deleteArt = async id => { if (confirm('Delete?')) { await fetch('/api/artwork/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadArtwork(); } };
+
+            /* --- CERTIFICATES --- */
+            window.loadCertificates = async () => {
+                const r = await fetch('/api/certificates'); const list = await r.json();
+                const p = document.getElementById('certificate-pending'); const a = document.getElementById('certificate-approved');
+                p.innerHTML = '<h3>Pending Approvals</h3>'; a.innerHTML = '<h3>Approved History</h3>';
+                list.forEach(c => {
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div><strong>${c.name}</strong><br><small>${c.courseTitle}</small></div>
+                        <div class="admin-buttons">
+                            ${c.status === 'pending' ? `<button class="approve-button" onclick="approveCert('${c._id}')">Approve</button>` : `<button class="edit-button" onclick="window.open('/api/certificate?name=${encodeURIComponent(c.name)}&mobile=${c.mobile}&courseTitle=${encodeURIComponent(c.courseTitle)}&lang=${c.language || 'hi'}', '_blank')">View</button>`}
+                            <button class="delete-button" onclick="deleteCert('${c._id}')">Delete</button>
+                        </div>`;
+                    (c.status === 'pending' ? p : a).appendChild(div);
+                });
+            };
+            window.approveCert = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); showToast('Approved!', 'success'); };
+            window.deleteCert = async id => { if (confirm('Delete?')) { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); } };
+
+            /* --- QUIZZES --- */
+            async function loadQuizzes() {
+                const r = await fetch('/api/quiz'); const list = await r.json();
+                const box = document.getElementById('quiz-list'); box.innerHTML = '';
+                list.forEach(q => {
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div><strong>${q.course?.title || 'Unknown Course'}</strong></div>
+                        <button class="delete-button" onclick="deleteQuiz('${q._id}')">Delete</button>`;
+                    box.appendChild(div);
+                });
+            }
+            window.deleteQuiz = async id => { if (confirm('Delete Quiz?')) { await fetch('/api/quiz/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadQuizzes(); } };
+
+            document.getElementById('add-question').onclick = () => {
+                const d = document.createElement('div'); d.className = 'stat-card'; d.style.background = '#f8fafc'; d.style.marginTop = '10px';
+                d.innerHTML = `<input placeholder="Question" required><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;"><input placeholder="Option A"><input placeholder="Option B"><input placeholder="Option C"><input placeholder="Option D"></div><input type="number" placeholder="Correct Index (0-3)" style="margin-top:10px;"><button type="button" onclick="this.parentElement.remove()" style="background:var(--error); margin-top:10px;">Remove</button>`;
+                document.getElementById('quiz-questions').appendChild(d);
+            };
+
+            document.getElementById('quiz-save').onclick = async () => {
+                const qs = Array.from(document.querySelectorAll('#quiz-questions .stat-card')).map(d => {
+                    const inps = d.querySelectorAll('input');
+                    return { question: inps[0].value, options: [inps[1].value, inps[2].value, inps[3].value, inps[4].value], correctIndex: parseInt(inps[5].value) };
+                });
+                await fetch('/api/quiz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ course: document.getElementById('quiz-course').value, passPercentage: document.getElementById('quiz-pass').value, questions: qs, password: adminPassword }) });
+                showToast('Quiz Saved!', 'success'); loadQuizzes(); document.getElementById('quiz-questions').innerHTML = '';
+            };
+
+            /* --- TESTIMONIALS --- */
+            window.loadTestimonials = async () => {
+                const r = await fetch('/api/testimonials/all'); const list = await r.json();
+                const p = document.getElementById('testimonial-list-pending'); const a = document.getElementById('testimonial-list-approved');
+                p.innerHTML = '<h3>Pending</h3>'; a.innerHTML = '<h3>Approved</h3>';
+                list.forEach(t => {
+                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
+                    div.innerHTML = `<div style="flex:1;"><strong>${t.author}</strong></div>
+                        <div class="admin-buttons">${t.status === 'pending' ? `<button class="approve-button" onclick="approveTest('${t._id}')">Approve</button>` : ''}<button class="delete-button" onclick="deleteTest('${t._id}')">Delete</button></div>`;
+                    (t.status === 'pending' ? p : a).appendChild(div);
+                });
+            };
+            window.approveTest = async id => { await fetch('/api/testimonials/approve/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); };
+            window.deleteTest = async id => { if (confirm('Delete?')) { await fetch('/api/testimonials/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadTestimonials(); } };
+
+            document.getElementById('testimonial-form').onsubmit = async e => {
+                e.preventDefault();
+                await fetch('/api/testimonials/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ author: document.getElementById('testimonial-author').value, quote: document.getElementById('testimonial-quote').value, password: adminPassword }) });
+                showToast('Testimonial Added!', 'success'); loadTestimonials(); e.target.reset();
+            };
+
+            /* --- SITE SETTINGS --- */
             async function loadAboutContent() {
-                const r = await fetch('/api/about');
-                const d = await r.json();
+                const r = await fetch('/api/about'); const d = await r.json();
                 document.getElementById('about-image-url').value = d.imageUrl || '';
                 document.getElementById('about-text-input').value = d.content || '';
             }
-
-            document.getElementById('about-form').addEventListener('submit', async e => {
+            document.getElementById('about-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/about', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        newText: document.getElementById('about-text-input').value,
-                        newImageUrl: document.getElementById('about-image-url').value,
-                        password: adminPassword
-                    })
-                });
-                showToast('Settings saved!', 'success');
-            });
+                await fetch('/api/about', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newText: document.getElementById('about-text-input').value, newImageUrl: document.getElementById('about-image-url').value, password: adminPassword }) });
+                showToast('Settings Saved!', 'success');
+            };
 
-            /* HELPERS */
-            async function loadCoursesForCertificate() {
-                const r = await fetch('/api/courses');
-                const list = await r.json();
-                const sel = document.getElementById('cert-course');
-                sel.innerHTML = '<option value="">Select Course</option>';
-                list.forEach(c => sel.innerHTML += `<option value="${c._id}">${c.title}</option>`);
+            document.getElementById('push-form').onsubmit = async e => {
+                e.preventDefault();
+                const r = await fetch('/api/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('push-title').value, body: document.getElementById('push-body').value, password: adminPassword }) });
+                if (r.ok) { let d = await r.json(); showToast(`Broadcast sent to ${d.sent} users!`, 'success'); e.target.reset(); }
+            };
+
+            /* --- INIT --- */
+            async function loadAdhyayForCourses() {
+                const r = await fetch('/api/shlokas'); const sh = await r.json();
+                const ads = [...new Set(sh.map(s => s.adhyay))].sort((a, b) => a - b);
+                const sel = document.getElementById('course-adhyay');
+                sel.innerHTML = '<option value="">Select Adhyay</option>';
+                ads.forEach(a => sel.innerHTML += `<option value="${a}">Adhyay ${a}</option>`);
             }
-
+            document.getElementById('course-adhyay').onchange = async e => {
+                const r = await fetch('/api/shlokas'); const sh = await r.json();
+                document.getElementById('course-shloka-list').innerHTML = sh.filter(s => s.adhyay == e.target.value).map(s => `<label style="display:block; margin:5px 0;"><input type="checkbox" value="${s._id}"> Shloka ${s.shloka}</label>`).join('');
+            };
             async function loadCoursesForQuiz() {
-                const r = await fetch('/api/courses');
-                const list = await r.json();
+                const r = await fetch('/api/courses'); const list = await r.json();
                 const sel = document.getElementById('quiz-course');
                 sel.innerHTML = '<option value="">Select Course</option>';
                 list.forEach(c => sel.innerHTML += `<option value="${c._id}">${c.title}</option>`);
