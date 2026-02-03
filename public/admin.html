@@ -163,6 +163,7 @@
                     <form id="course-form">
                         <input id="course-title" placeholder="Course Title" required>
                         <select id="course-adhyay" required></select>
+                        <input id="course-image-url" placeholder="Course Image URL">
                         <textarea id="course-description" placeholder="Description..."></textarea>
                         <div id="course-shloka-list"
                             style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
@@ -549,6 +550,7 @@
                 const html = `
                     <form id="modal-edit-course">
                         <input id="me-title" value="${c.title}" required>
+                        <input id="me-image-url" value="${c.imageUrl || ''}" placeholder="Course Image URL">
                         <textarea id="me-desc">${c.description || ''}</textarea>
                         <div style="max-height:150px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:8px;">${checks}</div>
                         <button type="submit" class="primary-btn" style="margin-top:15px;">Update Course</button>
@@ -559,7 +561,7 @@
                     const sel = Array.from(e.target.querySelectorAll('input:checked')).map(cb => cb.value);
                     await fetch(`/api/courses/${id}`, {
                         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ title: document.getElementById('me-title').value, description: document.getElementById('me-desc').value, shlokas: sel, adhyay: c.adhyay, password: adminPassword })
+                        body: JSON.stringify({ title: document.getElementById('me-title').value, imageUrl: document.getElementById('me-image-url').value, description: document.getElementById('me-desc').value, shlokas: sel, adhyay: c.adhyay, password: adminPassword })
                     });
                     showToast('Course Updated!', 'success'); closeEditModal(); loadCoursesAdmin();
                 };
@@ -572,7 +574,7 @@
                 const sel = Array.from(document.querySelectorAll('#course-shloka-list input:checked')).map(cb => cb.value);
                 await fetch('/api/courses', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: document.getElementById('course-title').value, adhyay: document.getElementById('course-adhyay').value, description: document.getElementById('course-description').value, shlokas: sel, password: adminPassword })
+                    body: JSON.stringify({ title: document.getElementById('course-title').value, adhyay: document.getElementById('course-adhyay').value, imageUrl: document.getElementById('course-image-url').value, description: document.getElementById('course-description').value, shlokas: sel, password: adminPassword })
                 });
                 showToast('Course Created!', 'success'); loadCoursesAdmin(); e.target.reset(); document.getElementById('course-form-wrapper').style.display = 'none';
             };

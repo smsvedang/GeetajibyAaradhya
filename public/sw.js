@@ -15,6 +15,11 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(payload => {
+  const targetUrl = (payload && payload.data && payload.data.url)
+    || (payload && payload.fcmOptions && payload.fcmOptions.link)
+    || (payload && payload.notification && payload.notification.click_action)
+    || '/';
+
   self.registration.showNotification(
     payload.notification.title,
     {
@@ -29,7 +34,7 @@ messaging.onBackgroundMessage(payload => {
       image: '/apple-touch-icon.png',
 
       data: {
-        url: '/'
+        url: targetUrl
       }
     }
   );
@@ -75,15 +80,23 @@ self.addEventListener('activate', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
+  const rawUrl = (event.notification && event.notification.data && event.notification.data.url) || '/';
+  let targetUrl = rawUrl;
+  try {
+    targetUrl = new URL(rawUrl, self.location.origin).href;
+  } catch (e) {
+    targetUrl = self.location.origin + '/';
+  }
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(clientList => {
         for (const client of clientList) {
-          if (client.url === '/' && 'focus' in client) {
+          if ((client.url === targetUrl || client.url === rawUrl) && 'focus' in client) {
             return client.focus();
           }
         }
-        return clients.openWindow('/');
+        return clients.openWindow(targetUrl);
       })
   );
 });
