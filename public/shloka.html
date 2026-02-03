@@ -18,6 +18,34 @@
 
 <body>
 
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-modal" id="login-modal">
+      <button class="auth-close" onclick="closeAuth()" aria-label="Close">✕</button>
+      <h2>Haree Krishna,</h2>
+      <form id="student-login-form">
+        <input type="tel" id="l-mobile" placeholder="Mobile Number" required>
+        <input type="password" id="l-pass" placeholder="Password" required>
+        <button type="submit" class="auth-btn">Login to Continue</button>
+      </form>
+      <div class="auth-switch" onclick="switchAuth('register')">New seeker? Register here</div>
+    </div>
+
+    <div class="auth-modal" id="register-modal" style="display:none;">
+      <button class="auth-close" onclick="closeAuth()" aria-label="Close">✕</button>
+      <h2>Join the Journey,</h2>
+      <form id="student-register-form">
+        <input type="text" id="r-name" placeholder="Your Full Name" required>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin:-4px 0 10px;">
+          Phone number वही डालें जिस पर आप certificate receive करेंगे
+        </div>
+        <input type="tel" id="r-mobile" placeholder="Mobile Number" required>
+        <input type="password" id="r-pass" placeholder="Create Password" required>
+        <button type="submit" class="auth-btn">Register</button>
+      </form>
+      <div class="auth-switch" onclick="switchAuth('login')">Already registered? Login here</div>
+    </div>
+  </div>
+
   <nav class="top-navbar">
     <div class="container nav-container">
       <div class="logo">
@@ -71,8 +99,37 @@
     let ytApiReady = false;
     let pendingPlayers = [];
 
-    const gitadhyaUser = JSON.parse(localStorage.getItem('gitadhya_user'));
-    const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
+    let currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+    const userMobile = currentUser ? currentUser.mobile : '';
+
+    function showAuth() { document.getElementById('auth-overlay').style.display = 'flex'; }
+    function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
+    function switchAuth(type) {
+      document.getElementById('login-modal').style.display = type === 'login' ? 'block' : 'none';
+      document.getElementById('register-modal').style.display = type === 'register' ? 'block' : 'none';
+    }
+
+    document.getElementById('student-register-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/student/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: document.getElementById('r-name').value, mobile: document.getElementById('r-mobile').value, password: document.getElementById('r-pass').value })
+      });
+      const d = await res.json();
+      if (d.success) { localStorage.setItem('gitadhya_user', JSON.stringify(d.student)); location.reload(); }
+      else alert(d.message);
+    };
+
+    document.getElementById('student-login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/student/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: document.getElementById('l-mobile').value, password: document.getElementById('l-pass').value })
+      });
+      const d = await res.json();
+      if (d.success) { localStorage.setItem('gitadhya_user', JSON.stringify(d.student)); location.reload(); }
+      else alert(d.message);
+    };
 
     function createPendingPlayers() {
       if (!ytApiReady) return;
@@ -84,6 +141,8 @@
         try {
           new YT.Player(p.elementId, {
             videoId: p.videoId,
+            width: '100%',
+            height: '100%',
             playerVars: {
               enablejsapi: 1,
               origin: window.location.origin
@@ -139,7 +198,7 @@
 
       item.innerHTML = `
   <div class="card-video-container">
-    <div id="yt-single-${shloka._id}" data-video-id="${shloka.video_id || ''}"></div>
+    <div id="yt-single-${shloka._id}" data-video-id="${shloka.video_id || ''}" style="width:100%; height:100%;"></div>
   </div>
 
   <div class="card-content">
@@ -167,6 +226,7 @@
 
     // Page load hone par shlok fetch karo (UPDATED - Reverted to ID)
     document.addEventListener('DOMContentLoaded', async () => {
+      if (!currentUser) showAuth();
       const container = document.getElementById('single-shloka-container');
 
       // 1. URL se ID nikalo (e.g., ?id=12345)
