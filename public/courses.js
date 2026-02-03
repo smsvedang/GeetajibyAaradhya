@@ -35,8 +35,8 @@ async function loadCourses() {
     courses.forEach(course => {
         const running = isCourseRunningForCourse(course);
         const statusBadge = running
-            ? `<div class="course-status-badge running">Ongoing</div>`
-            : `<div class="course-status-badge completed">Full Syllabus</div>`;
+            ? `<div class="course-status-badge running">Currently Running</div>`
+            : `<div class="course-status-badge completed">All Shlokas Included</div>`;
         const desc = (course.description || 'A spiritual odyssey through the verses of the Geeta.').replace(/\s+/g, ' ').trim();
         const shortDesc = desc.length > 140 ? desc.slice(0, 140).trim() + '...' : desc;
         list.innerHTML += `
