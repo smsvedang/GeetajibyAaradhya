@@ -137,6 +137,12 @@
       document.getElementById('register-modal').style.display = type === 'register' ? 'block' : 'none';
     }
 
+    if (!currentUser) {
+      window.addEventListener('load', () => {
+        showAuth();
+      });
+    }
+
     document.getElementById('student-register-form').onsubmit = async (e) => {
       e.preventDefault();
       const res = await fetch('/api/student/register', {
