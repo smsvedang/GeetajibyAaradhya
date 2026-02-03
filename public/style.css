@@ -436,6 +436,12 @@ body {
     overflow: hidden;
 }
 
+.card-video-container > iframe,
+.card-video-container > div {
+    width: 100%;
+    height: 100%;
+}
+
 .card-content {
     padding: 25px;
     display: flex;
@@ -778,4 +784,24 @@ body {
     border-radius: 50px;
     font-size: 0.9rem;
     font-weight: 600;
+}
+
+.auth-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-close:hover {
+    background: #e5e7eb;
 }

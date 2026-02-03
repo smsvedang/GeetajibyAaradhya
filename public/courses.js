@@ -66,11 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
  ***********************/
 async function openCourse(courseId) {
     await loadSiteSettings();
-    if (!userMobile) {
-        alert('Please login to Gitadhya to start this course.');
-        window.location.href = 'index.html?auth=true';
-        return;
-    }
 
     localStorage.setItem('active_course', courseId);
 

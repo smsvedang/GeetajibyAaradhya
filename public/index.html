@@ -34,6 +34,7 @@
   <!-- AUTH MODALS -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-modal" id="login-modal">
+      <button class="auth-close" onclick="closeAuth()" aria-label="Close">✕</button>
       <h2>Haree Krishna,</h2>
       <form id="student-login-form">
         <input type="tel" id="l-mobile" placeholder="Mobile Number" required>
@@ -44,6 +45,7 @@
     </div>
 
     <div class="auth-modal" id="register-modal" style="display:none;">
+      <button class="auth-close" onclick="closeAuth()" aria-label="Close">✕</button>
       <h2>Join the Journey,</h2>
       <form id="student-register-form">
         <input type="text" id="r-name" placeholder="Your Full Name" required>
