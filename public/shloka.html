@@ -127,8 +127,13 @@
     let ytApiReady = false;
     let pendingPlayers = [];
 
-    let currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
-    const userMobile = currentUser ? currentUser.mobile : '';
+    let currentUser = null;
+    try {
+      currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+    } catch (e) {
+      localStorage.removeItem('gitadhya_user');
+    }
+    const userMobile = currentUser && currentUser.mobile ? currentUser.mobile : '';
 
     function showAuth() { document.getElementById('auth-overlay').style.display = 'flex'; }
     function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
@@ -137,10 +142,13 @@
       document.getElementById('register-modal').style.display = type === 'register' ? 'block' : 'none';
     }
 
-    if (!currentUser) {
+    const isLoggedIn = !!(currentUser && currentUser.mobile);
+    if (!isLoggedIn) {
       window.addEventListener('load', () => {
         showAuth();
       });
+    } else {
+      closeAuth();
     }
 
     document.getElementById('student-register-form').onsubmit = async (e) => {

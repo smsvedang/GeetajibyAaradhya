@@ -115,7 +115,12 @@
         </div>
     </footer>
     <script>
-        let currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+        let currentUser = null;
+        try {
+            currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+        } catch (e) {
+            localStorage.removeItem('gitadhya_user');
+        }
 
         function showAuth() { document.getElementById('auth-overlay').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
@@ -124,11 +129,16 @@
             document.getElementById('register-modal').style.display = type === 'register' ? 'block' : 'none';
         }
 
-        if (!currentUser) {
+        const isLoggedIn = !!(currentUser && currentUser.mobile);
+        if (!isLoggedIn) {
             window.addEventListener('load', () => {
                 showAuth();
             });
-        } else if (currentUser.mobile && !localStorage.getItem('user_mobile')) {
+        } else {
+            closeAuth();
+        }
+
+        if (isLoggedIn && currentUser.mobile && !localStorage.getItem('user_mobile')) {
             localStorage.setItem('user_mobile', currentUser.mobile);
         }
 
