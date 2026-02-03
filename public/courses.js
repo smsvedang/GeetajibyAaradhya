@@ -6,6 +6,14 @@ let completedShlokas = new Set();
 let currentCourse = null;
 let quizPassed = false;
 
+const DEFAULT_ADHYAY_TOTALS = {
+    1: 47, 2: 72, 3: 43, 4: 42, 5: 29, 6: 47,
+    7: 30, 8: 28, 9: 34, 10: 42, 11: 55, 12: 20,
+    13: 35, 14: 27, 15: 20, 16: 24, 17: 28, 18: 78
+};
+
+let siteSettings = null;
+
 // Get user from Gitadhya login
 const gitadhyaUser = JSON.parse(localStorage.getItem('gitadhya_user'));
 const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
@@ -39,7 +47,9 @@ async function loadCourses() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadCourses();
+    loadSiteSettings().finally(() => {
+        loadCourses();
+    });
 
     if (autoCourseId) {
         setTimeout(() => openCourse(autoCourseId), 500);
@@ -50,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * OPEN COURSE
  ***********************/
 async function openCourse(courseId) {
+    await loadSiteSettings();
     if (!userMobile) {
         alert('Please login to Gitadhya to start this course.');
         window.location.href = 'index.html?auth=true';
@@ -74,6 +85,8 @@ async function openCourse(courseId) {
 
     completedShlokas.clear();
     quizPassed = false;
+    if (document.getElementById('quiz-box')) document.getElementById('quiz-box').style.display = 'none';
+    if (document.getElementById('certificate-box')) document.getElementById('certificate-box').style.display = 'none';
 
     // UPDATE UI WITH COURSE DATA
     document.getElementById('view-course-title').textContent = currentCourse.title;
@@ -103,6 +116,9 @@ async function openCourse(courseId) {
         initPlayers();
         setTimeout(restoreProgress, 600);
     }, 500);
+
+    updateProgressBar();
+    checkQuizUnlock();
 }
 
 /***********************
@@ -177,14 +193,41 @@ async function restoreProgress() {
 
 function updateProgressBar() {
     if (!currentCourse) return;
-    const percent = Math.round((completedShlokas.size / currentCourse.shlokas.length) * 100);
     const badge = document.getElementById('progress-stats');
-    if (badge) badge.innerHTML = `<i class="fas fa-tasks"></i> ${percent}% Complete`;
+    if (!badge) return;
+
+    const expectedTotal = getExpectedTotalShlokas();
+    const available = currentCourse.shlokas.length;
+    const base = expectedTotal || available || 1;
+    const percent = Math.round((completedShlokas.size / base) * 100);
+
+    if (isCourseRunning()) {
+        badge.innerHTML = `<i class="fas fa-spinner"></i> Currently Running • ${available}/${expectedTotal} Shlokas Available`;
+        badge.style.background = 'rgba(245,158,11,0.08)';
+        badge.style.borderColor = '#f59e0b';
+        badge.style.color = '#b45309';
+    } else {
+        badge.innerHTML = `<i class="fas fa-tasks"></i> ${percent}% Complete`;
+        badge.style.background = 'rgba(216,67,21,0.05)';
+        badge.style.borderColor = 'var(--primary)';
+        badge.style.color = 'var(--primary)';
+    }
 }
 
 function checkQuizUnlock() {
-    if (currentCourse && completedShlokas.size === currentCourse.shlokas.length) {
-        document.getElementById('quiz-box').style.display = 'block';
+    if (!currentCourse) return;
+    const quizBox = document.getElementById('quiz-box');
+    if (!quizBox) return;
+
+    if (isCourseRunning()) {
+        quizBox.style.display = 'none';
+        return;
+    }
+
+    if (completedShlokas.size === currentCourse.shlokas.length) {
+        quizBox.style.display = 'block';
+    } else {
+        quizBox.style.display = 'none';
     }
 }
 
@@ -240,4 +283,34 @@ function goBack() {
     document.getElementById('single-course-view').style.display = 'none';
     document.getElementById('back-btn').style.display = 'none';
     window.scrollTo(0, 0);
+}
+
+function getExpectedTotalShlokas() {
+    if (!currentCourse) return 0;
+    const adhyay = parseInt(currentCourse.adhyay, 10);
+    const customTotals = siteSettings && siteSettings.adhyayTotals ? siteSettings.adhyayTotals : {};
+    const customTotal = customTotals && customTotals[adhyay];
+    return customTotal || DEFAULT_ADHYAY_TOTALS[adhyay] || currentCourse.shlokas.length || 0;
+}
+
+function isCourseRunning() {
+    if (!currentCourse) return false;
+    const statusOverrides = siteSettings && siteSettings.courseStatusOverrides ? siteSettings.courseStatusOverrides : {};
+    const override = statusOverrides ? statusOverrides[currentCourse._id] : null;
+    if (override === 'running') return true;
+    if (override === 'completed') return false;
+    const expectedTotal = getExpectedTotalShlokas();
+    if (!expectedTotal) return false;
+    return currentCourse.shlokas.length < expectedTotal;
+}
+
+async function loadSiteSettings() {
+    if (siteSettings) return siteSettings;
+    try {
+        const r = await fetch('/api/settings');
+        siteSettings = await r.json();
+    } catch (e) {
+        siteSettings = {};
+    }
+    return siteSettings;
 }

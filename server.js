@@ -322,7 +322,9 @@ app.get('/api/settings', async (req, res) => {
                     aboutImageUrl: '/favicon.png',
                     personalLink: '',
                     personalLinkLogo: '',
-                    social: { instagram: '', youtube: '', twitter: '', facebook: '' }
+                    social: { instagram: '', youtube: '', twitter: '', facebook: '' },
+                    adhyayTotals: {},
+                    courseStatusOverrides: {}
                 }),
                 imageUrl: '/favicon.png'
             });
@@ -339,8 +341,26 @@ app.post('/api/settings', async (req, res) => {
         return res.status(401).json({ message: 'Password galat hai' });
     }
     try {
-        const { aboutText, logoUrl, aboutImageUrl, personalLink, personalLinkLogo, social } = req.body;
-        const settingsData = { aboutText, logoUrl, aboutImageUrl, personalLink, personalLinkLogo, social };
+        const {
+            aboutText,
+            logoUrl,
+            aboutImageUrl,
+            personalLink,
+            personalLinkLogo,
+            social,
+            adhyayTotals,
+            courseStatusOverrides
+        } = req.body;
+        const settingsData = {
+            aboutText,
+            logoUrl,
+            aboutImageUrl,
+            personalLink,
+            personalLinkLogo,
+            social,
+            adhyayTotals,
+            courseStatusOverrides
+        };
         await SiteContent.findOneAndUpdate(
             { key: 'siteSettings' },
             { content: JSON.stringify(settingsData), imageUrl: logoUrl },

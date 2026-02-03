@@ -261,6 +261,12 @@
                             <input id="set-personal-link" placeholder="Personal Link/Portfolio URL">
                             <input id="set-personal-link-logo" placeholder="Personal Link Logo/Icon URL">
                         </div>
+                        <h4 style="margin:15px 0 8px;">Course Progress Controls</h4>
+                        <textarea id="set-adhyay-totals" placeholder='Adhyay totals JSON (e.g. {"17":28,"18":78})'
+                            style="height:120px;"></textarea>
+                        <textarea id="set-course-status"
+                            placeholder='Course status overrides JSON (courseId: "running"/"completed")'
+                            style="height:120px;"></textarea>
                         <button type="submit" style="margin-top:20px;">Save All Settings</button>
                     </form>
                 </div>
@@ -634,6 +640,8 @@
                 document.getElementById('set-about-text').value = d.aboutText || '';
                 document.getElementById('set-personal-link').value = d.personalLink || '';
                 document.getElementById('set-personal-link-logo').value = d.personalLinkLogo || '';
+                document.getElementById('set-adhyay-totals').value = d.adhyayTotals ? JSON.stringify(d.adhyayTotals, null, 2) : '';
+                document.getElementById('set-course-status').value = d.courseStatusOverrides ? JSON.stringify(d.courseStatusOverrides, null, 2) : '';
                 if (d.social) {
                     document.getElementById('soc-instagram').value = d.social.instagram || '';
                     document.getElementById('soc-youtube').value = d.social.youtube || '';
@@ -644,6 +652,20 @@
 
             document.getElementById('settings-form').onsubmit = async e => {
                 e.preventDefault();
+                let adhyayTotals = {};
+                let courseStatusOverrides = {};
+                const adhyayRaw = document.getElementById('set-adhyay-totals').value.trim();
+                const statusRaw = document.getElementById('set-course-status').value.trim();
+
+                if (adhyayRaw) {
+                    try { adhyayTotals = JSON.parse(adhyayRaw); }
+                    catch { return showToast('Adhyay totals JSON invalid', 'error'); }
+                }
+
+                if (statusRaw) {
+                    try { courseStatusOverrides = JSON.parse(statusRaw); }
+                    catch { return showToast('Course status JSON invalid', 'error'); }
+                }
                 const data = {
                     logoUrl: document.getElementById('set-logo-url').value,
                     aboutImageUrl: document.getElementById('set-about-img-url').value,
@@ -656,6 +678,8 @@
                         twitter: document.getElementById('soc-twitter').value,
                         facebook: document.getElementById('soc-facebook').value
                     },
+                    adhyayTotals,
+                    courseStatusOverrides,
                     password: adminPassword
                 };
                 const r = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
