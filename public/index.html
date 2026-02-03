@@ -282,10 +282,8 @@
         const dailyLink = document.getElementById('daily-shloka-link');
 
         if (data.length > 0) {
-          // Pick shloka of the day based on date
-          const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-          const dailyIdx = dayOfYear % data.length;
-          const ds = data[dailyIdx];
+          // Pick the last shloka added
+          const ds = data[data.length - 1];
 
           dailyContent.innerHTML = `
                 <h3>Adhyay ${ds.adhyay}, Shloka ${ds.shloka}</h3>
