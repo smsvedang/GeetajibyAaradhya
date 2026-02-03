@@ -28,8 +28,13 @@
         </div>
     </nav>
 
-    <div class="container">
-        <main id="single-blog-container">
+    <div class="container" style="padding: 40px 20px;">
+        <h1 id="page-title" style="text-align: center; margin-bottom: 40px; color: var(--primary-dark);">Spiritual Blog
+        </h1>
+        <main id="blog-list-container" class="card-grid">
+            <p style="grid-column: 1/-1; text-align:center;">Loading blogs...</p>
+        </main>
+        <main id="single-blog-container" style="display:none;">
             <p>Loading blog post...</p>
         </main>
     </div>
@@ -87,27 +92,53 @@
             return item;
         }
 
+        // Blog list card
+        function createBlogListCard(post) {
+            const item = document.createElement('article');
+            item.className = 'blog-card';
+
+            const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+
+            const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
+            const excerpt = (post.content || '').replace(/\n/g, ' ').slice(0, 160);
+            const shareUrl = `${window.location.origin}/blog.html?id=${post._id}`;
+            const shareTitle = post.title + " - by Gitadhya";
+            const shareText = "Check out this blog post from Gitadhya!";
+
+            item.innerHTML = `
+                <h3>${post.title}</h3>
+                <div class="blog-date">${postDate}</div>
+                ${post.imageUrl ? `<img src="${post.imageUrl}" class="blog-image" alt="${post.title}">` : ''}
+                <p>${excerpt}${excerpt.length >= 160 ? '...' : ''}</p>
+                <div style="font-weight:700; color:var(--primary); cursor:pointer;" onclick="location.href='blog.html?id=${post._id}'">
+                    Read Wisdom <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="blog-card-actions">
+                    <button class="shloka-action-button like-button" data-id="${post._id}" ${isLiked ? 'disabled' : ''}>
+                        ❤️ <span class="like-count">${post.likes || 0}</span>
+                    </button>
+                    <button class="shloka-action-button share-button"
+                            data-url="${shareUrl}"
+                            data-title="${shareTitle}"
+                            data-text="${shareText}">
+                        🔗 Share
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
         // Page load hone par post fetch karo
         document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('single-blog-container');
+            const pageTitle = document.getElementById('page-title');
+            const listContainer = document.getElementById('blog-list-container');
+            const singleContainer = document.getElementById('single-blog-container');
             const params = new URLSearchParams(window.location.search);
             const postId = params.get('id');
 
-            if (!postId) {
-                container.innerHTML = "<p>Error: No post ID provided.</p>";
-                return;
-            }
-
             try {
-                const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Blog post not found');
-                }
-                const post = await response.json();
-
                 // Load site info for social links
                 try {
                     const sr = await fetch('/api/settings');
@@ -132,9 +163,33 @@
                     }
                 } catch (e) { console.error("Settings load error", e); }
 
-                container.innerHTML = '';
-                const blogCard = createSingleBlogCard(post);
-                container.appendChild(blogCard);
+                if (postId) {
+                    const cacheBuster = `?cache_buster=${new Date().getTime()}`;
+                    const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Blog post not found');
+                    }
+                    const post = await response.json();
+                    pageTitle.innerText = post.title;
+                    listContainer.style.display = 'none';
+                    singleContainer.style.display = 'block';
+                    singleContainer.innerHTML = '';
+                    const blogCard = createSingleBlogCard(post);
+                    singleContainer.appendChild(blogCard);
+                } else {
+                    pageTitle.innerText = 'Spiritual Blog';
+                    listContainer.style.display = 'grid';
+                    singleContainer.style.display = 'none';
+                    const response = await fetch('/api/blog');
+                    const posts = await response.json();
+                    listContainer.innerHTML = '';
+                    if (!posts || posts.length === 0) {
+                        listContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center;">No blogs found yet.</p>';
+                    } else {
+                        posts.forEach(p => listContainer.appendChild(createBlogListCard(p)));
+                    }
+                }
 
                 // --- Mobile Menu ---
                 const menuBtn = document.getElementById('menu-btn');
@@ -145,13 +200,15 @@
                     };
                 }
             } catch (err) {
-                container.innerHTML = '<p>Blog load error.</p>';
+                singleContainer.style.display = 'block';
+                listContainer.style.display = 'none';
+                singleContainer.innerHTML = '<p>Blog load error.</p>';
             }
 
             // --- [NAYA FIX] ---
             // Click listener ko DOMContentLoaded ke ANDAR yahaan move kar diya hai
             // Taaki yeh content load hone ke BAAD attach ho
-            document.getElementById('single-blog-container').addEventListener('click', async (e) => {
+            document.addEventListener('click', async (e) => {
                 const shareButton = e.target.closest('.share-button');
                 if (shareButton) {
                     const urlToShare = shareButton.dataset.url;
