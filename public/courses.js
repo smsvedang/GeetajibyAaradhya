@@ -63,6 +63,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.addEventListener('click', async (e) => {
+    const shareButton = e.target.closest('.share-button');
+    if (shareButton) {
+        const urlToShare = shareButton.dataset.url;
+        const title = shareButton.dataset.title;
+        const text = shareButton.dataset.text;
+        if (navigator.share) {
+            try { await navigator.share({ title: title, text: text, url: urlToShare }); }
+            catch (err) { console.error('Share failed:', err); }
+        } else {
+            try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); }
+            catch (err) { alert('Failed to copy link.'); }
+        }
+    }
+
+    const likeButton = e.target.closest('.like-button');
+    if (likeButton) {
+        const shlokaDbId = likeButton.dataset.id;
+        if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
+        likeButton.disabled = true;
+        try {
+            const response = await fetch(`/api/shloka/like/${shlokaDbId}`, { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                const countSpan = likeButton.querySelector('.like-count');
+                countSpan.textContent = data.likes;
+                localStorage.setItem('liked_' + shlokaDbId, 'true');
+            } else { likeButton.disabled = false; }
+        } catch (err) { likeButton.disabled = false; }
+    }
+});
+
 /***********************
  * OPEN COURSE
  ***********************/
@@ -99,6 +131,10 @@ async function openCourse(courseId) {
     if (shlokaBox) {
         shlokaBox.innerHTML = '';
         currentCourse.shlokas.forEach((shloka, idx) => {
+            const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
+            const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+            const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
             shlokaBox.innerHTML += `
                 <div class="shloka-item-card">
                     <div class="card-video-container">
@@ -108,6 +144,17 @@ async function openCourse(courseId) {
                         <span style="color:var(--primary); font-weight:800; font-size:0.8rem; text-transform:uppercase;">Lesson ${idx + 1}</span>
                         <h3 style="margin:5px 0 10px;">Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
                         <p id="status-${shloka._id}" class="status-badge status-pending">⏳ Not completed</p>
+                        <div class="shloka-actions">
+                            <button class="shloka-action-button like-button" data-id="${shloka._id}" ${isLiked ? 'disabled' : ''}>
+                                ❤️ <span class="like-count">${shloka.likes || 0}</span>
+                            </button>
+                            <button class="shloka-action-button share-button"
+                                data-url="${shareUrl}"
+                                data-title="${shareTitle}"
+                                data-text="${shareText}">
+                                🔗 Share
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
