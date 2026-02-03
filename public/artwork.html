@@ -28,9 +28,11 @@
         </div>
     </nav>
 
-    <div class="container">
-        <main id="single-artwork-container">
-            <p>Loading artwork...</p>
+    <div class="container" style="padding: 40px 20px;">
+        <h1 id="page-title" style="text-align: center; margin-bottom: 40px; color: var(--primary-dark);">Divine Gallery
+        </h1>
+        <main id="artwork-container" class="card-grid">
+            <p>Loading divine art...</p>
         </main>
     </div>
 
@@ -43,120 +45,120 @@
     </footer>
 
     <script>
-        // Single artwork card banane ka function
-        function createSingleArtworkCard(artwork) {
-            const item = document.createElement('div');
-            item.className = 'artwork-card'; // Naya style
-
+        // Shared Helper for Cards
+        function createArtworkCard(artwork) {
+            const div = document.createElement('div');
+            div.className = 'shloka-item-card';
             const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
 
-            // Share data
-            const shareTitle = artwork.title + " - by Gitadhya";
-            const shareText = "Check out this artwork by Gitadhya!";
-            const shareUrl = window.location.href;
-
-            item.innerHTML = `
-                <div class="artwork-image">
-                    <img src="${artwork.imageUrl}" alt="${artwork.title}">
+            div.innerHTML = `
+                <div class="card-video-container">
+                    <img src="${artwork.imageUrl}" style="width:100%; height:100%; object-fit:cover;">
                 </div>
-                <div class="shloka-actions">
-                    <button class="shloka-action-button like-button" data-id="${artwork._id}" ${isLiked ? 'disabled' : ''}>
-                        ❤️ <span class="like-count">${artwork.likes || 0}</span>
-                    </button>
-                    <button class="shloka-action-button share-button" 
-                            data-url="${shareUrl}" 
-                            data-title="${shareTitle}" 
-                            data-text="${shareText}">
-                        🔗 Share
-                    </button>
-                </div>
-            `;
-            return item;
+                <div class="card-content">
+                    <h3 style="text-align:center;">${artwork.title}</h3>
+                    <div class="shloka-actions">
+                        <button class="shloka-action-button like-button" data-id="${artwork._id}" ${isLiked ? 'disabled' : ''}>
+                            <i class="far fa-heart"></i> <span class="like-count">${artwork.likes || 0}</span>
+                        </button>
+                        <button class="shloka-action-button share-button" data-id="${artwork._id}" data-title="${artwork.title}">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+                </div>`;
+            return div;
         }
 
-        // Page load hone par artwork fetch karo
         document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('single-artwork-container');
+            const container = document.getElementById('artwork-container');
             const params = new URLSearchParams(window.location.search);
             const artworkId = params.get('id');
 
-            if (!artworkId) {
-                container.innerHTML = "<p>Error: No artwork ID provided.</p>";
-                return;
+            // --- Mobile Menu Toggle ---
+            const menuBtn = document.getElementById('menu-btn');
+            const navLinks = document.getElementById('nav-links');
+            if (menuBtn && navLinks) {
+                menuBtn.onclick = () => { navLinks.classList.toggle('active'); };
             }
 
+            // --- Load Site Info/Social ---
             try {
-                const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                const response = await fetch(`/api/artwork/${artworkId}${cacheBuster}`);
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Artwork not found');
-                }
-                const artwork = await response.json();
-
-                // Load site info for social links
-                try {
-                    const sr = await fetch('/api/settings');
-                    const settings = await sr.json();
-                    const socBox = document.getElementById('social-links');
-                    if (socBox) {
-                        socBox.innerHTML = '';
-                        const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
-                        if (settings.personalLink) {
-                            socBox.innerHTML += `<a href="${settings.personalLink}" target="_blank" class="social-icon"><i class="fas fa-globe"></i></a>`;
-                        }
-                        if (settings.social) {
-                            Object.keys(settings.social).forEach(key => {
-                                const url = settings.social[key];
-                                if (url) socBox.innerHTML += `<a href="${url}" target="_blank" class="social-icon"><i class="${icons[key]}"></i></a>`;
-                            });
+                const r = await fetch('/api/settings');
+                const siteSettings = await r.json();
+                const socBox = document.getElementById('social-links');
+                if (socBox) {
+                    socBox.innerHTML = '';
+                    const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
+                    if (siteSettings.personalLink) {
+                        if (siteSettings.personalLinkLogo) {
+                            socBox.innerHTML += `<a href="${siteSettings.personalLink}" target="_blank" class="social-icon"><img src="${siteSettings.personalLinkLogo}" style="height:24px; width:24px; border-radius:50%;"></a>`;
+                        } else {
+                            socBox.innerHTML += `<a href="${siteSettings.personalLink}" target="_blank" class="social-icon"><i class="fas fa-globe"></i></a>`;
                         }
                     }
-                } catch (e) { console.error("Settings load error", e); }
+                    if (siteSettings.social) {
+                        Object.keys(siteSettings.social).forEach(key => {
+                            const url = siteSettings.social[key];
+                            if (url) socBox.innerHTML += `<a href="${url}" target="_blank" class="social-icon"><i class="${icons[key]}"></i></a>`;
+                        });
+                    }
+                }
+            } catch (e) { console.error("Settings load error", e); }
 
-                container.innerHTML = '';
-                const artworkCard = createSingleArtworkCard(artwork);
-                container.appendChild(artworkCard);
-
-                // --- Mobile Menu ---
-                const menuBtn = document.getElementById('menu-btn');
-                const navLinks = document.getElementById('nav-links');
-                if (menuBtn && navLinks) {
-                    menuBtn.onclick = () => {
-                        navLinks.classList.toggle('active');
-                    };
+            // --- Load Content ---
+            try {
+                if (artworkId) {
+                    // Single View
+                    const response = await fetch(`/api/artwork/${artworkId}`);
+                    if (!response.ok) throw new Error('Artwork not found');
+                    const artwork = await response.json();
+                    container.innerHTML = '';
+                    container.classList.remove('card-grid');
+                    container.style.maxWidth = '800px';
+                    container.style.margin = '0 auto';
+                    document.getElementById('page-title').innerText = artwork.title;
+                    container.appendChild(createArtworkCard(artwork));
+                } else {
+                    // Gallery View
+                    const response = await fetch('/api/artwork');
+                    const artworks = await response.json();
+                    container.innerHTML = '';
+                    if (artworks.length === 0) {
+                        container.innerHTML = '<p style="grid-column: 1/-1; text-align:center;">No artworks found yet.</p>';
+                    } else {
+                        artworks.forEach(a => container.appendChild(createArtworkCard(a)));
+                    }
                 }
             } catch (err) {
-                container.innerHTML = '<p>Artwork load error.</p>';
+                container.innerHTML = `<p>Error loading artwork: ${err.message}</p>`;
             }
         });
 
-        // Like/Share button logic
-        document.getElementById('single-artwork-container').addEventListener('click', async (e) => {
-            const shareButton = e.target.closest('.share-button');
-            if (shareButton) {
-                // (Share logic...)
+        // Like/Share Logic
+        document.getElementById('artwork-container').addEventListener('click', async (e) => {
+            const likeBtn = e.target.closest('.like-button');
+            if (likeBtn) {
+                const id = likeBtn.dataset.id;
+                if (localStorage.getItem('liked_art_' + id)) return;
+                likeBtn.disabled = true;
+                const r = await fetch(`/api/artwork/like/${id}`, { method: 'POST' });
+                const d = await r.json();
+                if (d.success) {
+                    likeBtn.querySelector('.like-count').innerText = d.likes;
+                    localStorage.setItem('liked_art_' + id, 'true');
+                }
             }
 
-            const likeButton = e.target.closest('.like-button');
-            if (likeButton) {
-                const artId = likeButton.dataset.id;
-                const key = 'liked_art_' + artId;
-                if (localStorage.getItem(key)) { return; }
-
-                likeButton.disabled = true;
-                try {
-                    const response = await fetch(`/api/artwork/like/${artId}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        likeButton.querySelector('.like-count').textContent = data.likes;
-                        localStorage.setItem(key, 'true');
-                    } else {
-                        likeButton.disabled = false;
-                    }
-                } catch (err) {
-                    likeButton.disabled = false;
+            const shareBtn = e.target.closest('.share-button');
+            if (shareBtn) {
+                const id = shareBtn.dataset.id;
+                const title = shareBtn.dataset.title;
+                const shareUrl = `${window.location.origin}/artwork.html?id=${id}`;
+                if (navigator.share) {
+                    navigator.share({ title: 'Gitadhya Art: ' + title, url: shareUrl });
+                } else {
+                    navigator.clipboard.writeText(shareUrl);
+                    alert('Link copied to clipboard!');
                 }
             }
         });

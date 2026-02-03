@@ -258,7 +258,8 @@
                             <input id="soc-youtube" placeholder="YouTube URL">
                             <input id="soc-twitter" placeholder="Twitter/X URL">
                             <input id="soc-facebook" placeholder="Facebook URL">
-                            <input id="set-personal-link" placeholder="Personal/Official Link (Portfolio)">
+                            <input id="set-personal-link" placeholder="Personal Link/Portfolio URL">
+                            <input id="set-personal-link-logo" placeholder="Personal Link Logo/Icon URL">
                         </div>
                         <button type="submit" style="margin-top:20px;">Save All Settings</button>
                     </form>
@@ -632,6 +633,7 @@
                 document.getElementById('set-about-img-url').value = d.aboutImageUrl || '';
                 document.getElementById('set-about-text').value = d.aboutText || '';
                 document.getElementById('set-personal-link').value = d.personalLink || '';
+                document.getElementById('set-personal-link-logo').value = d.personalLinkLogo || '';
                 if (d.social) {
                     document.getElementById('soc-instagram').value = d.social.instagram || '';
                     document.getElementById('soc-youtube').value = d.social.youtube || '';
@@ -647,6 +649,7 @@
                     aboutImageUrl: document.getElementById('set-about-img-url').value,
                     aboutText: document.getElementById('set-about-text').value,
                     personalLink: document.getElementById('set-personal-link').value,
+                    personalLinkLogo: document.getElementById('set-personal-link-logo').value,
                     social: {
                         instagram: document.getElementById('soc-instagram').value,
                         youtube: document.getElementById('soc-youtube').value,
