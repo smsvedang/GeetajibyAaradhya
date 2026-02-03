@@ -146,6 +146,9 @@
                         <input type="number" id="shloka" placeholder="Shloka" required>
                     </div>
                     <input id="video_url" placeholder="YouTube Video ID">
+                    <select id="shloka-course-select">
+                        <option value="">Add to Course (optional)</option>
+                    </select>
                     <textarea id="text" placeholder="Shloka translation..."></textarea>
                     <button type="submit">Add New Shloka <i class="fas fa-plus"></i></button>
                 </form>
@@ -355,6 +358,18 @@
                 });
             }
 
+            function renderShlokaCourseSelect() {
+                const sel = document.getElementById('shloka-course-select');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">Add to Course (optional)</option>';
+                coursesCache.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c._id;
+                    opt.textContent = `${c.title} (Adhyay ${c.adhyay})`;
+                    sel.appendChild(opt);
+                });
+            }
+
             /* --- LOGIN --- */
             document.getElementById('login-form').onsubmit = async (e) => {
                 e.preventDefault();
@@ -471,11 +486,39 @@
 
             document.getElementById('shloka-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/shlokas', {
+                const addRes = await fetch('/api/shlokas', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ adhyay: Number(document.getElementById('adhyay').value), shloka: Number(document.getElementById('shloka').value), text: document.getElementById('text').value, video_id: document.getElementById('video_url').value, password: adminPassword })
                 });
-                showToast('Shloka Added!', 'success'); loadShlokasAdmin(); e.target.reset();
+                const newShloka = await addRes.json();
+                if (addRes.ok) {
+                    const courseId = document.getElementById('shloka-course-select').value;
+                    if (courseId && newShloka && newShloka._id) {
+                        try {
+                            const cr = await fetch(`/api/courses/${courseId}`);
+                            const course = await cr.json();
+                            const existing = Array.isArray(course.shlokas) ? course.shlokas.map(s => s._id || s) : [];
+                            const updatedShlokas = [...new Set([...existing, newShloka._id])];
+                            await fetch(`/api/courses/${courseId}`, {
+                                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    title: course.title,
+                                    description: course.description,
+                                    adhyay: course.adhyay,
+                                    shlokas: updatedShlokas,
+                                    imageUrl: course.imageUrl,
+                                    password: adminPassword
+                                })
+                            });
+                            showToast('Shloka added to course!', 'success');
+                        } catch (err) {
+                            showToast('Course update failed', 'error');
+                        }
+                    }
+                    showToast('Shloka Added!', 'success'); loadShlokasAdmin(); e.target.reset();
+                } else {
+                    showToast(newShloka.message || 'Shloka add failed', 'error');
+                }
             };
 
             window.deleteShloka = async id => { if (confirm('Delete?')) { await fetch('/api/shlokas/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadShlokasAdmin(); } };
@@ -496,6 +539,7 @@
                     box.appendChild(div);
                 });
                 renderCourseStatusOverrides();
+                renderShlokaCourseSelect();
             };
 
             window.showEditCourseModal = async id => {

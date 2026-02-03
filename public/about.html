@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Aaradhya | Gitadhya</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav class="top-navbar">
+    <div class="container nav-container">
+      <div class="logo"><a href="index.html">Gitadhya</a></div>
+      <div class="menu-links" id="nav-links">
+        <a href="index.html" class="main-tab-button">Home</a>
+        <a href="index.html#site-about-main" class="main-tab-button active">About</a>
+        <a href="courses.html" class="main-tab-button">Courses</a>
+        <a href="artwork.html" class="main-tab-button">Art</a>
+        <a href="blog.html" class="main-tab-button">Blog</a>
+        <a href="testimonials.html" class="main-tab-button">Testimonials</a>
+        <button class="main-tab-button" id="back-btn" onclick="goBack()"
+          style="display:none; background:#eee; border-radius: 10px;">
+          <i class="fas fa-arrow-left"></i> All Courses
+        </button>
+        <div id="auth-box">
+          <a href="index.html?auth=true" class="main-tab-button">Login</a>
+        </div>
+      </div>
+      <button class="menu-toggle" id="menu-btn"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <header class="shloka-welcome-hero" style="padding-top:120px;">
+    <div class="container">
+      <div class="verified-badge-inline">
+        <span class="dot"></span>
+        About Aaradhya
+      </div>
+      <h1>A Journey of Devotion</h1>
+      <p class="subtitle">The voice behind Gitadhya and the Gita recitations.</p>
+    </div>
+  </header>
+
+  <section class="container" style="padding: 60px 0 90px;">
+    <div class="about-grid">
+      <div class="about-image-card"
+        style="border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+        <img id="about-page-img" src="/favicon.png" style="width: 100%; height: auto; display: block;">
+      </div>
+      <div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--primary-dark);">Aaradhya's Story</h2>
+        <p id="about-page-text" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-muted);">
+          Loading the wisdom of the ages...
+        </p>
+        <div style="margin-top: 25px; display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="courses.html" class="auth-btn" style="width:auto; padding:12px 22px; text-decoration:none;">Explore
+            Courses</a>
+          <a href="index.html" style="color:var(--primary); font-weight:700; text-decoration:none; align-self:center;">
+            Back to Home <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="main-footer">
+    <div class="container">
+      <h2 id="footer-logo-text">Gitadhya</h2>
+      <div class="social-row" id="social-links"></div>
+      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2026 Gitadhya | Spiritual Resonance</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // --- Mobile Menu ---
+      const menuBtn = document.getElementById('menu-btn');
+      const navLinks = document.getElementById('nav-links');
+      if (menuBtn && navLinks) {
+        menuBtn.onclick = () => {
+          navLinks.classList.toggle('active');
+        };
+      }
+
+      // --- Load About + Social ---
+      try {
+        const r = await fetch('/api/settings');
+        const settings = await r.json();
+        const img = document.getElementById('about-page-img');
+        const text = document.getElementById('about-page-text');
+        if (img) img.src = settings.aboutImageUrl || settings.logoUrl || '/favicon.png';
+        if (text) text.innerText = settings.aboutText || 'Welcome to Gitadhya.';
+
+        const socBox = document.getElementById('social-links');
+        if (socBox) {
+          socBox.innerHTML = '';
+          const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
+          if (settings.personalLink) {
+            if (settings.personalLinkLogo) {
+              socBox.innerHTML += `<a href="${settings.personalLink}" target="_blank" class="social-icon"><img src="${settings.personalLinkLogo}" style="height:24px; width:24px; border-radius:50%; vertical-align:middle;"></a>`;
+            } else {
+              socBox.innerHTML += `<a href="${settings.personalLink}" target="_blank" class="social-icon"><i class="fas fa-globe"></i></a>`;
+            }
+          }
+          if (settings.social) {
+            Object.keys(settings.social).forEach(key => {
+              const url = settings.social[key];
+              if (url) {
+                socBox.innerHTML += `<a href="${url}" target="_blank" class="social-icon"><i class="${icons[key]}"></i></a>`;
+              }
+            });
+          }
+        }
+      } catch (e) { console.error("Settings load error", e); }
+    });
+  </script>
+</body>
+
+</html>

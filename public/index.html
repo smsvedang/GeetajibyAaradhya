@@ -110,6 +110,11 @@
             <p id="site-about-main" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-muted);">
               Loading the wisdom of the ages...
             </p>
+            <div style="margin-top: 18px;">
+              <a href="about.html" style="color:var(--primary); font-weight:700; text-decoration: none;">
+                View About <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -251,7 +256,8 @@
           document.getElementById('site-about-img').src = siteSettings.aboutImageUrl || siteSettings.logoUrl || '/favicon.png';
         }
         const aboutText = siteSettings.aboutText || 'Welcome to the spiritual platform of Gita recitations.';
-        document.getElementById('site-about-main').innerText = aboutText;
+        const shortAbout = aboutText.length > 260 ? aboutText.slice(0, 260).trim() + '...' : aboutText;
+        document.getElementById('site-about-main').innerText = shortAbout;
 
         const socBox = document.getElementById('social-links');
         socBox.innerHTML = '';
@@ -300,7 +306,14 @@
 
         const box = document.getElementById('home-shlokas');
         box.innerHTML = '';
-        data.slice(0, 6).forEach(s => {
+        const adhyays = [...new Set(data.map(s => s.adhyay))].sort((a, b) => b - a).slice(0, 3);
+        const selected = [];
+        adhyays.forEach(a => {
+          const inAdhyay = data.filter(s => s.adhyay === a);
+          const first = inAdhyay.find(s => s.shloka === 1) || inAdhyay.sort((x, y) => x.shloka - y.shloka)[0];
+          if (first) selected.push(first);
+        });
+        selected.forEach(s => {
           const card = document.createElement('div');
           card.className = 'shloka-item-card';
           card.style.background = '#fff'; card.style.borderRadius = '20px'; card.style.overflow = 'hidden'; card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
