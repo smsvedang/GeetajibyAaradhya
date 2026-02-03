@@ -204,10 +204,38 @@
         </div>
     </div>
 
+    <footer class="main-footer" style="margin-top: 80px;">
+        <div class="container">
+            <h2 id="footer-logo-text">Gitadhya</h2>
+            <div class="social-row" id="social-links"></div>
+            <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2026 Gitadhya | Spiritual Resonance</p>
+        </div>
+    </footer>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="courses.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="courses.js"></script>
+    <script>
+        // Load site info for social links
+        (async () => {
+            try {
+                const sr = await fetch('/api/settings');
+                const settings = await sr.json();
+                const socBox = document.getElementById('social-links');
+                if (socBox) {
+                    socBox.innerHTML = '';
+                    const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
+                    if (settings.personalLink) {
+                        socBox.innerHTML += `<a href="${settings.personalLink}" target="_blank" class="social-icon"><i class="fas fa-globe"></i></a>`;
+                    }
+                    if (settings.social) {
+                        Object.keys(settings.social).forEach(key => {
+                            const url = settings.social[key];
+                            if (url) socBox.innerHTML += `<a href="${url}" target="_blank" class="social-icon"><i class="${icons[key]}"></i></a>`;
+                        });
+                    }
+                }
+            } catch (e) { console.error("Settings load error", e); }
+        })();
+    </script>
 </body>
 
 </html>

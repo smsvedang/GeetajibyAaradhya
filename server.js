@@ -319,6 +319,8 @@ app.get('/api/settings', async (req, res) => {
                 content: JSON.stringify({
                     aboutText: 'Welcome to Gitadhya!',
                     logoUrl: '/favicon.png',
+                    aboutImageUrl: '/favicon.png',
+                    personalLink: '',
                     social: { instagram: '', youtube: '', twitter: '', facebook: '' }
                 }),
                 imageUrl: '/favicon.png'
@@ -336,8 +338,8 @@ app.post('/api/settings', async (req, res) => {
         return res.status(401).json({ message: 'Password galat hai' });
     }
     try {
-        const { aboutText, logoUrl, social } = req.body;
-        const settingsData = { aboutText, logoUrl, social };
+        const { aboutText, logoUrl, aboutImageUrl, personalLink, social } = req.body;
+        const settingsData = { aboutText, logoUrl, aboutImageUrl, personalLink, social };
         await SiteContent.findOneAndUpdate(
             { key: 'siteSettings' },
             { content: JSON.stringify(settingsData), imageUrl: logoUrl },
@@ -427,6 +429,21 @@ app.post('/api/artwork', async (req, res) => {
         res.status(201).json(newArtwork);
     } catch (err) {
         res.status(500).json({ message: 'Artwork jodne mein error' });
+    }
+});
+app.put('/api/artwork/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+    try {
+        const { id } = req.params;
+        const updatedArtwork = await Artwork.findByIdAndUpdate(id, {
+            title: req.body.title,
+            imageUrl: req.body.imageUrl
+        }, { new: true });
+        res.json(updatedArtwork);
+    } catch (err) {
+        res.status(500).json({ message: 'Artwork update karne mein error' });
     }
 });
 app.delete('/api/artwork/:id', async (req, res) => {

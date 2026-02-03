@@ -50,20 +50,6 @@
       gap: 30px;
       margin-top: 40px;
     }
-
-    /* --- FOOTER --- */
-    .main-footer {
-      background: #1a1a1a;
-      color: #fff;
-      padding: 80px 0 40px;
-    }
-
-    .social-row {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin: 30px 0;
-    }
   </style>
 </head>
 
@@ -100,7 +86,7 @@
         <button class="main-tab-button active" data-tab="tab-home">Home</button>
         <a href="#site-about-main" class="main-tab-button">About</a>
         <a href="courses.html" class="main-tab-button">Courses</a>
-        <button class="main-tab-button" data-tab="tab-gallery">Art</button>
+        <a href="artwork.html" class="main-tab-button">Art</a>
         <a href="testimonials.html" class="main-tab-button">Testimonials</a>
         <div id="auth-box">
           <button class="main-tab-button" onclick="showAuth()">Login</button>
@@ -125,7 +111,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
           <div class="about-image-card"
             style="border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-            <img src="/favicon.png" style="width: 100%; height: auto; display: block;">
+            <img id="site-about-img" src="/favicon.png" style="width: 100%; height: auto; display: block;">
           </div>
           <div>
             <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--primary-dark);">About Gitadhya</h2>
@@ -203,7 +189,7 @@
       <div class="social-row" id="social-links">
         <!-- Social links from settings -->
       </div>
-      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2025 Gitadhya | All Rights Reserved.</p>
+      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2026 Gitadhya | Spiritual Resonance</p>
     </div>
   </footer>
 
@@ -255,12 +241,20 @@
         const r = await fetch('/api/settings');
         siteSettings = await r.json();
         document.getElementById('site-logo').src = siteSettings.logoUrl || '/favicon.png';
+        if (document.getElementById('site-about-img')) {
+          document.getElementById('site-about-img').src = siteSettings.aboutImageUrl || siteSettings.logoUrl || '/favicon.png';
+        }
         const aboutText = siteSettings.aboutText || 'Welcome to the spiritual platform of Gita recitations.';
         document.getElementById('site-about-main').innerText = aboutText;
 
         const socBox = document.getElementById('social-links');
         socBox.innerHTML = '';
         const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
+
+        if (siteSettings.personalLink) {
+          socBox.innerHTML += `<a href="${siteSettings.personalLink}" target="_blank" class="social-icon"><i class="fas fa-globe"></i></a>`;
+        }
+
         if (siteSettings.social) {
           Object.keys(siteSettings.social).forEach(key => {
             const url = siteSettings.social[key];

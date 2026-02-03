@@ -363,11 +363,28 @@ body {
 }
 
 /* --- FOOTER --- */
-footer {
-    background: var(--primary-dark);
+.main-footer {
+    background: #1a1a1a;
     color: #fff;
-    padding: 60px 0;
+    padding: 80px 0 40px;
     text-align: center;
+}
+
+.social-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.social-icon {
+    color: #fff;
+    font-size: 1.5rem;
+    transition: 0.3s;
+}
+
+.social-icon:hover {
+    color: var(--primary);
 }
 
 .footer-content {

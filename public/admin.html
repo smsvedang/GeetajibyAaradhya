@@ -248,15 +248,17 @@
                     <h3>Global Branding</h3>
                     <form id="settings-form" style="box-shadow:none; border:none; padding:0;">
                         <input id="set-logo-url" placeholder="Logo Image URL">
+                        <input id="set-about-img-url" placeholder="About Aaradhya Photo URL">
                         <textarea id="set-about-text" placeholder="About Gitadhya content..."
                             style="height:100px;"></textarea>
 
-                        <h4 style="margin:15px 0;">Social Links</h4>
+                        <h4 style="margin:15px 0;">Social & Personal Links</h4>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                             <input id="soc-instagram" placeholder="Instagram URL">
                             <input id="soc-youtube" placeholder="YouTube URL">
                             <input id="soc-twitter" placeholder="Twitter/X URL">
                             <input id="soc-facebook" placeholder="Facebook URL">
+                            <input id="set-personal-link" placeholder="Personal/Official Link (Portfolio)">
                         </div>
                         <button type="submit" style="margin-top:20px;">Save All Settings</button>
                     </form>
@@ -627,7 +629,9 @@
                 const r = await fetch('/api/settings');
                 const d = await r.json();
                 document.getElementById('set-logo-url').value = d.logoUrl || '';
+                document.getElementById('set-about-img-url').value = d.aboutImageUrl || '';
                 document.getElementById('set-about-text').value = d.aboutText || '';
+                document.getElementById('set-personal-link').value = d.personalLink || '';
                 if (d.social) {
                     document.getElementById('soc-instagram').value = d.social.instagram || '';
                     document.getElementById('soc-youtube').value = d.social.youtube || '';
@@ -640,7 +644,9 @@
                 e.preventDefault();
                 const data = {
                     logoUrl: document.getElementById('set-logo-url').value,
+                    aboutImageUrl: document.getElementById('set-about-img-url').value,
                     aboutText: document.getElementById('set-about-text').value,
+                    personalLink: document.getElementById('set-personal-link').value,
                     social: {
                         instagram: document.getElementById('soc-instagram').value,
                         youtube: document.getElementById('soc-youtube').value,
