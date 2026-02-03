@@ -119,10 +119,15 @@
     <nav class="top-navbar">
         <div class="container nav-container">
             <div class="logo"><a href="index.html">Gitadhya</a></div>
-            <div class="menu-links">
+            <div class="menu-links" id="nav-links">
                 <a href="index.html" class="main-tab-button">Home</a>
+                <a href="courses.html" class="main-tab-button">Courses</a>
+                <a href="artwork.html" class="main-tab-button">Art</a>
+                <a href="blog.html" class="main-tab-button">Blog</a>
                 <a href="japcounter.html" class="main-tab-button active">Mantra Digital</a>
+                <a href="testimonials.html" class="main-tab-button">Testimonials</a>
             </div>
+            <button class="menu-toggle" id="menu-btn"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
@@ -217,6 +222,15 @@
                 }
             } catch (e) { console.error("Settings load error", e); }
         })();
+
+        // --- Mobile Menu ---
+        const menuBtn = document.getElementById('menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        if (menuBtn && navLinks) {
+            menuBtn.onclick = () => {
+                navLinks.classList.toggle('active');
+            };
+        }
 
         updateUI();
     </script>

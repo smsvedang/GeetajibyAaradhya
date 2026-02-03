@@ -97,10 +97,16 @@ body {
 
 /* --- HERO SECTION --- */
 .shloka-welcome-hero {
-    padding: 120px 20px 60px;
+    padding: 100px 20px 40px;
     text-align: center;
     background: radial-gradient(circle at top right, #FFF3E0, transparent),
         radial-gradient(circle at bottom left, #FFECB3, transparent);
+}
+
+@media (max-width: 768px) {
+    .shloka-welcome-hero {
+        padding: 80px 20px 30px;
+    }
 }
 
 .verified-badge-inline {
@@ -348,6 +354,20 @@ body {
     line-height: 1.8;
 }
 
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+@media (max-width: 900px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
 /* --- ARTWORK GALLERY --- */
 .gallery h2 {
     font-size: 2.5rem;
@@ -413,13 +433,16 @@ body {
     .menu-links {
         display: none;
         position: fixed;
-        top: 70px;
-        left: 0;
-        width: 100%;
+        top: 0;
+        right: 0;
+        width: 280px;
+        height: 100vh;
         background: #fff;
-        padding: 20px;
+        padding: 80px 30px 40px;
         flex-direction: column;
-        border-bottom: 1px solid var(--border);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        z-index: 2000;
+        transition: transform 0.4s ease;
     }
 
     .menu-links.active {
@@ -428,6 +451,8 @@ body {
 
     .menu-toggle {
         display: block;
+        position: relative;
+        z-index: 2001;
         background: none;
         border: none;
         font-size: 1.5rem;
