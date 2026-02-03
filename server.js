@@ -94,12 +94,16 @@ const quizSchema = new mongoose.Schema({
 const Quiz = mongoose.model('Quiz', quizSchema);
 
 // --- 8. Web push Notifications Setup ---
-const pushTokenSchema = new mongoose.Schema({
-    token: { type: String, unique: true },
+const PushToken = mongoose.model('PushToken', pushTokenSchema);
+
+// --- 9. Student/User Model ---
+const studentSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    mobile: { type: String, unique: true, required: true },
+    password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
-
-const PushToken = mongoose.model('PushToken', pushTokenSchema);
+const Student = mongoose.model('Student', studentSchema);
 
 if (!admin.apps.length) {
     admin.initializeApp({
@@ -155,13 +159,40 @@ async function sendAutoPush(title, body) {
 
 // --- API Routes ---
 
-// --- Login API ---
+// --- Admin Login ---
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
     if (password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true });
     } else {
         res.status(401).json({ message: 'Galat Password!' });
+    }
+});
+
+// --- Student Registration ---
+app.post('/api/student/register', async (req, res) => {
+    try {
+        const { name, mobile, password } = req.body;
+        const exists = await Student.findOne({ mobile });
+        if (exists) return res.status(400).json({ message: 'Mobile number already registered' });
+
+        const newStudent = new Student({ name, mobile, password });
+        await newStudent.save();
+        res.json({ success: true, student: { name: newStudent.name, mobile: newStudent.mobile } });
+    } catch (err) {
+        res.status(500).json({ message: 'Registration failed' });
+    }
+});
+
+// --- Student Login ---
+app.post('/api/student/login', async (req, res) => {
+    try {
+        const { mobile, password } = req.body;
+        const student = await Student.findOne({ mobile, password });
+        if (!student) return res.status(401).json({ message: 'Invalid mobile or password' });
+        res.json({ success: true, student: { name: student.name, mobile: student.mobile } });
+    } catch (err) {
+        res.status(500).json({ message: 'Login failed' });
     }
 });
 
@@ -273,41 +304,55 @@ app.delete('/api/shlokas/:id', async (req, res) => {
     }
 });
 
-// --- 'About' APIs ---
-app.get('/api/about', async (req, res) => {
+// --- 'Settings' APIs (Logo, Social Links, About) ---
+app.get('/api/settings', async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        let about = await SiteContent.findOne({ key: 'aboutText' });
-        if (!about) {
-            about = new SiteContent({
-                key: 'aboutText',
-                content: 'Welcome! Please update this text in the admin panel.',
-                imageUrl: 'placeholder.jpg'
+        let settings = await SiteContent.findOne({ key: 'siteSettings' });
+        if (!settings) {
+            settings = new SiteContent({
+                key: 'siteSettings',
+                content: JSON.stringify({
+                    aboutText: 'Welcome to Gitadhya!',
+                    logoUrl: '/favicon.png',
+                    social: { instagram: '', youtube: '', twitter: '', facebook: '' }
+                }),
+                imageUrl: '/favicon.png'
             });
-            await about.save();
+            await settings.save();
         }
-        res.json(about);
+        res.json(JSON.parse(settings.content));
     } catch (err) {
-        res.status(500).json({ message: 'Cannot fetch about text' });
+        res.status(500).json({ message: 'Cannot fetch settings' });
     }
 });
-app.post('/api/about', async (req, res) => {
+
+app.post('/api/settings', async (req, res) => {
     if (req.body.password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ message: 'Password galat hai' });
     }
     try {
-        const { newText, newImageUrl } = req.body;
+        const { aboutText, logoUrl, social } = req.body;
+        const settingsData = { aboutText, logoUrl, social };
         await SiteContent.findOneAndUpdate(
-            { key: 'aboutText' },
-            { content: newText, imageUrl: newImageUrl },
+            { key: 'siteSettings' },
+            { content: JSON.stringify(settingsData), imageUrl: logoUrl },
             { upsert: true }
         );
-        res.json({ success: true, message: 'About section updated!' });
+        res.json({ success: true, message: 'Settings updated!' });
     } catch (err) {
-        res.status(500).json({ message: 'Error updating about text' });
+        res.status(500).json({ message: 'Error updating settings' });
     }
+});
+
+// Backward compatibility for old "About" calls
+app.get('/api/about', async (req, res) => {
+    try {
+        let settings = await SiteContent.findOne({ key: 'siteSettings' });
+        if (!settings) return res.json({ content: 'Welcome!' });
+        const data = JSON.parse(settings.content);
+        res.json({ content: data.aboutText, imageUrl: data.logoUrl });
+    } catch (err) { res.status(500).json({ message: 'Error' }); }
 });
 
 
@@ -922,25 +967,25 @@ app.post('/api/push/send', async (req, res) => {
 
 // --- ADMIN ACCESS APIs (NEW) ---
 
-// 1. Get All Students List (Unique Mobiles from Progress)
+// 1. Get All Students List
 app.get('/api/admin/detailed-students', async (req, res) => {
+    if (req.query.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json([]);
+    }
     try {
-        // Aggregate unique users from data
-        const students = await Progress.aggregate([
-            {
-                $group: {
-                    _id: "$mobile",
-                    coursesEnrolled: { $sum: 1 },
-                    quizzesPassed: { $sum: { $cond: ["$quizPassed", 1, 0] } },
-                    avgScore: { $avg: "$quizScore" },
-                    lastActive: { $max: "$updatedAt" }
-                }
-            },
-            { $sort: { lastActive: -1 } }
-        ]);
-        res.json(students);
+        const students = await Student.find().sort({ createdAt: -1 }).lean();
+        // Enrich with progress info
+        const enriched = await Promise.all(students.map(async (s) => {
+            const progress = await Progress.find({ mobile: s.mobile });
+            return {
+                ...s,
+                coursesEnrolled: progress.length,
+                quizzesPassed: progress.filter(p => p.quizPassed).length,
+                lastActive: progress.length > 0 ? progress.sort((a, b) => b.updatedAt - a.updatedAt)[0].updatedAt : s.createdAt
+            };
+        }));
+        res.json(enriched);
     } catch (err) {
-        console.error("Aggregation error:", err);
         res.status(500).json([]);
     }
 });
@@ -955,7 +1000,10 @@ app.get('/api/admin/stats', async (req, res) => {
             artCount,
             pendingTestimonials,
             pendingCerts,
-            uniqueStudents
+            studentCount,
+            shlokaLikes,
+            blogLikes,
+            artLikes
         ] = await Promise.all([
             Shloka.countDocuments(),
             Course.countDocuments(),
@@ -963,16 +1011,21 @@ app.get('/api/admin/stats', async (req, res) => {
             Artwork.countDocuments(),
             Testimonial.countDocuments({ status: 'pending' }),
             Certificate.countDocuments({ status: 'pending' }),
-            Progress.distinct('mobile')
+            Student.countDocuments(),
+            Shloka.aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }]),
+            Blog.aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }]),
+            Artwork.aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }])
         ]);
+
+        const totalLikes = (shlokaLikes[0]?.total || 0) + (blogLikes[0]?.total || 0) + (artLikes[0]?.total || 0);
 
         res.json({
             stats: [
                 { label: 'Total Shlokas', value: shlokaCount, icon: '📖' },
                 { label: 'Courses Active', value: courseCount, icon: '📚' },
-                { label: 'Blog Posts', value: blogCount, icon: '✍️' },
-                { label: 'Artworks', value: artCount, icon: '🎨' },
-                { label: 'Total Students', value: uniqueStudents.length, icon: '🎓' }
+                { label: 'Enrolled Students', value: studentCount, icon: '🎓' },
+                { label: 'Total Likes ❤️', value: totalLikes, icon: '❤️' },
+                { label: 'Artworks', value: artCount, icon: '🎨' }
             ],
             alerts: {
                 testimonials: pendingTestimonials,

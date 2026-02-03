@@ -5,10 +5,13 @@ let players = {};
 let completedShlokas = new Set();
 let currentCourse = null;
 let quizPassed = false;
-let userMobile = localStorage.getItem('userMobile') || '';
+
+// Get user from Gitadhya login
+const gitadhyaUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
+
 const params = new URLSearchParams(window.location.search);
 const autoCourseId = params.get('courseId');
-const quizStatus = params.get('quiz');
 
 /***********************
  * LOAD COURSES LIST
@@ -18,16 +21,17 @@ async function loadCourses() {
     const courses = await res.json();
 
     const list = document.getElementById('course-list');
+    if (!list) return;
     list.innerHTML = '';
 
     courses.forEach(course => {
         list.innerHTML += `
-<div class="course-card" onclick="openCourse('${course._id}')">
-    <div class="course-card-image" style="background-image: url('${course.imageUrl || 'default-course.jpg'}')"></div>
-    <div class="course-card-content">
+<div class="course-card-premium" onclick="openCourse('${course._id}')">
+    <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
+    <div class="course-info">
         <h3>${course.title}</h3>
-        <p>${course.description || ''}</p>
-        <button class="primary-btn">Start Course</button>
+        <p>${course.description || 'A spiritual odyssey through the verses of the Geeta.'}</p>
+        <div style="font-weight:700; color:var(--primary); margin-top:auto;">Explore Curriculum <i class="fas fa-arrow-right"></i></div>
     </div>
 </div>
 `;
@@ -38,14 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCourses();
 
     if (autoCourseId) {
-        openCourse(autoCourseId);
-
-        if (quizStatus === 'passed') {
-            setTimeout(() => {
-                const certBox = document.getElementById('certificate-box');
-                if (certBox) certBox.scrollIntoView({ behavior: 'smooth' });
-            }, 800);
-        }
+        setTimeout(() => openCourse(autoCourseId), 500);
     }
 });
 
@@ -53,13 +50,24 @@ document.addEventListener('DOMContentLoaded', () => {
  * OPEN COURSE
  ***********************/
 async function openCourse(courseId) {
-    // ✅ ACTIVE COURSE SAVE (VERY IMPORTANT)
-localStorage.setItem('active_course', courseId);
-    const courseListEl = document.getElementById('course-list');
-    if (courseListEl) courseListEl.style.display = 'none';
+    if (!userMobile) {
+        alert('Please login to Gitadhya to start this course.');
+        window.location.href = 'index.html?auth=true';
+        return;
+    }
 
-    const singleCourseEl = document.getElementById('single-course');
-    if (singleCourseEl) singleCourseEl.style.display = 'block';
+    localStorage.setItem('active_course', courseId);
+
+    // UI SWITCH
+    const listSection = document.getElementById('course-list-view');
+    const detailSection = document.getElementById('single-course-view');
+    const backBtn = document.getElementById('back-btn');
+
+    if (listSection) listSection.style.display = 'none';
+    if (detailSection) detailSection.style.display = 'block';
+    if (backBtn) backBtn.style.display = 'block';
+
+    window.scrollTo(0, 0);
 
     const res = await fetch(`/api/courses/${courseId}`);
     currentCourse = await res.json();
@@ -67,31 +75,24 @@ localStorage.setItem('active_course', courseId);
     completedShlokas.clear();
     quizPassed = false;
 
-    const courseTitleEl = document.getElementById('course-title');
-    if (courseTitleEl) courseTitleEl.textContent = currentCourse.title;
-
-    const headerTitleEl = document.getElementById('header-title');
-    if (headerTitleEl) headerTitleEl.textContent = currentCourse.title;
-
-    const quizBoxEl = document.getElementById('quiz-box');
-    if (quizBoxEl) quizBoxEl.style.display = 'none';
-
-    const certificateBoxEl = document.getElementById('certificate-box');
-    if (certificateBoxEl) certificateBoxEl.style.display = 'none';
+    // UPDATE UI WITH COURSE DATA
+    document.getElementById('view-course-title').textContent = currentCourse.title;
+    document.getElementById('view-course-desc').textContent = currentCourse.description || 'Embark on a spiritual journey of the soul.';
+    document.getElementById('view-course-img').src = currentCourse.imageUrl || '/favicon.png';
 
     const shlokaBox = document.getElementById('course-shlokas');
     if (shlokaBox) {
         shlokaBox.innerHTML = '';
-
-        currentCourse.shlokas.forEach(shloka => {
+        currentCourse.shlokas.forEach((shloka, idx) => {
             shlokaBox.innerHTML += `
                 <div class="shloka-item-card">
-                    <div class="video-wrapper">
+                    <div class="card-video-container">
                         <div id="player-${shloka._id}"></div>
                     </div>
                     <div class="card-content">
-                        <p>${shloka.text || ''}</p>
-                        <p id="status-${shloka._id}">⏳ Not completed</p>
+                        <span style="color:var(--primary); font-weight:800; font-size:0.8rem; text-transform:uppercase;">Lesson ${idx + 1}</span>
+                        <h3 style="margin:5px 0 10px;">Shloka ${shloka.shloka}</h3>
+                        <p id="status-${shloka._id}" class="status-badge status-pending">⏳ Not completed</p>
                     </div>
                 </div>
             `;
@@ -100,8 +101,8 @@ localStorage.setItem('active_course', courseId);
 
     setTimeout(() => {
         initPlayers();
-        setTimeout(restoreProgress, 300);
-    }, 400);
+        setTimeout(restoreProgress, 600);
+    }, 500);
 }
 
 /***********************
@@ -120,10 +121,11 @@ function initPlayers() {
                 onStateChange: e => {
                     if (e.data === YT.PlayerState.ENDED) {
                         completedShlokas.add(shloka._id);
-
                         const el = document.getElementById(`status-${shloka._id}`);
-                        if (el) el.textContent = '✅ Completed';
-
+                        if (el) {
+                            el.textContent = '✅ Completed';
+                            el.className = 'status-badge status-done';
+                        }
                         saveProgress();
                         checkQuizUnlock();
                     }
@@ -134,250 +136,108 @@ function initPlayers() {
 }
 
 /***********************
- * SAVE PROGRESS
+ * SAVE & RESTORE
  ***********************/
 async function saveProgress() {
-    if (!currentCourse || !currentCourse._id) return;
-
-    if (!userMobile) {
-        userMobile = prompt('Enter your mobile number');
-        if (!userMobile) return;
-        localStorage.setItem('userMobile', userMobile);
-    }
-
+    if (!currentCourse || !userMobile) return;
     await fetch('/api/progress/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            mobile: userMobile,
-            courseId: currentCourse._id,
-            completed: [...completedShlokas]
-        })
+        body: JSON.stringify({ mobile: userMobile, courseId: currentCourse._id, completed: [...completedShlokas] })
     });
+    updateProgressBar();
 }
 
-/***********************
- * RESTORE PROGRESS
- ***********************/
 async function restoreProgress() {
-    if (!currentCourse || !currentCourse._id || !userMobile) return;
+    if (!currentCourse || !userMobile) return;
+    try {
+        const res = await fetch(`/api/progress/${userMobile}/${currentCourse._id}`);
+        if (!res.ok) return;
+        const data = await res.json();
 
-    const res = await fetch(
-        `/api/progress/${userMobile}/${currentCourse._id}`
-    );
-    if (!res.ok) return;
+        if (Array.isArray(data.completed)) {
+            data.completed.forEach(id => {
+                completedShlokas.add(id);
+                const el = document.getElementById(`status-${id}`);
+                if (el) {
+                    el.textContent = '✅ Completed';
+                    el.className = 'status-badge status-done';
+                }
+            });
+        }
+        updateProgressBar();
+        checkQuizUnlock();
 
-    const data = await res.json();
-
-    if (Array.isArray(data.completed)) {
-        data.completed.forEach(id => {
-            completedShlokas.add(id);
-            const el = document.getElementById(`status-${id}`);
-            if (el) el.textContent = '✅ Completed';
-        });
-    }
-
-    checkQuizUnlock();
-
-    if (data.quizPassed) {
-    quizPassed = true;
-
-    const certBox = document.getElementById('certificate-box');
-    certBox.style.display = 'block';
-
-    certBox.innerHTML = `
-        <h3>🎓 Certificate Request</h3>
-        <input id="cert-name" placeholder="Your Full Name">
-        <input id="cert-mobile" placeholder="Mobile Number">
-        <input id="cert-email" placeholder="Email (optional)">
-        <button class="primary-btn" onclick="requestCertificate()">
-            Submit Request
-        </button>
-    `;
-
-    certBox.scrollIntoView({ behavior: 'smooth' });
+        if (data.quizPassed) {
+            quizPassed = true;
+            showCertificateForm();
+        }
+    } catch (e) { console.error("Restore error", e); }
 }
 
-    // ✅ restore quiz pass status
-   if (data.quizPassed) {
-    quizPassed = true;
-
-    const certBox = document.getElementById('certificate-box');
-    certBox.style.display = 'block';
-
-    // quiz dobara start na ho
-    const quizBtn = document.getElementById('quiz-btn');
-    if (quizBtn) quizBtn.disabled = true;
-
-    // ⚠️ IMPORTANT: form ko overwrite NA karein
-    certBox.scrollIntoView({ behavior: 'smooth' });
-    const courseKey = `cert_submitted_${currentCourse._id}`;
-
-if (localStorage.getItem(courseKey)) {
-    document.getElementById('certificate-box').innerHTML = `
-        <p style="color:green;font-weight:bold">
-            ✅ Your certificate request has already been submitted.<br>
-            You will receive it on WhatsApp & Email within 24 hours.
-        </p>
-    `;
-}
-}
+function updateProgressBar() {
+    if (!currentCourse) return;
+    const percent = Math.round((completedShlokas.size / currentCourse.shlokas.length) * 100);
+    const badge = document.getElementById('progress-stats');
+    if (badge) badge.innerHTML = `<i class="fas fa-tasks"></i> ${percent}% Complete`;
 }
 
-/***********************
- * QUIZ UNLOCK
- ***********************/
 function checkQuizUnlock() {
-    if (
-        currentCourse &&
-        completedShlokas.size === currentCourse.shlokas.length
-    ) {
+    if (currentCourse && completedShlokas.size === currentCourse.shlokas.length) {
         document.getElementById('quiz-box').style.display = 'block';
     }
 }
 
 /***********************
- * Progress Bar Update
- ***********************/
-function updateProgressBar() {
-    const percent = Math.round(
-        (completedShlokas.size / currentCourse.shlokas.length) * 100
-    );
-    document.getElementById('progress-bar').style.width = percent + '%';
-}
-
-/***********************
- * START QUIZ
+ * QUIZ & CERT
  ***********************/
 function startQuiz() {
-    if (!currentCourse || !currentCourse._id) {
-        alert('Course not loaded');
-        return;
-    }
-
     window.location.href = `/quiz.html?courseId=${currentCourse._id}`;
 }
 
-/***********************
- * CERTIFICATE download
- ***********************/
-/***********************
- * CERTIFICATE REQUEST ONLY
- ***********************/
-function requestCertificate() {
-
+function showCertificateForm() {
+    const box = document.getElementById('certificate-box');
+    if (!box) return;
+    box.style.display = 'block';
     const courseKey = `cert_submitted_${currentCourse._id}`;
 
     if (localStorage.getItem(courseKey)) {
-        document.getElementById('certificate-box').innerHTML = `
-            <p style="color:green;font-weight:bold">
-                ✅ Certificate request already submitted.<br>
-                Admin approval pending.
-            </p>
+        box.innerHTML = `<p style="color:green;font-weight:bold;text-align:center;">
+            ✅ Your request is submitted. Admin approval pending.
+        </p>`;
+    } else {
+        box.innerHTML = `
+            <h3>🎓 Claim Your Certificate</h3>
+            <p>You have successfully completed the course. Please provide your printing details.</p>
+            <input id="cert-name" placeholder="Full Name for Certificate" value="${gitadhyaUser.name}" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+            <input id="cert-mobile" placeholder="Mobile Number" value="${gitadhyaUser.mobile}" readonly style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; background:#f5f5f5;">
+            <button class="watch-btn" onclick="requestCertificate()" style="border:none; cursor:pointer; width:100%;">Request Certificate</button>
         `;
-        return;
     }
-
-    const name   = document.getElementById('cert-name').value;
-    const mobile = document.getElementById('cert-mobile').value;
-    const email  = document.getElementById('cert-email').value || '';
-
-    if (!name || !mobile) {
-        alert('Please fill required details');
-        return;
-    }
-
-    fetch('/api/certificate/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name,
-            mobile,
-            email,
-            courseTitle: currentCourse.title,
-            language: 'hi'
-        })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error();
-        localStorage.setItem(courseKey, 'true');
-        document.getElementById('certificate-box').innerHTML = `
-            <p style="color:green;font-weight:bold">
-                ✅ Certificate request submitted successfully.<br>
-                Please wait for admin approval.
-            </p>
-        `;
-    })
-    .catch(() => {
-        alert('Request already exists');
-    });
 }
 
-/***********************
- * CERTIFICATE REQUEST ONLY
- ***********************/
-function requestCertificate() {
-
-    const courseKey = `cert_submitted_${currentCourse._id}`;
-
-    if (localStorage.getItem(courseKey)) {
-        document.getElementById('certificate-box').innerHTML = `
-            <p style="color:green;font-weight:bold">
-                ✅ Certificate request already submitted.<br>
-                Admin approval pending.
-            </p>
-        `;
-        return;
-    }
-
-    const name   = document.getElementById('cert-name').value;
+async function requestCertificate() {
+    const name = document.getElementById('cert-name').value;
     const mobile = document.getElementById('cert-mobile').value;
-    const email  = document.getElementById('cert-email').value || '';
+    if (!name || !mobile) return alert('Name is required');
 
-    if (!name || !mobile) {
-        alert('Please fill required details');
-        return;
-    }
-
-    fetch('/api/certificate/request', {
+    const res = await fetch('/api/certificate/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name,
-            mobile,
-            email,
-            courseTitle: currentCourse.title,
-            language: 'hi'
-        })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error();
-        localStorage.setItem(courseKey, 'true');
-        document.getElementById('certificate-box').innerHTML = `
-            <p style="color:green;font-weight:bold">
-                ✅ Certificate request submitted successfully.<br>
-                Please wait for admin approval.
-            </p>
-        `;
-    })
-    .catch(() => {
-        alert('Request already exists');
+        body: JSON.stringify({ name, mobile, courseTitle: currentCourse.title, language: 'hi' })
     });
+    if (res.ok) {
+        localStorage.setItem(`cert_submitted_${currentCourse._id}`, 'true');
+        showCertificateForm();
+    } else alert('Request failed or already exists');
 }
-
 
 /***********************
  * NAVIGATION
  ***********************/
 function goBack() {
-    document.getElementById('single-course').style.display = 'none';
-    document.getElementById('course-list').style.display = 'block';
+    document.getElementById('course-list-view').style.display = 'block';
+    document.getElementById('single-course-view').style.display = 'none';
+    document.getElementById('back-btn').style.display = 'none';
+    window.scrollTo(0, 0);
 }
-
-function goHome() {
-    window.location.href = '/';
-}
-
-/***********************
- * INIT
- ***********************/

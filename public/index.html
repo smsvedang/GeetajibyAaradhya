@@ -14,7 +14,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aaradhya Soni - Spiritual Guide & SMA Warrior</title>
+  <title>Gitadhya - Spiritual Resonance</title>
 
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -28,340 +28,242 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* Modern Hero Section */
-    .hero-banner {
-      height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, rgba(255, 248, 225, 0.9) 0%, rgba(255, 243, 224, 0.7) 100%),
-        url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=1920') center;
-      background-size: cover;
-      position: relative;
+    .gitadhya-header {
+      padding: 140px 20px 80px;
       text-align: center;
-      padding-top: 70px;
+      background: radial-gradient(circle at top right, #FFF3E0, transparent);
     }
 
-    .hero-text h1 {
-      font-size: clamp(3rem, 10vw, 5.5rem);
-      margin-bottom: 20px;
-      color: var(--primary-dark);
-      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    .gitadhya-logo-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
     }
 
-    .floating-cards {
+    /* --- GRID --- */
+    .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: -60px;
-      position: relative;
-      z-index: 10;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
     }
 
-    .f-card {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      text-align: center;
-      transition: 0.3s;
-    }
-
-    .f-card:hover {
-      transform: translateY(-10px);
-      background: #fff;
-    }
-
-    .f-card i {
-      font-size: 2rem;
-      color: var(--primary);
-      margin-bottom: 15px;
-    }
-
-    .section-title {
-      text-align: center;
-      margin: 100px 0 60px;
-    }
-
-    .section-title h2 {
-      font-size: 3rem;
-      color: var(--primary-dark);
-      margin-bottom: 10px;
-    }
-
-    .section-title p {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-    }
-
-    .latest-grid {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 40px;
-      margin-bottom: 100px;
-    }
-
-    /* Stats Section */
-    .stats-strip {
-      background: var(--primary-dark);
-      padding: 60px 0;
+    /* --- FOOTER --- */
+    .main-footer {
+      background: #1a1a1a;
       color: #fff;
-      margin: 100px 0;
-      text-align: center;
+      padding: 80px 0 40px;
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 40px;
-    }
-
-    .stat-item h4 {
-      font-size: 3rem;
-      font-weight: 900;
-    }
-
-    .stat-item p {
-      opacity: 0.8;
-      font-weight: 600;
-    }
-
-    @media (max-width: 900px) {
-      .floating-cards {
-        grid-template-columns: 1fr;
-        margin-top: 20px;
-      }
-
-      .latest-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+    .social-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 30px 0;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- AUTH MODALS -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-modal" id="login-modal">
+      <h2>Haree Krishna,</h2>
+      <form id="student-login-form">
+        <input type="tel" id="l-mobile" placeholder="Mobile Number" required>
+        <input type="password" id="l-pass" placeholder="Password" required>
+        <button type="submit" class="auth-btn">Login to Continue</button>
+      </form>
+      <div class="auth-switch" onclick="switchAuth('register')">New seeker? Register here</div>
+    </div>
+
+    <div class="auth-modal" id="register-modal" style="display:none;">
+      <h2>Join the Journey,</h2>
+      <form id="student-register-form">
+        <input type="text" id="r-name" placeholder="Your Full Name" required>
+        <input type="tel" id="r-mobile" placeholder="Mobile Number" required>
+        <input type="password" id="r-pass" placeholder="Create Password" required>
+        <button type="submit" class="auth-btn">Register</button>
+      </form>
+      <div class="auth-switch" onclick="switchAuth('login')">Already registered? Login here</div>
+    </div>
+  </div>
+
   <nav class="top-navbar">
     <div class="container nav-container">
-      <div class="logo"><a href="index.html">Warrior Aaradhya</a></div>
-      <button class="menu-toggle" id="menu-toggle-button"><i class="fas fa-bars"></i></button>
-      <div class="menu-links" id="menu-links-container">
-        <button class="main-tab-button active" data-tab="tab-shlokas">Home</button>
-        <a href="courses.html" class="main-tab-button">Learning Center</a>
-        <button class="main-tab-button" data-tab="tab-about">The Warrior</button>
-        <button class="main-tab-button" data-tab="tab-gallery">Art Gallery</button>
-        <button class="main-tab-button" data-tab="tab-blog">Blog</button>
-        <a href="testimonials.html" class="main-tab-button">Testimonials</a>
+      <div class="logo"><a href="index.html" id="branding-name">Gitadhya</a></div>
+      <div class="menu-links" id="nav-links">
+        <button class="main-tab-button active" data-tab="tab-home">Home</button>
+        <a href="courses.html" class="main-tab-button">Courses</a>
+        <button class="main-tab-button" data-tab="tab-gallery">Art</button>
+        <div id="auth-box">
+          <button class="main-tab-button" onclick="showAuth()">Login</button>
+        </div>
       </div>
+      <button class="menu-toggle" id="menu-btn"><i class="fas fa-bars"></i></button>
     </div>
   </nav>
 
   <div class="tab-contents">
-
-    <!-- HOME TAB -->
-    <div id="tab-shlokas" class="main-tab-content active">
-      <section class="hero-banner">
-        <div class="container hero-text">
-          <div class="verified-badge-inline" style="background:#fff;">
-            <span class="dot"></span> India Book of Records Holder
-          </div>
-          <h1>Divine Recitations</h1>
-          <p class="subtitle">Experience the Bhagavad Gita through the soul of a warrior.</p>
+    <!-- HOME -->
+    <div id="tab-home" class="main-tab-content active">
+      <header class="gitadhya-header">
+        <div class="container">
+          <img src="" id="site-logo" class="gitadhya-logo-img">
+          <h1 style="font-size: 4rem; font-weight: 900; color: var(--secondary);">Eternal Resonance</h1>
+          <p class="subtitle" id="site-about">Welcome to the spiritual platform of Gita recitations.</p>
         </div>
-      </section>
+      </header>
 
-      <div class="container">
-        <div class="floating-cards">
-          <div class="f-card">
-            <i class="fas fa-book-quran"></i>
-            <h3>Learn Geeta</h3>
-            <p>Structured courses to master every shloka with meaning.</p>
-          </div>
-          <div class="f-card">
-            <i class="fas fa-palette"></i>
-            <h3>Art Gallery</h3>
-            <p>Explore the vibrant paintings created by Aaradhya Soni.</p>
-          </div>
-          <div class="f-card">
-            <i class="fas fa-newspaper"></i>
-            <h3>Daily Updates</h3>
-            <p>Stay connected with her journey and spiritual insights.</p>
-          </div>
-        </div>
-
+      <section class="container" style="padding: 60px 0;">
         <div class="section-title">
-          <h2>Record-Breaking Devotion</h2>
-          <p>Reciting the eternal wisdom, one shloka at a time.</p>
+          <h2>Soulful Recitations</h2>
+          <p>Listen to the divine verses narrated with devotion.</p>
         </div>
-
-        <div class="latest-grid">
-          <div class="record-card" style="margin:0;">
-            <div class="video-wrapper">
-              <iframe src="https://www.youtube.com/embed/F2GwS41lVAA" title="Aaradhya Soni - Record Proof"
-                frameborder="0" allowfullscreen></iframe>
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; justify-content:center;">
-            <h3 style="font-size:2rem; color:var(--primary-dark); margin-bottom:20px;">India Book of Records 2024</h3>
-            <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:30px;">Aaradhya Soni created professional
-              recognition for her unmatched dedication towards Shrimad Bhagavad Gita recitations despite her medical
-              challenges.</p>
-            <a href="https://youtu.be/F2GwS41lVAA" target="_blank" class="watch-btn"
-              style="align-self: flex-start;">View Professional Proof</a>
-          </div>
-        </div>
-
-        <div class="section-title">
-          <h2>Explore the Chapters</h2>
-          <p>Dive deep into the spiritual chapters narrated by Aaradhya.</p>
-        </div>
-
-        <div id="shloka-container" class="shloka-container">
-          <!-- JS Injected -->
-        </div>
-      </div>
-
-      <section class="stats-strip">
-        <div class="container stats-grid">
-          <div class="stat-item">
-            <h4 id="stat-s">0</h4>
-            <p>Shlokas</p>
-          </div>
-          <div class="stat-item">
-            <h4 id="stat-c">0</h4>
-            <p>Courses</p>
-          </div>
-          <div class="stat-item">
-            <h4 id="stat-l">0</h4>
-            <p>Likes</p>
-          </div>
-          <div class="stat-item">
-            <h4 id="stat-a">0</h4>
-            <p>Artworks</p>
-          </div>
+        <div id="home-shlokas" class="card-grid">
+          <!-- Shlokas Injected -->
         </div>
       </section>
     </div>
 
-    <!-- ABOUT TAB -->
-    <div id="tab-about" class="main-tab-content container">
-      <section class="about">
-        <h2>The Impossible Journey</h2>
-        <div class="about-content">
-          <div class="about-image"><img src="/favicon.png" alt="Aaradhya"></div>
-          <div class="about-text" id="about-text-content">
-            <p>Loading her story of resilience...</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- GALLERY TAB -->
+    <!-- GALLERY -->
     <div id="tab-gallery" class="main-tab-content container">
-      <section class="gallery">
-        <h2>Warrior's Palette</h2>
-        <div id="gallery-carousel-container" class="carousel-container">
-          <p>Preparing the gallery...</p>
-        </div>
+      <section style="padding: 100px 0;">
+        <h2 style="text-align:center; font-size:3rem; margin-bottom:40px;">Divine Art</h2>
+        <div id="home-art" class="card-grid"></div>
       </section>
     </div>
-
-    <!-- BLOG TAB -->
-    <div id="tab-blog" class="main-tab-content container">
-      <section class="blog-container">
-        <h2>From the Heart</h2>
-        <div id="blog-posts-container" class="shloka-grid">
-          <p>Loading updates...</p>
-        </div>
-      </section>
-    </div>
-
   </div>
 
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 Warrior Aaradhya. Spreading devotion through digital space.</p>
+  <footer class="main-footer">
+    <div class="container" style="text-align: center;">
+      <h2 id="footer-logo-text">Gitadhya</h2>
+      <div class="social-row" id="social-links">
+        <!-- Social links from settings -->
+      </div>
+      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2025 Gitadhya | All Rights Reserved.</p>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    let pPlayers = [];
+    let currentUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+    let siteSettings = {};
 
-    async function loadContent() {
-      // Stats
-      const [sh, crs, art] = await Promise.all([
-        fetch('/api/shlokas').then(r => r.json()),
-        fetch('/api/courses').then(r => r.json()),
-        fetch('/api/artwork').then(r => r.json())
-      ]);
-      document.getElementById('stat-s').innerText = sh.length;
-      document.getElementById('stat-c').innerText = crs.length;
-      document.getElementById('stat-a').innerText = art.length;
-      let likes = 0; sh.forEach(s => likes += (s.likes || 0));
-      document.getElementById('stat-l').innerText = likes;
+    // --- AUTH LOGIC ---
+    function showAuth() { document.getElementById('auth-overlay').style.display = 'flex'; }
+    function closeAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
+    function switchAuth(type) {
+      document.getElementById('login-modal').style.display = type === 'login' ? 'block' : 'none';
+      document.getElementById('register-modal').style.display = type === 'register' ? 'block' : 'none';
+    }
 
-      // Shlokas
-      const box = document.getElementById('shloka-container');
-      const grouped = {};
-      sh.forEach(s => { if (!grouped[s.adhyay]) grouped[s.adhyay] = []; grouped[s.adhyay].push(s); });
-      box.innerHTML = '';
-      Object.keys(grouped).forEach(a => {
-        const group = document.createElement('details');
-        group.className = 'adhyay-group';
-        group.innerHTML = `<summary class="adhyay-title">Chapter ${a}</summary><div class="shloka-grid"></div>`;
-        const grid = group.querySelector('.shloka-grid');
-        grouped[a].forEach(s => {
-          const card = document.createElement('div');
-          card.className = 'shloka-item-card';
-          card.innerHTML = `
-                        <div class="card-video-container"><div id="home-yt-${s._id}"></div></div>
-                        <div class="card-content">
-                            <h3>Shloka ${s.shloka}</h3>
-                            <p class="shloka-text">${s.text.substring(0, 100)}...</p>
-                        </div>`;
-          grid.appendChild(card);
-          pPlayers.push({ id: `home-yt-${s._id}`, vid: s.video_id });
-        });
-        box.appendChild(group);
+    document.getElementById('student-register-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/student/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: document.getElementById('r-name').value, mobile: document.getElementById('r-mobile').value, password: document.getElementById('r-pass').value })
       });
-      setTimeout(initYT, 500);
+      const d = await res.json();
+      if (d.success) { localStorage.setItem('gitadhya_user', JSON.stringify(d.student)); location.reload(); }
+      else alert(d.message);
+    };
+
+    document.getElementById('student-login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/student/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: document.getElementById('l-mobile').value, password: document.getElementById('l-pass').value })
+      });
+      const d = await res.json();
+      if (d.success) { localStorage.setItem('gitadhya_user', JSON.stringify(d.student)); location.reload(); }
+      else alert(d.message);
+    };
+
+    function updateAuthUI() {
+      const box = document.getElementById('auth-box');
+      if (currentUser) {
+        box.innerHTML = `<div class="auth-user-badge"><i class="fas fa-user-circle"></i> ${currentUser.name} <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i></div>`;
+      }
+    }
+    function logout() { localStorage.removeItem('gitadhya_user'); location.reload(); }
+
+    // --- CORE LOAD ---
+    async function loadSiteInfo() {
+      const r = await fetch('/api/settings');
+      siteSettings = await r.json();
+      document.getElementById('site-logo').src = siteSettings.logoUrl || '/favicon.png';
+      document.getElementById('site-about').innerText = siteSettings.aboutText;
+
+      const socBox = document.getElementById('social-links');
+      socBox.innerHTML = '';
+      const icons = { instagram: 'fab fa-instagram', youtube: 'fab fa-youtube', twitter: 'fab fa-twitter', facebook: 'fab fa-facebook' };
+      if (siteSettings.social) {
+        Object.keys(siteSettings.social).forEach(key => {
+          const url = siteSettings.social[key];
+          if (url) {
+            socBox.innerHTML += `<a href="${url}" target="_blank" class="social-icon"><i class="${icons[key]}"></i></a>`;
+          }
+        });
+      }
     }
 
-    function initYT() {
-      if (!window.YT || !YT.Player) return;
-      pPlayers.forEach(p => { if (!p.init) { p.init = true; new YT.Player(p.id, { videoId: p.vid }); } });
+    async function loadShlokas() {
+      const r = await fetch('/api/shlokas');
+      const data = await r.json();
+      const box = document.getElementById('home-shlokas');
+      data.slice(0, 6).forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'shloka-item-card'; // re-use from style.css
+        card.innerHTML = `
+                    <div class="card-video-container"><iframe src="https://www.youtube.com/embed/${s.video_id}?enablejsapi=1" style="width:100%; height:100%; border:none;"></iframe></div>
+                    <div class="card-content">
+                        <h3>Ch ${s.adhyay}, Shloka ${s.shloka}</h3>
+                        <p class="shloka-text">${s.text.substring(0, 100)}...</p>
+                        <div class="shloka-actions">
+                            <button class="shloka-action-button" onclick="handleLike('${s._id}', 'shloka', this)">❤️ <span>${s.likes || 0}</span></button>
+                            <button class="shloka-action-button" onclick="handleShare('${s._id}', 'shloka')">🔗 Share</button>
+                        </div>
+                    </div>`;
+        box.appendChild(card);
+      });
     }
-    function onYouTubeIframeAPIReady() { initYT(); }
+
+    // --- HELPERS ---
+    async function handleLike(id, type, btn) {
+      const res = await fetch(`/api/${type}/like/${id}`, { method: 'POST' });
+      const d = await res.json();
+      if (d.success) { btn.querySelector('span').innerText = d.likes; btn.disabled = true; }
+    }
+
+    function handleShare(id, type) {
+      const url = `${window.location.origin}/${type}.html?id=${id}`;
+      if (navigator.share) navigator.share({ title: 'Gitadhya', url });
+      else { navigator.clipboard.writeText(url); alert('Link Copied!'); }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadContent();
-      // TAB SWITCHING
+      loadSiteInfo(); loadShlokas(); updateAuthUI();
+
+      // Check for auto-auth redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('auth') === 'true' && !currentUser) {
+        showAuth();
+      }
+
       document.querySelectorAll('.main-tab-button').forEach(btn => {
-        if (btn.tagName === 'BUTTON') {
+        if (btn.tagName === 'BUTTON' && btn.dataset.tab) {
           btn.onclick = () => {
             document.querySelectorAll('.main-tab-button').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.main-tab-content').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
-            window.scrollTo(0, 0);
           };
         }
       });
-
-      // Navbar Scroll Effect
-      window.onscroll = () => {
-        const nav = document.querySelector('.top-navbar');
-        if (window.scrollY > 50) nav.style.padding = '5px 0';
-        else nav.style.padding = '15px 0';
-      };
     });
   </script>
 </body>
