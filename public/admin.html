@@ -307,6 +307,26 @@
                 setTimeout(() => { t.classList.add('fade-out'); setTimeout(() => t.remove(), 500); }, 4000);
             };
 
+            function showAutoPushToast(autoPush, label = 'Auto push') {
+                if (!autoPush) return;
+                const sent = Number(autoPush.sent || 0);
+                const failed = Number(autoPush.failed || 0);
+                const removed = Number(autoPush.removed || 0);
+
+                if (sent === 0 && failed === 0 && removed === 0) {
+                    showToast(`${label}: no subscribers yet.`, 'info');
+                    return;
+                }
+
+                const parts = [];
+                if (sent) parts.push(`sent to ${sent}`);
+                if (failed) parts.push(`${failed} failed`);
+                if (removed) parts.push(`${removed} removed`);
+
+                const type = failed ? 'error' : 'success';
+                showToast(`${label} ${parts.join(', ')}.`, type);
+            }
+
             window.openEditModal = (title, html) => {
                 document.getElementById('modal-title').innerText = title;
                 document.getElementById('modal-content').innerHTML = html;
@@ -516,6 +536,7 @@
                             showToast('Course update failed', 'error');
                         }
                     }
+                    showAutoPushToast(newShloka.autoPush, 'Auto push');
                     showToast('Shloka Added!', 'success'); loadShlokasAdmin(); e.target.reset();
                 } else {
                     showToast(newShloka.message || 'Shloka add failed', 'error');
@@ -572,11 +593,17 @@
             document.getElementById('course-form').onsubmit = async e => {
                 e.preventDefault();
                 const sel = Array.from(document.querySelectorAll('#course-shloka-list input:checked')).map(cb => cb.value);
-                await fetch('/api/courses', {
+                const r = await fetch('/api/courses', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title: document.getElementById('course-title').value, adhyay: document.getElementById('course-adhyay').value, imageUrl: document.getElementById('course-image-url').value, description: document.getElementById('course-description').value, shlokas: sel, password: adminPassword })
                 });
-                showToast('Course Created!', 'success'); loadCoursesAdmin(); e.target.reset(); document.getElementById('course-form-wrapper').style.display = 'none';
+                const d = await r.json();
+                if (r.ok) {
+                    showAutoPushToast(d.autoPush, 'Auto push');
+                    showToast('Course Created!', 'success'); loadCoursesAdmin(); e.target.reset(); document.getElementById('course-form-wrapper').style.display = 'none';
+                } else {
+                    showToast(d.message || 'Course create failed', 'error');
+                }
             };
 
             window.deleteCourse = async id => { if (confirm('Delete Course?')) { await fetch('/api/courses/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadCoursesAdmin(); } };
@@ -609,8 +636,14 @@
 
             document.getElementById('blog-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('blog-title').value, content: document.getElementById('blog-content').value, password: adminPassword }) });
-                showToast('Blog Published!', 'success'); loadBlogPosts(); e.target.reset();
+                const r = await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('blog-title').value, content: document.getElementById('blog-content').value, password: adminPassword }) });
+                const d = await r.json();
+                if (r.ok) {
+                    showAutoPushToast(d.autoPush, 'Auto push');
+                    showToast('Blog Published!', 'success'); loadBlogPosts(); e.target.reset();
+                } else {
+                    showToast(d.message || 'Blog publish failed', 'error');
+                }
             };
 
             window.deleteBlog = async id => { if (confirm('Delete?')) { await fetch('/api/blog/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadBlogPosts(); } };
@@ -643,8 +676,14 @@
 
             document.getElementById('artwork-form').onsubmit = async e => {
                 e.preventDefault();
-                await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('artwork-title').value, imageUrl: document.getElementById('artwork-url').value, password: adminPassword }) });
-                showToast('Artwork Added!', 'success'); loadArtwork(); e.target.reset();
+                const r = await fetch('/api/artwork', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('artwork-title').value, imageUrl: document.getElementById('artwork-url').value, password: adminPassword }) });
+                const d = await r.json();
+                if (r.ok) {
+                    showAutoPushToast(d.autoPush, 'Auto push');
+                    showToast('Artwork Added!', 'success'); loadArtwork(); e.target.reset();
+                } else {
+                    showToast(d.message || 'Artwork add failed', 'error');
+                }
             };
 
             window.deleteArt = async id => { if (confirm('Delete?')) { await fetch('/api/artwork/' + id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: adminPassword }) }); loadArtwork(); } };

@@ -119,29 +119,38 @@ if (!admin.apps.length) {
     });
 }
 
+const DEFAULT_PUSH_URL = process.env.PUSH_DEFAULT_URL || 'https://warrioraaradhya.in';
+
 // ===== AUTO PUSH HELPER FUNCTION =====
-async function sendAutoPush(title, body) {
+async function sendAutoPush(title, body, url = DEFAULT_PUSH_URL) {
     try {
         const tokens = await PushToken.find();
         if (!tokens.length) {
             console.log('⚠️ No push tokens');
-            return;
+            return { sent: 0, failed: 0, removed: 0 };
         }
+
+        let sent = 0;
+        let failed = 0;
+        let removed = 0;
 
         for (const t of tokens) {
             try {
                 await admin.messaging().send({
                     token: t.token,
                     notification: { title, body },
+                    data: { url },
                     webpush: {
+                        fcmOptions: { link: url },
                         notification: {
                             title,
                             body,
                             icon: 'https://warrioraaradhya.in/favicon.png',
-                            data: { url: 'https://warrioraaradhya.in' }
+                            data: { url }
                         }
                     }
                 });
+                sent++;
             } catch (err) {
 
                 // 🔴 THIS IS THE KEY FIX
@@ -151,13 +160,29 @@ async function sendAutoPush(title, body) {
                 ) {
                     console.log('🗑 Removing dead token');
                     await PushToken.deleteOne({ token: t.token });
+                    removed++;
                 } else {
-                    console.error('Push error:', err.message);
+                    // Fallback: try minimal payload if webpush block fails
+                    try {
+                        await admin.messaging().send({
+                            token: t.token,
+                            notification: { title, body },
+                            data: { url }
+                        });
+                        sent++;
+                        continue;
+                    } catch (fallbackErr) {
+                        console.error('Push error:', fallbackErr.message);
+                    }
                 }
+                failed++;
             }
         }
+
+        return { sent, failed, removed };
     } catch (err) {
         console.error('sendAutoPush fatal:', err.message);
+        return { sent: 0, failed: 0, removed: 0 };
     }
 }
 
@@ -266,12 +291,14 @@ app.post('/api/shlokas', async (req, res) => {
         await newShloka.save();
 
         // 🔔 auto push (NON-BLOCKING)
-        sendAutoPush(
+        const autoPush = await sendAutoPush(
             'New Gita Shloka Added 🙏',
             `Adhyay ${newShloka.adhyay}, Shloka ${newShloka.shloka}`
-        ).catch(err => console.error('Auto push failed:', err.message));
+        );
 
-        res.json(newShloka);
+        const payload = newShloka.toObject();
+        payload.autoPush = autoPush;
+        res.json(payload);
 
     } catch (err) {
         res.status(500).json({ message: 'Shloka jodne mein error', error: err.message });
@@ -443,11 +470,13 @@ app.post('/api/artwork', async (req, res) => {
             imageUrl: req.body.imageUrl
         });
         await newArtwork.save();
-        await sendAutoPush(
+        const autoPush = await sendAutoPush(
             'New Artwork Added 🎨',
             newArtwork.title
         );
-        res.status(201).json(newArtwork);
+        const payload = newArtwork.toObject();
+        payload.autoPush = autoPush;
+        res.status(201).json(payload);
     } catch (err) {
         res.status(500).json({ message: 'Artwork jodne mein error' });
     }
@@ -542,11 +571,13 @@ app.post('/api/blog', async (req, res) => {
             imageUrl: req.body.imageUrl || null
         });
         await newPost.save();
-        await sendAutoPush(
+        const autoPush = await sendAutoPush(
             'New Blog Published ✍️',
             newPost.title
         );
-        res.status(201).json(newPost);
+        const payload = newPost.toObject();
+        payload.autoPush = autoPush;
+        res.status(201).json(payload);
     } catch (err) {
         res.status(500).json({ message: 'Post jodne mein error' });
     }
@@ -634,12 +665,14 @@ app.post('/api/courses', async (req, res) => {
             imageUrl: req.body.imageUrl
         });
         await course.save();
-        await sendAutoPush(
+        const autoPush = await sendAutoPush(
             'New Course Launched 📚',
             `${course.title} (Adhyay ${course.adhyay}) – Complete it and get certified!`
         );
 
-        res.status(201).json(course);
+        const payload = course.toObject();
+        payload.autoPush = autoPush;
+        res.status(201).json(payload);
     } catch (err) {
         res.status(500).json({ message: 'Course save karne mein error' });
     }
