@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaradhya Soni - Artwork</title>
+    <title>Gitadhya - Spiritual Art</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" href="style.css">
-    </head>
+</head>
+
 <body>
-    
+
     <nav class="top-navbar">
         <div class="container nav-container">
             <div class="logo">
@@ -27,25 +29,23 @@
         </main>
     </div>
 
-    <footer class="footer">
-          <p>Contact: Aaradhya Soni</p>
-        <p>Email: warrioraaradhya111@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 Vedang Soni. All Rights Reserved.</p>
-        </footer>
+    <footer class="footer"
+        style="padding: 40px 0; text-align: center; border-top: 1px solid #f0f0f0; margin-top: 60px;">
+        <p>&copy; 2025 Gitadhya | All Rights Reserved.</p>
+    </footer>
 
     <script>
         // Single artwork card banane ka function
         function createSingleArtworkCard(artwork) {
             const item = document.createElement('div');
             item.className = 'artwork-card'; // Naya style
-            
+
             const isLiked = localStorage.getItem('liked_art_' + artwork._id) === 'true';
-            
+
             // Share data
             const shareTitle = artwork.title + " - by Gitadhya";
             const shareText = "Check out this artwork by Gitadhya!";
-            const shareUrl = window.location.href; 
+            const shareUrl = window.location.href;
 
             item.innerHTML = `
                 <div class="artwork-image">
@@ -80,14 +80,14 @@
             try {
                 const cacheBuster = `?cache_buster=${new Date().getTime()}`;
                 const response = await fetch(`/api/artwork/${artworkId}${cacheBuster}`);
-                
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Artwork not found');
                 }
                 const artwork = await response.json();
-                
-                container.innerHTML = ''; 
+
+                container.innerHTML = '';
                 const artworkCard = createSingleArtworkCard(artwork);
                 container.appendChild(artworkCard);
 
@@ -96,20 +96,20 @@
                 container.innerHTML = `<p>Error: ${err.message}</p>`;
             }
         });
-        
+
         // Like/Share button logic
         document.getElementById('single-artwork-container').addEventListener('click', async (e) => {
             const shareButton = e.target.closest('.share-button');
             if (shareButton) {
                 // (Share logic...)
             }
-            
+
             const likeButton = e.target.closest('.like-button');
             if (likeButton) {
                 const artId = likeButton.dataset.id;
                 const key = 'liked_art_' + artId;
                 if (localStorage.getItem(key)) { return; }
-                
+
                 likeButton.disabled = true;
                 try {
                     const response = await fetch(`/api/artwork/like/${artId}`, { method: 'POST' });
@@ -127,4 +127,5 @@
         });
     </script>
 </body>
+
 </html>

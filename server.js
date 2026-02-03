@@ -94,6 +94,10 @@ const quizSchema = new mongoose.Schema({
 const Quiz = mongoose.model('Quiz', quizSchema);
 
 // --- 8. Web push Notifications Setup ---
+const pushTokenSchema = new mongoose.Schema({
+    token: { type: String, unique: true },
+    createdAt: { type: Date, default: Date.now }
+});
 const PushToken = mongoose.model('PushToken', pushTokenSchema);
 
 // --- 9. Student/User Model ---

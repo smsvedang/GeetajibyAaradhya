@@ -108,6 +108,9 @@
                     <div class="stat-card">
                         <h3>Artworks</h3><span id="stat-artwork" class="stat-number">0</span>
                     </div>
+                    <div class="stat-card" style="border-left: 5px solid var(--warning);">
+                        <h3>Certificates (Pending)</h3><span id="stat-certificates" class="stat-number">0</span>
+                    </div>
                 </div>
 
                 <div class="dashboard-charts">
@@ -595,8 +598,15 @@
                 p.innerHTML = '<h3>Pending</h3>'; a.innerHTML = '<h3>Approved</h3>';
                 list.forEach(t => {
                     const div = document.createElement('div'); div.className = 'shloka-admin-item';
-                    div.innerHTML = `<div style="flex:1;"><strong>${t.author}</strong></div>
-                        <div class="admin-buttons">${t.status === 'pending' ? `<button class="approve-button" onclick="approveTest('${t._id}')">Approve</button>` : ''}<button class="delete-button" onclick="deleteTest('${t._id}')">Delete</button></div>`;
+                    div.innerHTML = `
+                        <div style="flex:1;">
+                            <strong>${t.author}</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">${t.quote.substring(0, 100)}...</p>
+                        </div>
+                        <div class="admin-buttons">
+                            ${t.status === 'pending' ? `<button class="approve-button" onclick="approveTest('${t._id}')">Approve</button>` : ''}
+                            <button class="delete-button" onclick="deleteTest('${t._id}')">Delete</button>
+                        </div>`;
                     (t.status === 'pending' ? p : a).appendChild(div);
                 });
             };

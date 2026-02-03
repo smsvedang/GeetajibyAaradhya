@@ -1,89 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaradhya Soni - Gita Shloka</title>
-    <link rel="stylesheet" href="style.css">
-    </head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gitadhya - Spiritual Wisdom</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
 <body>
-    
-    <nav class="top-navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <a href="index.html" style="text-decoration: none; color: #D84315;">Gitadhya</a>
-            </div>
-            <div class="shloka-nav-links">
-                <a href="index.html" class="home-button">Home</a>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container">
-        <main id="single-shloka-container">
-            <p>Loading shloka...</p>
-        </main>
+  <nav class="top-navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <a href="index.html" style="text-decoration: none; color: #D84315;">Gitadhya</a>
+      </div>
+      <div class="shloka-nav-links">
+        <a href="index.html" class="home-button">Home</a>
+      </div>
     </div>
+  </nav>
 
-    <footer class="footer">
-        <p>Contact: Aaradhya Soni</p>
-        <p>Email: warrioraaradhya111@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 Vedang Soni. All Rights Reserved.</p>
-    </footer>
+  <div class="container">
+    <main id="single-shloka-container">
+      <p>Loading shloka...</p>
+    </main>
+  </div>
 
-    <script>
-        let ytApiReady = false;
-     let pendingPlayers = [];
+  <footer class="footer" style="padding: 40px 0; text-align: center; border-top: 1px solid #f0f0f0; margin-top: 60px;">
+    <p>&copy; 2025 Gitadhya | All Rights Reserved.</p>
+  </footer>
 
-     function createPendingPlayers() {
-  if (!ytApiReady) return;
+  <script>
+    let ytApiReady = false;
+    let pendingPlayers = [];
 
-  pendingPlayers.forEach(p => {
-    if (p._created) return; // duplicate se bachao
-    p._created = true;
+    const gitadhyaUser = JSON.parse(localStorage.getItem('gitadhya_user'));
+    const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
 
-    new YT.Player(p.elementId, {
-      videoId: p.videoId,
-      playerVars: {
-        enablejsapi: 1,
-        origin: window.location.origin
-      },
-      events: {
-        onStateChange: (e) => {
-          if (e.data === YT.PlayerState.ENDED) {
-            const courseId = localStorage.getItem('active_course');
-            if (!courseId ) return;
+    function createPendingPlayers() {
+      if (!ytApiReady) return;
 
-            fetch('/api/progress/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                mobile,
-                courseId,
-                completed: [p.shlokaId]
-              })
-            });
+      pendingPlayers.forEach(p => {
+        if (p._created) return; // duplicate se bachao
+        p._created = true;
 
-            console.log('✅ COMPLETED (ENDED)', p.shlokaId);
+        new YT.Player(p.elementId, {
+          videoId: p.videoId,
+          playerVars: {
+            enablejsapi: 1,
+            origin: window.location.origin
+          },
+          events: {
+            onStateChange: (e) => {
+              if (e.data === YT.PlayerState.ENDED) {
+                const courseId = localStorage.getItem('active_course');
+                if (!courseId || !userMobile) return;
+
+                fetch('/api/progress/save', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    mobile: userMobile,
+                    courseId,
+                    completed: [p.shlokaId]
+                  })
+                });
+
+                console.log('✅ COMPLETED (ENDED)', p.shlokaId);
+              }
+            }
           }
-        }
-      }
-    });
-  });
-}
+        });
+      });
+    }
 
-        function createSingleShlokaCard(shloka) {
-    const item = document.createElement('div');
-    item.className = 'shloka-item-card'; 
+    function createSingleShlokaCard(shloka) {
+      const item = document.createElement('div');
+      item.className = 'shloka-item-card';
 
-    const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
-    const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
-    const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-    const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-    const shareUrl = window.location.href; 
+      const formattedText = shloka.text ? shloka.text.replace(/\n/g, '<br>') : '';
+      const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
+      const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+      const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
+      const shareUrl = window.location.href;
 
-    item.innerHTML = `
+      item.innerHTML = `
   <div class="card-video-container">
     <div id="yt-single-${shloka._id}"></div>
   </div>
@@ -108,89 +110,90 @@
     </div>
   </div>
 `;
-    return item;
-}
+      return item;
+    }
 
-        // Page load hone par shlok fetch karo (UPDATED - Reverted to ID)
-        document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('single-shloka-container');
-            
-            // 1. URL se ID nikalo (e.g., ?id=12345)
-            const params = new URLSearchParams(window.location.search);
-            const shlokaId = params.get('id'); // 'id' se fetch karein
+    // Page load hone par shlok fetch karo (UPDATED - Reverted to ID)
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('single-shloka-container');
 
-            if (!shlokaId) {
-                container.innerHTML = "<p>Error: No shloka ID provided.</p>";
-                return;
-            }
+      // 1. URL se ID nikalo (e.g., ?id=12345)
+      const params = new URLSearchParams(window.location.search);
+      const shlokaId = params.get('id'); // 'id' se fetch karein
 
-            // 2. Puraane API route se data fetch karo
-            try {
-                // [FIX] Cache buster add kiya gaya
-                const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                const response = await fetch(`/api/shloka/${shlokaId}${cacheBuster}`);
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Shloka not found');
-                }
-                
-                const shloka = await response.json();
-                
-                container.innerHTML = ''; 
-                const shlokaCard = createSingleShlokaCard(shloka);
-                container.appendChild(shlokaCard);
-                pendingPlayers.push({
-  elementId: `yt-single-${shloka._id}`,
-  videoId: shloka.video_id,
-  shlokaId: shloka._id
-});
-createPendingPlayers();
+      if (!shlokaId) {
+        container.innerHTML = "<p>Error: No shloka ID provided.</p>";
+        return;
+      }
 
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = `<p>Error: ${err.message}</p>`;
-            }
+      // 2. Puraane API route se data fetch karo
+      try {
+        // [FIX] Cache buster add kiya gaya
+        const cacheBuster = `?cache_buster=${new Date().getTime()}`;
+        const response = await fetch(`/api/shloka/${shlokaId}${cacheBuster}`);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Shloka not found');
+        }
+
+        const shloka = await response.json();
+
+        container.innerHTML = '';
+        const shlokaCard = createSingleShlokaCard(shloka);
+        container.appendChild(shlokaCard);
+        pendingPlayers.push({
+          elementId: `yt-single-${shloka._id}`,
+          videoId: shloka.video_id,
+          shlokaId: shloka._id
         });
-        
-        // 3. Like/Share button logic (No Change)
-        document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
-            const shareButton = e.target.closest('.share-button');
-            if (shareButton) {
-                const urlToShare = shareButton.dataset.url;
-                const title = shareButton.dataset.title;
-                const text = shareButton.dataset.text;
-                if (navigator.share) {
-                    try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
-                    catch (err) { console.error('Share failed:', err); }
-                } else {
-                    try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
-                    catch (err) { alert('Failed to copy link.'); }
-                }
-            }
-            const likeButton = e.target.closest('.like-button');
-            if (likeButton) {
-                const shlokaDbId = likeButton.dataset.id;
-                if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
-                likeButton.disabled = true;
-                try {
-                    const response = await fetch(`/api/shloka/like/${shlokaDbId}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        const countSpan = likeButton.querySelector('.like-count');
-                        countSpan.textContent = data.likes;
-                        localStorage.setItem('liked_' + shlokaDbId, 'true');
-                    } else { likeButton.disabled = false; }
-                } catch (err) { likeButton.disabled = false; }
-            }
-        });
-    </script>
-<script src="https://www.youtube.com/iframe_api"></script>
-<script>
-function onYouTubeIframeAPIReady() {
-  ytApiReady = true;
-  createPendingPlayers();
-}
-</script>
+        createPendingPlayers();
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<p>Error: ${err.message}</p>`;
+      }
+    });
+
+    // 3. Like/Share button logic (No Change)
+    document.getElementById('single-shloka-container').addEventListener('click', async (e) => {
+      const shareButton = e.target.closest('.share-button');
+      if (shareButton) {
+        const urlToShare = shareButton.dataset.url;
+        const title = shareButton.dataset.title;
+        const text = shareButton.dataset.text;
+        if (navigator.share) {
+          try { await navigator.share({ title: title, text: text, url: urlToShare }); }
+          catch (err) { console.error('Share failed:', err); }
+        } else {
+          try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); }
+          catch (err) { alert('Failed to copy link.'); }
+        }
+      }
+      const likeButton = e.target.closest('.like-button');
+      if (likeButton) {
+        const shlokaDbId = likeButton.dataset.id;
+        if (localStorage.getItem('liked_' + shlokaDbId)) { return; }
+        likeButton.disabled = true;
+        try {
+          const response = await fetch(`/api/shloka/like/${shlokaDbId}`, { method: 'POST' });
+          const data = await response.json();
+          if (data.success) {
+            const countSpan = likeButton.querySelector('.like-count');
+            countSpan.textContent = data.likes;
+            localStorage.setItem('liked_' + shlokaDbId, 'true');
+          } else { likeButton.disabled = false; }
+        } catch (err) { likeButton.disabled = false; }
+      }
+    });
+  </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    function onYouTubeIframeAPIReady() {
+      ytApiReady = true;
+      createPendingPlayers();
+    }
+  </script>
 </body>
+
 </html>

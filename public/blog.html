@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post - Gitadhya</title>
+    <title>Gitadhya - Spiritual Blog</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" href="style.css">
-    </head>
+</head>
+
 <body>
-    
+
     <nav class="top-navbar">
         <div class="container nav-container">
             <div class="logo">
@@ -27,11 +29,9 @@
         </main>
     </div>
 
-    <footer class="footer">
-        <p>Contact: Aaradhya Soni</p>
-        <p>Email: warrioraaradhya111@gmail.com</p>
-        <p>Whatsapp: +91 9243714402</p>
-        <p>&copy; 2025 Vedang Soni. All Rights Reserved.</p>
+    <footer class="footer"
+        style="padding: 40px 0; text-align: center; border-top: 1px solid #f0f0f0; margin-top: 60px;">
+        <p>&copy; 2025 Gitadhya | All Rights Reserved.</p>
     </footer>
 
     <script>
@@ -39,17 +39,17 @@
         function createSingleBlogCard(post) {
             const item = document.createElement('article');
             item.className = 'blog-post-item'; // Puraana style reuse karein
-            
+
             const postDate = new Date(post.createdAt).toLocaleDateString('en-IN', {
                 day: 'numeric', month: 'long', year: 'numeric'
             });
-            
+
             const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
-            
+
             // Share data
             const shareTitle = post.title + " - by Gitadhya";
             const shareText = "Check out this blog post from Gitadhya!";
-            const shareUrl = window.location.href; 
+            const shareUrl = window.location.href;
 
             item.innerHTML = `
     <h3>${post.title}</h3>
@@ -93,14 +93,14 @@
             try {
                 const cacheBuster = `?cache_buster=${new Date().getTime()}`;
                 const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
-                
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Blog post not found');
                 }
                 const post = await response.json();
-                
-                container.innerHTML = ''; 
+
+                container.innerHTML = '';
                 const blogCard = createSingleBlogCard(post);
                 container.appendChild(blogCard);
 
@@ -108,7 +108,7 @@
                 console.error(err);
                 container.innerHTML = `<p>Error: ${err.message}</p>`;
             }
-            
+
             // --- [NAYA FIX] ---
             // Click listener ko DOMContentLoaded ke ANDAR yahaan move kar diya hai
             // Taaki yeh content load hone ke BAAD attach ho
@@ -119,20 +119,20 @@
                     const title = shareButton.dataset.title;
                     const text = shareButton.dataset.text;
                     if (navigator.share) {
-                        try { await navigator.share({ title: title, text: text, url: urlToShare }); } 
+                        try { await navigator.share({ title: title, text: text, url: urlToShare }); }
                         catch (err) { console.error('Share failed:', err); }
                     } else {
-                        try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); } 
+                        try { await navigator.clipboard.writeText(urlToShare); alert('Link copied to clipboard!'); }
                         catch (err) { alert('Failed to copy link.'); }
                     }
                 }
-                
+
                 const likeButton = e.target.closest('.like-button');
                 if (likeButton) {
                     const postId = likeButton.dataset.id;
                     const key = 'liked_blog_' + postId;
                     if (localStorage.getItem(key)) { return; }
-                    
+
                     likeButton.disabled = true;
                     try {
                         const response = await fetch(`/api/blog/like/${postId}`, { method: 'POST' });
@@ -150,7 +150,8 @@
             });
             // --- FIX END ---
         });
-        
+
     </script>
 </body>
+
 </html>
