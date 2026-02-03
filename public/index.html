@@ -98,8 +98,10 @@
       <div class="logo"><a href="index.html" id="branding-name">Gitadhya</a></div>
       <div class="menu-links" id="nav-links">
         <button class="main-tab-button active" data-tab="tab-home">Home</button>
+        <a href="#site-about-main" class="main-tab-button">About</a>
         <a href="courses.html" class="main-tab-button">Courses</a>
         <button class="main-tab-button" data-tab="tab-gallery">Art</button>
+        <a href="testimonials.html" class="main-tab-button">Testimonials</a>
         <div id="auth-box">
           <button class="main-tab-button" onclick="showAuth()">Login</button>
         </div>
@@ -114,8 +116,7 @@
       <header class="gitadhya-header">
         <div class="container">
           <img src="" id="site-logo" class="gitadhya-logo-img">
-          <h1 style="font-size: 4rem; font-weight: 900; color: var(--secondary);">Eternal Resonance</h1>
-          <p class="subtitle" id="site-about-hero">Welcome to the spiritual platform of Gita recitations.</p>
+          <!-- Redundant titles removed to focus on shlokas -->
         </div>
       </header>
 
@@ -161,6 +162,12 @@
           <div id="home-blogs" class="card-grid">
             <!-- Blogs Injected -->
           </div>
+          <div style="text-align: center; margin-top: 40px;">
+            <p style="color:var(--text-muted); font-size: 0.9rem;">Enjoying the wisdom? Browse our complete collection.
+            </p>
+            <a href="blog.html" style="color:var(--primary); font-weight:700; text-decoration: none;">View All Articles
+              <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></a>
+          </div>
         </div>
       </section>
 
@@ -173,6 +180,10 @@
         <div id="home-testimonials"
           style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
           <!-- Testimonials Injected -->
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="testimonials.html" class="auth-btn"
+            style="padding: 12px 30px; text-decoration: none; display: inline-block; width: auto;">Read More Stories</a>
         </div>
       </section>
     </div>
@@ -245,7 +256,6 @@
         siteSettings = await r.json();
         document.getElementById('site-logo').src = siteSettings.logoUrl || '/favicon.png';
         const aboutText = siteSettings.aboutText || 'Welcome to the spiritual platform of Gita recitations.';
-        document.getElementById('site-about-hero').innerText = aboutText.substring(0, 100) + '...';
         document.getElementById('site-about-main').innerText = aboutText;
 
         const socBox = document.getElementById('social-links');
@@ -275,10 +285,11 @@
           card.innerHTML = `
                       <div class="card-video-container" style="aspect-ratio:16/9;"><iframe src="https://www.youtube.com/embed/${s.video_id}?enablejsapi=1" style="width:100%; height:100%; border:none;"></iframe></div>
                       <div class="card-content" style="padding:20px;">
-                          <h3 style="margin-bottom:10px; color:var(--primary-dark);">Ch ${s.adhyay}, Shloka ${s.shloka}</h3>
-                          <p class="shloka-text" style="color:var(--text-muted); font-size:0.95rem; margin-bottom:15px;">${s.text ? s.text.substring(0, 100) + '...' : 'Sacred translation...'}</p>
+                          <h3 style="margin-bottom:10px; color:var(--primary-dark); cursor:pointer;" onclick="location.href='shloka.html?id=${s._id}'">Ch ${s.adhyay}, Shloka ${s.shloka}</h3>
+                          <p class="shloka-text" style="color:var(--text-muted); font-size:0.95rem; margin-bottom:15px;">${s.text || 'Sacred translation...'}</p>
                           <div class="shloka-actions" style="display:flex; justify-content:space-between; align-items:center;">
                               <button class="shloka-action-button" onclick="handleLike('${s._id}', 'shloka', this)" style="background:none; border:none; cursor:pointer; font-weight:700; color:var(--primary);">❤️ <span>${s.likes || 0}</span></button>
+                              <div style="color:var(--primary); font-weight:700; cursor:pointer; font-size:0.9rem;" onclick="location.href='shloka.html?id=${s._id}'">Read More</div>
                               <button class="shloka-action-button" onclick="handleShare('${s._id}', 'shloka')" style="background:none; border:none; cursor:pointer; font-weight:700; color:var(--text-muted);">🔗 Share</button>
                           </div>
                       </div>`;
@@ -297,9 +308,9 @@
           const card = document.createElement('div');
           card.style.background = '#fff'; card.style.borderRadius = '20px'; card.style.padding = '30px'; card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
           card.innerHTML = `
-                    <h3 style="margin-bottom:15px; color:var(--primary-dark);">${b.title}</h3>
+                    <h3 style="margin-bottom:15px; color:var(--primary-dark); cursor:pointer;" onclick="location.href='blog.html?id=${b._id}'">${b.title}</h3>
                     <p style="color:var(--text-muted); line-height:1.6; margin-bottom:20px;">${b.content.substring(0, 150)}...</p>
-                    <div style="font-weight:700; color:var(--primary); cursor:pointer;">Read Wisdom <i class="fas fa-arrow-right"></i></div>
+                    <div style="font-weight:700; color:var(--primary); cursor:pointer;" onclick="location.href='blog.html?id=${b._id}'">Read Wisdom <i class="fas fa-arrow-right"></i></div>
                 `;
           box.appendChild(card);
         });
