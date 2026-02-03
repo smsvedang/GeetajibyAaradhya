@@ -340,6 +340,16 @@
             else alert(d.message);
         };
 
+        function updateAuthUI() {
+            const box = document.getElementById('auth-box');
+            if (!box) return;
+            if (currentUser && currentUser.name) {
+                box.innerHTML = `<div class="auth-user-badge"><i class="fas fa-user-circle"></i> ${currentUser.name} <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i></div>`;
+            }
+        }
+        function logout() { localStorage.removeItem('gitadhya_user'); location.reload(); }
+        updateAuthUI();
+
         if (!currentUser) {
             window.addEventListener('load', () => {
                 showAuth();

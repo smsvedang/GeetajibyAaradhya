@@ -85,6 +85,17 @@
     </footer>
 
     <script>
+        function updateAuthUI() {
+            const box = document.getElementById('auth-box');
+            if (!box) return;
+            let user = null;
+            try { user = JSON.parse(localStorage.getItem('gitadhya_user')); } catch (e) { localStorage.removeItem('gitadhya_user'); }
+            if (user && user.name) {
+                box.innerHTML = `<div class="auth-user-badge"><i class="fas fa-user-circle"></i> ${user.name} <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i></div>`;
+            }
+        }
+        function logout() { localStorage.removeItem('gitadhya_user'); location.reload(); }
+
         // Single blog post card banane ka function
         function createSingleBlogCard(post) {
             const item = document.createElement('article');
@@ -169,6 +180,8 @@
 
         // Page load hone par post fetch karo
         document.addEventListener('DOMContentLoaded', async () => {
+            updateAuthUI();
+
             const pageTitle = document.getElementById('page-title');
             const listContainer = document.getElementById('blog-list-container');
             const singleContainer = document.getElementById('single-blog-container');
