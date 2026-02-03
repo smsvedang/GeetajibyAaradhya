@@ -14,7 +14,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gitadhya - Spiritual Resonance</title>
+  <title>Gitadhya - Gita by Aaradhya</title>
 
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -190,7 +190,7 @@
       <div class="social-row" id="social-links">
         <!-- Social links from settings -->
       </div>
-      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2026 Gitadhya | Spiritual Resonance</p>
+      <p style="opacity: 0.6; font-size: 0.9rem;">&copy; 2026 Gitadhya | Gita by Aaradhya</p>
     </div>
   </footer>
 
@@ -452,8 +452,62 @@
           document.getElementById('nav-links').classList.toggle('active');
         };
       }
+
+      // --- PWA & Push Registration ---
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('Service Worker registered');
+
+            // Initialize Firebase UI Side
+            if (!firebase.apps.length) {
+              firebase.initializeApp({
+                apiKey: "AIzaSyCmAzjIpbPy1ENyiLoURLWg2cI7fBWcUa4",
+                authDomain: "warrior-aaradhya.firebaseapp.com",
+                projectId: "warrior-aaradhya",
+                messagingSenderId: "105939562180",
+                appId: "1:105939562180:web:6eb2d862a01902a98fe391"
+              });
+            }
+
+            const messaging = firebase.messaging();
+
+            // Request Permission & Get Token
+            const token = await messaging.getToken({ serviceWorkerRegistration: registration }).catch(err => {
+              console.log('Token error or permission denied:', err);
+            });
+
+            if (token) {
+              await fetch('/api/push/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token })
+              });
+              console.log('Push Token registered on server');
+            } else {
+              // If no token, maybe ask for it again or just log
+              console.log('No token available. Requesting permission...');
+              const permission = await Notification.requestPermission();
+              if (permission === 'granted') {
+                const newToken = await messaging.getToken();
+                if (newToken) {
+                  await fetch('/api/push/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: newToken })
+                  });
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Service Worker or Firebase error:', error);
+          }
+        });
+      }
     });
   </script>
+  <script src="pwa.js"></script>
 </body>
 
 </html>

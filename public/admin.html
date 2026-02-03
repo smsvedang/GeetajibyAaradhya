@@ -262,11 +262,11 @@
                             <input id="set-personal-link-logo" placeholder="Personal Link Logo/Icon URL">
                         </div>
                         <h4 style="margin:15px 0 8px;">Course Progress Controls</h4>
-                        <textarea id="set-adhyay-totals" placeholder='Adhyay totals JSON (e.g. {"17":28,"18":78})'
-                            style="height:120px;"></textarea>
-                        <textarea id="set-course-status"
-                            placeholder='Course status overrides JSON (courseId: "running"/"completed")'
-                            style="height:120px;"></textarea>
+                        <div id="adhyay-totals-grid"
+                            style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:15px;">
+                        </div>
+                        <div id="course-status-list"
+                            style="display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:15px;"></div>
                         <button type="submit" style="margin-top:20px;">Save All Settings</button>
                     </form>
                 </div>
@@ -290,6 +290,8 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             let adminPassword = '';
+            let settingsCache = {};
+            let coursesCache = [];
 
             /* --- UI HELPERS --- */
             window.showToast = (msg, type = 'info') => {
@@ -310,6 +312,48 @@
             window.closeEditModal = () => {
                 document.getElementById('edit-modal').classList.remove('active');
             };
+
+            function renderAdhyayTotalsGrid(data = {}) {
+                const grid = document.getElementById('adhyay-totals-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+                for (let i = 1; i <= 18; i++) {
+                    const val = data[i] || '';
+                    const cell = document.createElement('div');
+                    cell.innerHTML = `
+                        <label style="font-weight:600; font-size:0.9rem;">Adhyay ${i}</label>
+                        <input type="number" min="0" id="adhyay-total-${i}" placeholder="Total Shlokas"
+                            value="${val}">
+                    `;
+                    grid.appendChild(cell);
+                }
+            }
+
+            function renderCourseStatusOverrides() {
+                const box = document.getElementById('course-status-list');
+                if (!box) return;
+                box.innerHTML = '';
+                if (!coursesCache.length) {
+                    box.innerHTML = '<div style="color:var(--text-muted);">No courses found yet.</div>';
+                    return;
+                }
+                const overrides = settingsCache.courseStatusOverrides || {};
+                coursesCache.forEach(c => {
+                    const row = document.createElement('div');
+                    row.style = 'display:grid; grid-template-columns:1fr 180px; gap:10px; align-items:center;';
+                    row.innerHTML = `
+                        <div><strong>${c.title}</strong> <span style="color:var(--text-muted);">(Adhyay ${c.adhyay})</span></div>
+                        <select data-course-id="${c._id}">
+                            <option value="">Auto</option>
+                            <option value="running">Currently Running</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    `;
+                    const sel = row.querySelector('select');
+                    if (overrides && overrides[c._id]) sel.value = overrides[c._id];
+                    box.appendChild(row);
+                });
+            }
 
             /* --- LOGIN --- */
             document.getElementById('login-form').onsubmit = async (e) => {
@@ -440,6 +484,7 @@
             window.loadCoursesAdmin = async () => {
                 const r = await fetch('/api/courses');
                 const list = await r.json();
+                coursesCache = Array.isArray(list) ? list : [];
                 const box = document.getElementById('course-list'); box.innerHTML = '';
                 list.forEach(c => {
                     const div = document.createElement('div'); div.className = 'shloka-admin-item';
@@ -450,6 +495,7 @@
                         </div>`;
                     box.appendChild(div);
                 });
+                renderCourseStatusOverrides();
             };
 
             window.showEditCourseModal = async id => {
@@ -635,13 +681,14 @@
             async function loadSiteSettings() {
                 const r = await fetch('/api/settings');
                 const d = await r.json();
+                settingsCache = d || {};
                 document.getElementById('set-logo-url').value = d.logoUrl || '';
                 document.getElementById('set-about-img-url').value = d.aboutImageUrl || '';
                 document.getElementById('set-about-text').value = d.aboutText || '';
                 document.getElementById('set-personal-link').value = d.personalLink || '';
                 document.getElementById('set-personal-link-logo').value = d.personalLinkLogo || '';
-                document.getElementById('set-adhyay-totals').value = d.adhyayTotals ? JSON.stringify(d.adhyayTotals, null, 2) : '';
-                document.getElementById('set-course-status').value = d.courseStatusOverrides ? JSON.stringify(d.courseStatusOverrides, null, 2) : '';
+                renderAdhyayTotalsGrid(d.adhyayTotals || {});
+                renderCourseStatusOverrides();
                 if (d.social) {
                     document.getElementById('soc-instagram').value = d.social.instagram || '';
                     document.getElementById('soc-youtube').value = d.social.youtube || '';
@@ -652,20 +699,17 @@
 
             document.getElementById('settings-form').onsubmit = async e => {
                 e.preventDefault();
-                let adhyayTotals = {};
-                let courseStatusOverrides = {};
-                const adhyayRaw = document.getElementById('set-adhyay-totals').value.trim();
-                const statusRaw = document.getElementById('set-course-status').value.trim();
-
-                if (adhyayRaw) {
-                    try { adhyayTotals = JSON.parse(adhyayRaw); }
-                    catch { return showToast('Adhyay totals JSON invalid', 'error'); }
+                const adhyayTotals = {};
+                for (let i = 1; i <= 18; i++) {
+                    const val = parseInt(document.getElementById(`adhyay-total-${i}`)?.value, 10);
+                    if (Number.isFinite(val) && val > 0) adhyayTotals[i] = val;
                 }
 
-                if (statusRaw) {
-                    try { courseStatusOverrides = JSON.parse(statusRaw); }
-                    catch { return showToast('Course status JSON invalid', 'error'); }
-                }
+                const courseStatusOverrides = {};
+                document.querySelectorAll('#course-status-list select').forEach(sel => {
+                    const id = sel.dataset.courseId;
+                    if (sel.value) courseStatusOverrides[id] = sel.value;
+                });
                 const data = {
                     logoUrl: document.getElementById('set-logo-url').value,
                     aboutImageUrl: document.getElementById('set-about-img-url').value,

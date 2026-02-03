@@ -33,10 +33,15 @@ async function loadCourses() {
     list.innerHTML = '';
 
     courses.forEach(course => {
+        const running = isCourseRunningForCourse(course);
+        const statusBadge = running
+            ? `<div class="course-status-badge running">Currently Running</div>`
+            : `<div class="course-status-badge completed">Complete</div>`;
         list.innerHTML += `
 <div class="course-card-premium" onclick="openCourse('${course._id}')">
     <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
     <div class="course-info">
+        ${statusBadge}
         <h3>${course.title}</h3>
         <p>${course.description || 'A spiritual odyssey through the verses of the Geeta.'}</p>
         <div style="font-weight:700; color:var(--primary); margin-top:auto;">Explore Curriculum <i class="fas fa-arrow-right"></i></div>
@@ -302,6 +307,24 @@ function isCourseRunning() {
     const expectedTotal = getExpectedTotalShlokas();
     if (!expectedTotal) return false;
     return currentCourse.shlokas.length < expectedTotal;
+}
+
+function getExpectedTotalForCourse(course) {
+    const adhyay = parseInt(course.adhyay, 10);
+    const customTotals = siteSettings && siteSettings.adhyayTotals ? siteSettings.adhyayTotals : {};
+    const customTotal = customTotals && customTotals[adhyay];
+    return customTotal || DEFAULT_ADHYAY_TOTALS[adhyay] || (course.shlokas ? course.shlokas.length : 0) || 0;
+}
+
+function isCourseRunningForCourse(course) {
+    const statusOverrides = siteSettings && siteSettings.courseStatusOverrides ? siteSettings.courseStatusOverrides : {};
+    const override = statusOverrides ? statusOverrides[course._id] : null;
+    if (override === 'running') return true;
+    if (override === 'completed') return false;
+    const expectedTotal = getExpectedTotalForCourse(course);
+    if (!expectedTotal) return false;
+    const available = course.shlokas ? course.shlokas.length : 0;
+    return available < expectedTotal;
 }
 
 async function loadSiteSettings() {
