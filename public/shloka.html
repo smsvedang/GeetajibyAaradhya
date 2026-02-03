@@ -17,10 +17,18 @@
       </div>
       <div class="menu-links" id="nav-links">
         <a href="index.html" class="main-tab-button">Home</a>
+        <a href="index.html#site-about-main" class="main-tab-button">About</a>
         <a href="courses.html" class="main-tab-button">Courses</a>
         <a href="artwork.html" class="main-tab-button">Art</a>
         <a href="blog.html" class="main-tab-button">Blog</a>
         <a href="testimonials.html" class="main-tab-button">Testimonials</a>
+        <button class="main-tab-button" id="back-btn" onclick="goBack()"
+          style="display:none; background:#eee; border-radius: 10px;">
+          <i class="fas fa-arrow-left"></i> All Courses
+        </button>
+        <div id="auth-box">
+          <a href="index.html?auth=true" class="main-tab-button">Login</a>
+        </div>
       </div>
       <button class="menu-toggle" id="menu-btn"><i class="fas fa-bars"></i></button>
     </div>
