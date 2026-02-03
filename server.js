@@ -121,94 +121,6 @@ if (!admin.apps.length) {
 
 const DEFAULT_PUSH_URL = process.env.PUSH_DEFAULT_URL || 'https://warrioraaradhya.in';
 
-const I18N_DICT = {
-    en: {
-        _lang: 'en',
-        nav_home: 'Home',
-        nav_about: 'About',
-        nav_courses: 'Courses',
-        nav_art: 'Art',
-        nav_blog: 'Blog',
-        nav_testimonials: 'Testimonials',
-        nav_login: 'Login',
-        nav_all_courses: 'All Courses',
-        footer_tagline: 'Rooted in the Bhagavad Gita, guided by devotion, and shared with love for every seeker.',
-        footer_explore: 'Explore',
-        footer_contact: 'Contact',
-        footer_contact_blurb: 'Open to collaborations, spiritual discussions, and community events.',
-        footer_bottom_left: '© 2026 Gitadhya | Spiritual Resonance',
-        footer_bottom_right: 'Guided by devotion, shared with love.',
-        auth_login_title: 'Haree Krishna,',
-        auth_login_btn: 'Login to Continue',
-        auth_login_switch: 'New seeker? Register here',
-        auth_register_title: 'Join the Journey,',
-        auth_register_btn: 'Register',
-        auth_register_switch: 'Already registered? Login here',
-        auth_note: 'Phone number वही डालें जिस पर आप certificate receive करेंगे',
-        auth_mobile_placeholder: 'Mobile Number',
-        auth_password_placeholder: 'Password',
-        auth_name_placeholder: 'Your Full Name',
-        hero_shloka_badge: 'Gita By Aaradhya',
-        hero_shloka_title: 'Divine Shloka',
-        hero_shloka_subtitle: 'Listen, reflect, and share the sacred verses.',
-        shloka_loading: 'Loading shloka...',
-        shloka_explore_btn: 'Explore All Adhyays',
-        course_loading: 'Loading course...',
-        course_no_shlokas: 'No shlokas in this course.',
-        course_failed: 'Failed to load course.',
-        course_mark_complete: 'Mark as Completed',
-        course_completed: 'Completed ✅',
-        about_badge: 'About Aaradhya',
-        about_title: 'A Journey of Devotion',
-        about_subtitle: 'The voice behind Gitadhya and the Gita recitations.',
-        about_story_title: "Aaradhya's Story",
-        about_cta_courses: 'Explore Courses',
-        about_cta_back: 'Back to Home'
-    },
-    hi: {
-        _lang: 'hi',
-        nav_home: 'होम',
-        nav_about: 'परिचय',
-        nav_courses: 'कोर्स',
-        nav_art: 'कला',
-        nav_blog: 'ब्लॉग',
-        nav_testimonials: 'अनुभव',
-        nav_login: 'लॉगिन',
-        nav_all_courses: 'सभी कोर्स',
-        footer_tagline: 'भगवद्गीता की जड़ में, भक्ति के मार्गदर्शन में, और हर साधक के साथ प्रेम से साझा।',
-        footer_explore: 'एक्सप्लोर',
-        footer_contact: 'संपर्क',
-        footer_contact_blurb: 'सहयोग, आध्यात्मिक चर्चा और सामुदायिक कार्यक्रमों के लिए खुले हैं।',
-        footer_bottom_left: '© 2026 गीताध्य | स्पिरिचुअल रेज़ोनेंस',
-        footer_bottom_right: 'भक्ति से प्रेरित, प्रेम से साझा।',
-        auth_login_title: 'हरे कृष्ण,',
-        auth_login_btn: 'आगे बढ़ने के लिए लॉगिन करें',
-        auth_login_switch: 'नए साधक? यहाँ रजिस्टर करें',
-        auth_register_title: 'यात्रा में स्वागत,',
-        auth_register_btn: 'रजिस्टर करें',
-        auth_register_switch: 'पहले से रजिस्टर्ड? यहाँ लॉगिन करें',
-        auth_note: 'Phone number वही डालें जिस पर आप certificate receive करेंगे',
-        auth_mobile_placeholder: 'मोबाइल नंबर',
-        auth_password_placeholder: 'पासवर्ड',
-        auth_name_placeholder: 'पूरा नाम',
-        hero_shloka_badge: 'गीता बाय आराध्या',
-        hero_shloka_title: 'दिव्य श्लोक',
-        hero_shloka_subtitle: 'श्रवण करें, मनन करें, और पवित्र श्लोकों को साझा करें।',
-        shloka_loading: 'श्लोक लोड हो रहा है...',
-        shloka_explore_btn: 'सभी अध्याय देखें',
-        course_loading: 'कोर्स लोड हो रहा है...',
-        course_no_shlokas: 'इस कोर्स में श्लोक नहीं हैं।',
-        course_failed: 'कोर्स लोड नहीं हो पाया।',
-        course_mark_complete: 'पूर्ण के रूप में चिन्हित करें',
-        course_completed: 'पूर्ण ✅',
-        about_badge: 'आराध्या के बारे में',
-        about_title: 'भक्ति की एक यात्रा',
-        about_subtitle: 'गीताध्य और गीता पाठ के पीछे की आवाज़।',
-        about_story_title: 'आराध्या की कहानी',
-        about_cta_courses: 'कोर्स देखें',
-        about_cta_back: 'होम पर लौटें'
-    }
-};
 
 // ===== AUTO PUSH HELPER FUNCTION =====
 async function sendAutoPush(title, body, url = DEFAULT_PUSH_URL) {
@@ -285,12 +197,6 @@ app.post('/api/login', (req, res) => {
     } else {
         res.status(401).json({ message: 'Galat Password!' });
     }
-});
-
-// --- I18N Dictionary ---
-app.get('/api/i18n', (req, res) => {
-    const lang = req.query.lang === 'hi' ? 'hi' : 'en';
-    res.json(I18N_DICT[lang] || I18N_DICT.en);
 });
 
 // --- Student Registration ---
