@@ -717,6 +717,21 @@ body {
     color: rgba(230, 238, 247, 0.6);
 }
 
+.lang-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.lang-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 .footer-content {
     display: flex;
     flex-direction: column;

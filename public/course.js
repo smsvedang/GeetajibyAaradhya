@@ -1,6 +1,11 @@
 const params = new URLSearchParams(location.search);
 const courseId = params.get('id');
 
+function t(key, fallback) {
+  const dict = window.__I18N__ || {};
+  return dict[key] || fallback;
+}
+
 async function saveProgress(shlokaId) {
   const mobile = localStorage.getItem('user_mobile');
   if (!mobile || !courseId) return;
@@ -21,6 +26,7 @@ async function loadCourse() {
 
     const titleEl = document.getElementById('course-title');
     const container = document.getElementById('course-container');
+    if (container) container.innerHTML = '';
 
     try {
         const res = await fetch(`/api/courses/${courseId}`);
@@ -29,7 +35,7 @@ async function loadCourse() {
         titleEl.textContent = course.title;
 
         if (!course.shlokas || course.shlokas.length === 0) {
-            container.innerHTML = '<p>No shlokas in this course.</p>';
+            container.innerHTML = `<p>${t('course_no_shlokas', 'No shlokas in this course.')}</p>`;
             return;
         }
 
@@ -54,7 +60,7 @@ if (mobile) {
                 <button class="complete-btn"
   ${completed.includes(s._id) ? 'disabled' : ''}
   onclick="saveProgress('${s._id}')">
-  ${completed.includes(s._id) ? 'Completed ✅' : 'Mark as Completed'}
+  ${completed.includes(s._id) ? t('course_completed', 'Completed ✅') : t('course_mark_complete', 'Mark as Completed')}
 </button>
             `;
 
@@ -71,8 +77,12 @@ if (mobile) {
     } catch (err) {
         console.error(err);
         container.innerHTML =
-            '<p style="color:red;">Failed to load course.</p>';
+            `<p style="color:red;">${t('course_failed', 'Failed to load course.')}</p>`;
     }
 }
 
 loadCourse();
+
+window.addEventListener('i18n:changed', () => {
+  loadCourse();
+});

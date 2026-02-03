@@ -838,7 +838,15 @@
             document.getElementById('push-form').onsubmit = async e => {
                 e.preventDefault();
                 const r = await fetch('/api/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('push-title').value, body: document.getElementById('push-body').value, password: adminPassword }) });
-                if (r.ok) { let d = await r.json(); showToast(`Broadcast sent to ${d.sent} users!`, 'success'); e.target.reset(); }
+                if (r.ok) {
+                    let d = await r.json();
+                    const parts = [];
+                    if (d.sent) parts.push(`sent ${d.sent}`);
+                    if (d.failed) parts.push(`${d.failed} failed`);
+                    if (d.removed) parts.push(`${d.removed} removed`);
+                    showToast(`Broadcast ${parts.join(', ') || 'done'}.`, d.failed ? 'error' : 'success');
+                    e.target.reset();
+                }
             };
 
             /* --- INIT --- */
