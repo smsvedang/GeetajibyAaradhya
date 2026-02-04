@@ -1,172 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Certificate of Completion</title>
+    <meta charset="UTF-8">
+    <title>Certificate of Completion</title>
 
-<style>
-@media print {
-    body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-}
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: "Georgia", serif;
-    background: #f3f3f3;
-}
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Georgia", serif;
+            background: #f3f3f3;
+        }
 
-.certificate {
-    width: 1000px;
-    height: 700px;
-    margin: 30px auto;
-    background: #fffdf6;
-    border: 14px solid #c9a44c;
-    padding: 50px;
-    box-sizing: border-box;
-    position: relative;
-}
+        .certificate {
+            width: 1000px;
+            height: 700px;
+            margin: 30px auto;
+            background: #fffdf6;
+            border: 14px solid #c9a44c;
+            padding: 50px;
+            box-sizing: border-box;
+            position: relative;
+        }
 
-.certificate::before {
-    content: "";
-    position: absolute;
-    inset: 18px;
-    border: 2px solid #e6d39a;
-}
+        .certificate::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border: 2px solid #e6d39a;
+        }
 
-/* Headings */
-.title {
-    text-align: center;
-    font-size: 44px;
-    font-weight: bold;
-    margin-top: 10px;
-    letter-spacing: 1px;
-}
+        /* Headings */
+        .title {
+            text-align: center;
+            font-size: 44px;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
 
-.subtitle {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 12px;
-    color: #444;
-}
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 12px;
+            color: #444;
+        }
 
-/* Name */
-.name {
-    text-align: center;
-    font-size: 38px;
-    margin: 40px 0 30px;
-    font-weight: bold;
-    color: #9c7a00;
-}
+        /* Name */
+        .name {
+            text-align: center;
+            font-size: 38px;
+            margin: 40px 0 30px;
+            font-weight: bold;
+            color: #9c7a00;
+        }
 
-/* Content text */
-.text {
-    text-align: center;
-    font-size: 18px;
-    line-height: 1.9;
-    padding: 0 90px;
-    color: #333;
-}
+        /* Content text */
+        .text {
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.9;
+            padding: 0 90px;
+            color: #333;
+        }
 
-/* Footer */
-.footer {
-    position: absolute;
-    bottom: 55px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 90px;
-    box-sizing: border-box;
-}
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 55px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 90px;
+            box-sizing: border-box;
+        }
 
-.footer-box {
-    text-align: center;
-    font-size: 16px;
-}
+        .footer-box {
+            text-align: center;
+            font-size: 16px;
+        }
 
-.signatory {
-    font-weight: bold;
-    margin-top: 6px;
-}
+        .signatory {
+            font-weight: bold;
+            margin-top: 6px;
+        }
 
-.course-name {
-    font-weight: bold;
-    color: #7a5c00;
-}
+        .course-name {
+            font-weight: bold;
+            color: #7a5c00;
+        }
 
-.download-box {
-    text-align: center;
-    margin-top: 30px;
-}
-@media print {
-    .download-box {
-        display: none !important;
-    }
-}
+        .download-box {
+            text-align: center;
+            margin-top: 30px;
+        }
 
-.download-box button {
-    padding: 10px 24px;
-    font-size: 16px;
-    background: #c9a23f;
-    color: #000;
-    border: none;
-    cursor: pointer;
-    border-radius: 6px;
-}
-</style>
+        @media print {
+            .download-box {
+                display: none !important;
+            }
+        }
+
+        .download-box button {
+            padding: 10px 24px;
+            font-size: 16px;
+            background: #c9a23f;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="certificate">
+    <div class="certificate">
 
-    <div class="title">Certificate of Completion</div>
+        <div class="title">Certificate of Completion</div>
 
-    <div class="subtitle">
-        This certificate is proudly presented to
-    </div>
-
-    <div class="name" id="cert-name"></div>
-
-    <div class="text" id="cert-text"></div>
-
-    <div class="footer">
-        <div class="footer-box">
-            <strong>Date</strong><br>
-            <span id="cert-date"></span>
+        <div class="subtitle">
+            This certificate is proudly presented to
         </div>
 
-        <div class="footer-box">
-            <strong>Issued By</strong><br>
-            <span class="signatory" id="cert-signatory"></span>
+        <div class="name" id="cert-name"></div>
+
+        <div class="text" id="cert-text"></div>
+
+        <div class="footer">
+            <div class="footer-box">
+                <strong>Date</strong><br>
+                <span id="cert-date"></span>
+            </div>
+
+            <div class="footer-box">
+                <strong>Issued By</strong><br>
+                <span class="signatory" id="cert-signatory"></span>
+            </div>
         </div>
+
     </div>
+    <div class="download-box">
+        <button onclick="window.print()">⬇ Download Certificate</button>
+    </div>
+    <script>
+        const params = new URLSearchParams(location.search);
 
-</div>
- <div class="download-box">
-      <button onclick="window.print()">⬇ Download Certificate</button>
-   </div>
-<script>
-const params = new URLSearchParams(location.search);
+        const name = params.get('name') || '';
+        const course = params.get('courseTitle') || params.get('course') || '';
+        const lang = params.get('lang') || 'English';
 
-const name = params.get('name') || '';
-const course = params.get('courseTitle') || params.get('course') ||'';
-const lang = params.get('lang') || 'English';
+        document.getElementById('cert-name').textContent = name;
+        document.getElementById('cert-date').textContent =
+            new Date().toLocaleDateString();
 
-document.getElementById('cert-name').textContent = name;
-document.getElementById('cert-date').textContent =
-    new Date().toLocaleDateString();
+        document.getElementById('cert-signatory').textContent =
+            'Aaradhya Soni';
 
-document.getElementById('cert-signatory').textContent =
-    'Aaradhya Soni';
+        const textEl = document.getElementById('cert-text');
 
-const textEl = document.getElementById('cert-text');
+        const percentage = params.get('percentage');
 
-if (lang === 'Hindi' || lang === 'hi') {
-    textEl.innerHTML = `
+        if (lang === 'Hindi' || lang === 'hi') {
+            textEl.innerHTML = `
         यह प्रमाणित किया जाता है कि <strong>${name}</strong> ने
         <span class="course-name">"${course}"</span> पाठ्यक्रम को
         पूर्ण निष्ठा, समर्पण एवं नियमित अभ्यास के साथ
@@ -176,8 +180,8 @@ if (lang === 'Hindi' || lang === 'hi') {
         एवं आत्म-विकास के प्रति प्रतिबद्धता का प्रमाण है।
         हम उनके उज्ज्वल भविष्य की कामना करते हैं।
     `;
-} else {
-    textEl.innerHTML = `
+        } else {
+            textEl.innerHTML = `
         This is to certify that <strong>${name}</strong> has
         successfully completed the course
         <span class="course-name">"${course}"</span>
@@ -188,8 +192,9 @@ if (lang === 'Hindi' || lang === 'hi') {
         and personal growth. We wish them continued success
         and inner strength on their journey ahead.
     `;
-}
-</script>
+        }
+    </script>
 
 </body>
+
 </html>

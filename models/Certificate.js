@@ -6,6 +6,7 @@ const CertificateSchema = new mongoose.Schema({
     mobile: String,
     courseTitle: String,
     language: String,
+    percentage: Number, // Added percentage field
     status: {
         type: String,
         enum: ['pending', 'approved'],

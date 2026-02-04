@@ -198,6 +198,23 @@
             <!-- TAB: CERTIFICATES -->
             <div id="tab-certificates" class="content-page">
                 <h1>Certificates</h1>
+                <div class="stat-card" style="margin-bottom:30px; border-left:5px solid var(--secondary);">
+                    <h3>Issue Manual Certificate</h3>
+                    <form id="manual-cert-form" style="box-shadow:none; border:none; padding:0;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <input id="mc-name" placeholder="Student Name" required>
+                            <input id="mc-mobile" placeholder="Mobile Number" required>
+                            <input id="mc-course" placeholder="Course Title" required>
+                            <input id="mc-percentage" type="number" placeholder="Percentage % (Optional)">
+                            <select id="mc-lang">
+                                <option value="hi">Hindi</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <button type="submit">Issue Certificate Immediately <i class="fas fa-check-circle"></i></button>
+                    </form>
+                </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                     <div id="certificate-pending">
                         <h3>Pending Approvals</h3>
@@ -741,6 +758,34 @@
             };
             window.approveCert = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); showToast('Approved!', 'success'); };
             window.deleteCert = async id => { if (confirm('Delete?')) { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); } };
+
+            document.getElementById('manual-cert-form').onsubmit = async e => {
+                e.preventDefault();
+                try {
+                    const r = await fetch('/api/certificates/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: document.getElementById('mc-name').value,
+                            mobile: document.getElementById('mc-mobile').value,
+                            courseTitle: document.getElementById('mc-course').value,
+                            percentage: document.getElementById('mc-percentage').value,
+                            language: document.getElementById('mc-lang').value,
+                            password: adminPassword
+                        })
+                    });
+                    const d = await r.json();
+                    if (d.success) {
+                        showToast('Certificate Issued Successfully!', 'success');
+                        loadCertificates();
+                        e.target.reset();
+                    } else {
+                        showToast(d.message || 'Failed to issue certificate', 'error');
+                    }
+                } catch (err) {
+                    showToast('Error issuing certificate', 'error');
+                }
+            };
 
             /* --- QUIZZES --- */
             async function loadQuizzes() {
