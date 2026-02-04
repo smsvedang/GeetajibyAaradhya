@@ -136,6 +136,23 @@
         </div>
     </nav>
 
+    <div class="auth-overlay" id="profile-overlay" style="display:none;">
+        <div class="auth-modal" id="profile-modal" style="max-width:520px;">
+            <button class="auth-close" onclick="closeProfile()" aria-label="Close">✕</button>
+            <h2>My Account</h2>
+            <p style="color:var(--text-muted); margin:-10px 0 20px; font-size:0.95rem;">
+                Apne details update kar sakte ho. Password change ke liye current password zaroor daalein.
+            </p>
+            <form id="profile-form" style="display:grid; gap:12px;">
+                <input id="profile-name" placeholder="Full Name" required>
+                <input id="profile-mobile" placeholder="Mobile Number" readonly>
+                <input id="profile-current-pass" type="password" placeholder="Current Password" required>
+                <input id="profile-new-pass" type="password" placeholder="New Password (optional)">
+                <button class="auth-btn" type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <header class="testimonials-hero">
         <div class="container">
             <h1>Voices of Inspiration</h1>
@@ -211,13 +228,60 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
+        let currentUser = null;
+
+        function openProfile() { document.getElementById('profile-overlay').style.display = 'flex'; }
+        function closeProfile() { document.getElementById('profile-overlay').style.display = 'none'; }
+        function initProfileModal() {
+            const form = document.getElementById('profile-form');
+            if (!form || !currentUser) return;
+            document.getElementById('profile-name').value = currentUser.name || '';
+            document.getElementById('profile-mobile').value = currentUser.mobile || '';
+
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const payload = {
+                    name: document.getElementById('profile-name').value.trim(),
+                    mobile: document.getElementById('profile-mobile').value.trim(),
+                    currentPassword: document.getElementById('profile-current-pass').value,
+                    newPassword: document.getElementById('profile-new-pass').value.trim()
+                };
+                const res = await fetch('/api/student/update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await res.json();
+                if (res.ok && d.success) {
+                    localStorage.setItem('gitadhya_user', JSON.stringify(d.student));
+                    currentUser = d.student;
+                    document.getElementById('profile-current-pass').value = '';
+                    document.getElementById('profile-new-pass').value = '';
+                    updateAuthUI();
+                    alert('Profile updated successfully!');
+                    closeProfile();
+                } else {
+                    alert(d.message || 'Profile update failed');
+                }
+            };
+        }
+
         function updateAuthUI() {
             const box = document.getElementById('auth-box');
             if (!box) return;
             let user = null;
             try { user = JSON.parse(localStorage.getItem('gitadhya_user')); } catch (e) { localStorage.removeItem('gitadhya_user'); }
             if (user && user.name) {
-                box.innerHTML = `<div class="auth-user-badge"><i class="fas fa-user-circle"></i> ${user.name} <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i></div>`;
+                currentUser = user;
+                box.innerHTML = `
+                    <div class="auth-user-badge">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="profile-trigger" style="cursor:pointer;">${user.name}</span>
+                        <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i>
+                    </div>
+                `;
+                const trigger = document.getElementById('profile-trigger');
+                if (trigger) trigger.onclick = () => { initProfileModal(); openProfile(); };
             }
         }
         function logout() { localStorage.removeItem('gitadhya_user'); location.reload(); }
