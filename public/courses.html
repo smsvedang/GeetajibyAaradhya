@@ -200,6 +200,23 @@
         </div>
     </div>
 
+    <div class="auth-overlay" id="profile-overlay" style="display:none;">
+        <div class="auth-modal" id="profile-modal" style="max-width:520px;">
+            <button class="auth-close" onclick="closeProfile()" aria-label="Close">✕</button>
+            <h2>My Account</h2>
+            <p style="color:var(--text-muted); margin:-10px 0 20px; font-size:0.95rem;">
+                Apne details update kar sakte ho. Password change ke liye current password zaroor daalein.
+            </p>
+            <form id="profile-form" style="display:grid; gap:12px;">
+                <input id="profile-name" placeholder="Full Name" required>
+                <input id="profile-mobile" placeholder="Mobile Number" readonly>
+                <input id="profile-current-pass" type="password" placeholder="Current Password" required>
+                <input id="profile-new-pass" type="password" placeholder="New Password (optional)">
+                <button class="auth-btn" type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <nav class="top-navbar">
         <div class="container nav-container">
             <div class="logo"><a href="index.html">Gitadhya-Gita by Aaradhya</a></div>
@@ -232,21 +249,6 @@
         </header>
 
         <section class="container" style="padding: 60px 0;">
-            <div id="profile-card" class="record-card"
-                style="display:none; text-align:left; margin: 0 auto 30px; max-width: 720px; background: #FFF7ED;">
-                <h2 style="margin-bottom:10px;">Profile Management</h2>
-                <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.95rem;">
-                    Apne details update kar sakte ho. Password change ke liye current password zaroor daalein.
-                </p>
-                <form id="profile-form" style="display:grid; gap:12px;">
-                    <input id="profile-name" placeholder="Full Name" required>
-                    <input id="profile-mobile" placeholder="Mobile Number" readonly>
-                    <input id="profile-current-pass" type="password" placeholder="Current Password" required>
-                    <input id="profile-new-pass" type="password" placeholder="New Password (optional)">
-                    <button class="watch-btn" type="submit" style="border:none; cursor:pointer; width:fit-content;">Save
-                        Changes</button>
-                </form>
-            </div>
             <div id="course-list" class="courses-grid">
                 <!-- JS Injected -->
             </div>
@@ -357,11 +359,22 @@
             else alert(d.message);
         };
 
+        function openProfile() { document.getElementById('profile-overlay').style.display = 'flex'; }
+        function closeProfile() { document.getElementById('profile-overlay').style.display = 'none'; }
+
         function updateAuthUI() {
             const box = document.getElementById('auth-box');
             if (!box) return;
             if (currentUser && currentUser.name) {
-                box.innerHTML = `<div class="auth-user-badge"><i class="fas fa-user-circle"></i> ${currentUser.name} <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i></div>`;
+                box.innerHTML = `
+                    <div class="auth-user-badge">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="profile-trigger" style="cursor:pointer;">${currentUser.name}</span>
+                        <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i>
+                    </div>
+                `;
+                const trigger = document.getElementById('profile-trigger');
+                if (trigger) trigger.onclick = () => { initProfileModal(); openProfile(); };
             }
         }
         function logout() { localStorage.removeItem('gitadhya_user'); location.reload(); }
@@ -373,12 +386,9 @@
             });
         }
 
-        function initProfileCard() {
-            const card = document.getElementById('profile-card');
+        function initProfileModal() {
             const form = document.getElementById('profile-form');
-            if (!card || !form || !currentUser) return;
-
-            card.style.display = 'block';
+            if (!form || !currentUser) return;
             document.getElementById('profile-name').value = currentUser.name || '';
             document.getElementById('profile-mobile').value = currentUser.mobile || '';
 
@@ -403,12 +413,12 @@
                     document.getElementById('profile-new-pass').value = '';
                     updateAuthUI();
                     alert('Profile updated successfully!');
+                    closeProfile();
                 } else {
                     alert(d.message || 'Profile update failed');
                 }
             };
         }
-        initProfileCard();
 
         // Load site info for social links
         (async () => {
