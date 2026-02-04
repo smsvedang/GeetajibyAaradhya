@@ -917,12 +917,12 @@ app.post('/api/quiz', async (req, res) => {
     res.json({ success: true, quiz });
 });
 app.post('/api/quiz/complete', async (req, res) => {
-    const { mobile, courseId, score } = req.body;
+    const { mobile, courseId, score, passed } = req.body;
 
     await Progress.findOneAndUpdate(
         { mobile, courseId },
         {
-            quizPassed: true,
+            quizPassed: passed,
             quizScore: score
         },
         { upsert: true }
