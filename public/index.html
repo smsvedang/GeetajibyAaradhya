@@ -318,15 +318,19 @@
 
     function updateAuthUI() {
       const box = document.getElementById('auth-box');
-      if (currentUser) {
+      if (!box) return;
+      let user = null;
+      try { user = JSON.parse(localStorage.getItem('gitadhya_user')); } catch (e) { localStorage.removeItem('gitadhya_user'); }
+      if (user && user.name) {
+        currentUser = user;
         box.innerHTML = `
           <div class="auth-user-badge">
             <i class="fas fa-user-circle"></i>
-            <span id="profile-trigger" style="cursor:pointer;">${currentUser.name}</span>
+            <span data-profile-trigger="true" style="cursor:pointer;">${user.name}</span>
             <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color:var(--primary);"></i>
           </div>
         `;
-        const trigger = document.getElementById('profile-trigger');
+        const trigger = box.querySelector('[data-profile-trigger]');
         if (trigger) trigger.onclick = () => { initProfileModal(); openProfile(); };
       }
     }
