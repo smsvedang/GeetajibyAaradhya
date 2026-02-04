@@ -40,6 +40,8 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            text-decoration: none;
+            color: inherit;
         }
 
         .course-card-premium:hover {
@@ -230,6 +232,21 @@
         </header>
 
         <section class="container" style="padding: 60px 0;">
+            <div id="profile-card" class="record-card"
+                style="display:none; text-align:left; margin: 0 auto 30px; max-width: 720px; background: #FFF7ED;">
+                <h2 style="margin-bottom:10px;">Profile Management</h2>
+                <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.95rem;">
+                    Apne details update kar sakte ho. Password change ke liye current password zaroor daalein.
+                </p>
+                <form id="profile-form" style="display:grid; gap:12px;">
+                    <input id="profile-name" placeholder="Full Name" required>
+                    <input id="profile-mobile" placeholder="Mobile Number" readonly>
+                    <input id="profile-current-pass" type="password" placeholder="Current Password" required>
+                    <input id="profile-new-pass" type="password" placeholder="New Password (optional)">
+                    <button class="watch-btn" type="submit" style="border:none; cursor:pointer; width:fit-content;">Save
+                        Changes</button>
+                </form>
+            </div>
             <div id="course-list" class="courses-grid">
                 <!-- JS Injected -->
             </div>
@@ -355,6 +372,43 @@
                 showAuth();
             });
         }
+
+        function initProfileCard() {
+            const card = document.getElementById('profile-card');
+            const form = document.getElementById('profile-form');
+            if (!card || !form || !currentUser) return;
+
+            card.style.display = 'block';
+            document.getElementById('profile-name').value = currentUser.name || '';
+            document.getElementById('profile-mobile').value = currentUser.mobile || '';
+
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const payload = {
+                    name: document.getElementById('profile-name').value.trim(),
+                    mobile: document.getElementById('profile-mobile').value.trim(),
+                    currentPassword: document.getElementById('profile-current-pass').value,
+                    newPassword: document.getElementById('profile-new-pass').value.trim()
+                };
+                const res = await fetch('/api/student/update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await res.json();
+                if (res.ok && d.success) {
+                    localStorage.setItem('gitadhya_user', JSON.stringify(d.student));
+                    currentUser = d.student;
+                    document.getElementById('profile-current-pass').value = '';
+                    document.getElementById('profile-new-pass').value = '';
+                    updateAuthUI();
+                    alert('Profile updated successfully!');
+                } else {
+                    alert(d.message || 'Profile update failed');
+                }
+            };
+        }
+        initProfileCard();
 
         // Load site info for social links
         (async () => {

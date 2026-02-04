@@ -40,7 +40,7 @@ async function loadCourses() {
         const desc = (course.description || 'A spiritual odyssey through the verses of the Geeta.').replace(/\s+/g, ' ').trim();
         const shortDesc = desc.length > 140 ? desc.slice(0, 140).trim() + '...' : desc;
         list.innerHTML += `
-<div class="course-card-premium" onclick="openCourse('${course._id}')">
+<a class="course-card-premium" href="courses.html?courseId=${course._id}">
     <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
     <div class="course-info">
         ${statusBadge}
@@ -48,7 +48,7 @@ async function loadCourses() {
         <p>${shortDesc}</p>
         <div style="font-weight:700; color:var(--primary); margin-top:auto;">Explore Curriculum <i class="fas fa-arrow-right"></i></div>
     </div>
-</div>
+</a>
 `;
     });
 }
@@ -329,10 +329,7 @@ async function requestCertificate() {
  * NAVIGATION
  ***********************/
 function goBack() {
-    document.getElementById('course-list-view').style.display = 'block';
-    document.getElementById('single-course-view').style.display = 'none';
-    document.getElementById('back-btn').style.display = 'none';
-    window.scrollTo(0, 0);
+    window.location.href = 'courses.html';
 }
 
 function getExpectedTotalShlokas() {

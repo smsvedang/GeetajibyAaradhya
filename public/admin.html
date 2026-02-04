@@ -472,14 +472,43 @@
                 const r = await fetch('/api/shlokas');
                 const list = await r.json();
                 const box = document.getElementById('shloka-list-admin'); box.innerHTML = '';
+                if (!Array.isArray(list) || list.length === 0) {
+                    box.innerHTML = '<div style="color:var(--text-muted);">No shlokas found yet.</div>';
+                    return;
+                }
+
+                const grouped = {};
                 list.forEach(s => {
-                    const div = document.createElement('div'); div.className = 'shloka-admin-item';
-                    div.innerHTML = `<div><strong>Adhyay ${s.adhyay}, Shloka ${s.shloka}</strong></div>
-                        <div class="admin-buttons">
-                            <button class="edit-button" onclick='showEditShlokaModal(${JSON.stringify(s)})'><i class="fas fa-edit"></i> Edit</button>
-                            <button class="delete-button" onclick="deleteShloka('${s._id}')">Delete</button>
-                        </div>`;
-                    box.appendChild(div);
+                    const key = Number(s.adhyay) || 0;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(s);
+                });
+
+                Object.keys(grouped).sort((a, b) => a - b).forEach(adhyay => {
+                    const group = document.createElement('details');
+                    group.open = true;
+                    group.style.marginBottom = '16px';
+                    group.style.border = '1px solid var(--border)';
+                    group.style.borderRadius = '12px';
+                    group.style.background = '#fff';
+                    group.innerHTML = `
+                        <summary style="cursor:pointer; padding:12px 16px; font-weight:800; background:#fafafa; border-bottom:1px solid var(--border);">
+                            Adhyay ${adhyay} <span style="color:var(--text-muted); font-weight:600;">(${grouped[adhyay].length})</span>
+                        </summary>
+                    `;
+                    grouped[adhyay]
+                        .sort((x, y) => x.shloka - y.shloka)
+                        .forEach(s => {
+                            const div = document.createElement('div');
+                            div.className = 'shloka-admin-item';
+                            div.innerHTML = `<div><strong>Shloka ${s.shloka}</strong></div>
+                                <div class="admin-buttons">
+                                    <button class="edit-button" onclick='showEditShlokaModal(${JSON.stringify(s)})'><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="delete-button" onclick="deleteShloka('${s._id}')">Delete</button>
+                                </div>`;
+                            group.appendChild(div);
+                        });
+                    box.appendChild(group);
                 });
             };
 

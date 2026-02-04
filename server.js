@@ -226,6 +226,28 @@ app.post('/api/student/login', async (req, res) => {
     }
 });
 
+// --- Student Profile Update ---
+app.put('/api/student/update', async (req, res) => {
+    try {
+        const { mobile, name, currentPassword, newPassword } = req.body;
+        if (!mobile || !currentPassword) {
+            return res.status(400).json({ message: 'Mobile and current password are required.' });
+        }
+        const student = await Student.findOne({ mobile });
+        if (!student || student.password !== currentPassword) {
+            return res.status(401).json({ message: 'Current password is incorrect.' });
+        }
+
+        if (name && name.trim()) student.name = name.trim();
+        if (newPassword && newPassword.trim()) student.password = newPassword.trim();
+
+        await student.save();
+        res.json({ success: true, student: { name: student.name, mobile: student.mobile } });
+    } catch (err) {
+        res.status(500).json({ message: 'Profile update failed' });
+    }
+});
+
 // --- Shloka APIs ---
 app.get('/api/shlokas', async (req, res) => {
     try {
