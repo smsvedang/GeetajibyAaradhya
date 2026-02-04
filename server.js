@@ -318,10 +318,11 @@ app.get('/api/students', async (req, res) => {
     }
 });
 
-// Update student (admin can only update name)
+
+// Update student (admin can update name, mobile, password)
 app.put('/api/admin/student/:id', async (req, res) => {
     try {
-        const { adminPassword, name } = req.body;
+        const { adminPassword, name, mobile, password } = req.body;
         if (adminPassword !== process.env.ADMIN_PASSWORD) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -331,13 +332,37 @@ app.put('/api/admin/student/:id', async (req, res) => {
             return res.status(404).json({ message: 'Student not found' });
         }
 
+        // Check if new mobile is already taken by another student
+        if (mobile && mobile !== student.mobile) {
+            const existingStudent = await Student.findOne({ mobile });
+            if (existingStudent && existingStudent._id.toString() !== req.params.id) {
+                return res.status(400).json({ message: 'Mobile number already registered to another student' });
+            }
+
+            // Update mobile in student record
+            const oldMobile = student.mobile;
+            student.mobile = mobile.trim();
+
+            // Update mobile in all progress records
+            await Progress.updateMany(
+                { mobile: oldMobile },
+                { mobile: mobile.trim() }
+            );
+        }
+
         if (name && name.trim()) {
             student.name = name.trim();
-            await student.save();
         }
+
+        if (password && password.trim()) {
+            student.password = password.trim();
+        }
+
+        await student.save();
 
         res.json({ success: true, student: { name: student.name, mobile: student.mobile } });
     } catch (err) {
+        console.error('Student update error:', err);
         res.status(500).json({ message: 'Update failed' });
     }
 });

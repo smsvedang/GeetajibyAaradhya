@@ -114,6 +114,9 @@
                     <div class="stat-card" style="border-left: 5px solid var(--warning);">
                         <h3>Certificates (Pending)</h3><span id="stat-certificates" class="stat-number">0</span>
                     </div>
+                    <div class="stat-card" style="border-left: 5px solid #9c27b0;">
+                        <h3>Testimonials (Pending)</h3><span id="stat-pending-testimonials" class="stat-number">0</span>
+                    </div>
                 </div>
 
                 <div class="dashboard-charts">
@@ -444,6 +447,10 @@
                     const certsRes = await fetch('/api/certificates');
                     const certs = await certsRes.json();
                     document.getElementById('stat-certificates').textContent = certs.filter(c => c.status === 'pending').length;
+
+                    const testimonialsRes = await fetch('/api/testimonials/all');
+                    const testimonials = await testimonialsRes.json();
+                    document.getElementById('stat-pending-testimonials').textContent = testimonials.filter(t => t.status === 'pending').length;
 
                     renderCharts(certs);
                 } catch (e) { console.error(e); }
@@ -979,8 +986,8 @@
                         ${enrolledHtml}
                         ${passedHtml}
                         <div style="display:flex; gap:10px; margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
-                            <button onclick="editStudentName('${s._id}', '${s.name}')" class="primary-btn" style="flex:1;">
-                                <i class="fas fa-edit"></i> Edit Name
+                            <button onclick="editStudentDetails('${s._id}', '${s.name}', '${s.mobile}')" class="primary-btn" style="flex:1;">
+                                <i class="fas fa-edit"></i> Edit Details
                             </button>
                             <button onclick="deleteStudent('${s._id}')" style="background:#ef4444; color:white; border:none; border-radius:8px; flex:1; cursor:pointer; padding:10px;">
                                 <i class="fas fa-trash"></i> Delete Student
@@ -992,25 +999,42 @@
                 openEditModal('Student Profile: ' + s.name, html);
             };
 
-            window.editStudentName = (id, currentName) => {
+            window.editStudentDetails = (id, currentName, currentMobile) => {
                 const html = `
                     <form id="student-update-form">
+                        <label style="font-weight:600; margin-bottom:5px; display:block;">Full Name</label>
                         <input id="stu-name" value="${currentName}" placeholder="Full Name" required>
-                        <button type="submit" class="primary-btn">Update Name</button>
+                        
+                        <label style="font-weight:600; margin-bottom:5px; display:block; margin-top:15px;">Mobile Number</label>
+                        <input id="stu-mobile" value="${currentMobile}" placeholder="Mobile Number" required>
+                        
+                        <label style="font-weight:600; margin-bottom:5px; display:block; margin-top:15px;">New Password (leave blank to keep current)</label>
+                        <input type="password" id="stu-password" placeholder="New Password (optional)">
+                        
+                        <button type="submit" class="primary-btn" style="margin-top:20px;">Update Details</button>
                     </form>
                 `;
 
-                openEditModal('Edit Student Name', html);
+                openEditModal('Edit Student Details', html);
 
                 document.getElementById('student-update-form').onsubmit = async (e) => {
                     e.preventDefault();
+
+                    const updateData = {
+                        name: document.getElementById('stu-name').value,
+                        mobile: document.getElementById('stu-mobile').value,
+                        adminPassword: adminPassword
+                    };
+
+                    const newPassword = document.getElementById('stu-password').value;
+                    if (newPassword && newPassword.trim()) {
+                        updateData.password = newPassword.trim();
+                    }
+
                     const res = await fetch(`/api/admin/student/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            name: document.getElementById('stu-name').value,
-                            adminPassword: adminPassword
-                        })
+                        body: JSON.stringify(updateData)
                     });
 
                     if (res.ok) {
@@ -1018,7 +1042,8 @@
                         closeEditModal();
                         loadStudentsV2();
                     } else {
-                        showToast('Update failed!', 'error');
+                        const error = await res.json();
+                        showToast(error.message || 'Update failed!', 'error');
                     }
                 };
             };
