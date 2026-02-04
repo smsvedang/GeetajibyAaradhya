@@ -3,7 +3,18 @@
  *********************************/
 let quizData = null;
 let userAnswers = {};
-let userMobile = localStorage.getItem("userMobile");
+
+// Correctly get user mobile
+let userMobile = null;
+try {
+    const u = JSON.parse(localStorage.getItem("gitadhya_user"));
+    if (u && u.mobile) userMobile = u.mobile;
+} catch (e) {
+    // ignore
+}
+if (!userMobile) {
+    userMobile = localStorage.getItem("user_mobile");
+}
 
 /*********************************
  * GET COURSE ID FROM URL
@@ -21,6 +32,7 @@ if (!courseId) {
  *********************************/
 async function loadQuiz() {
     try {
+        // 1. Load Quiz structure
         const res = await fetch(`/api/quiz/${courseId}`);
         if (!res.ok) throw new Error("Quiz not found");
 
@@ -29,6 +41,23 @@ async function loadQuiz() {
         if (!quizData.questions || quizData.questions.length === 0) {
             alert("Quiz questions missing");
             return;
+        }
+
+        // 2. Check if user already passed (Prevent re-attempt)
+        if (userMobile) {
+            try {
+                const progRes = await fetch(`/api/progress/${userMobile}/${courseId}`);
+                if (progRes.ok) {
+                    const prog = await progRes.json();
+                    if (prog.quizPassed) {
+                        // Already passed! Show result immediately
+                        showResultUI(true, prog.quizScore || 100, quizData.passPercentage || 50);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Progress check failed", err);
+            }
         }
 
         renderQuiz();
@@ -97,23 +126,27 @@ async function submitQuiz(e) {
     });
 
     const percentage = Math.round((correct / total) * 100);
-    const passingMarks = Number(quizData.passingMarks || 50);
+    const passingMarks = Number(quizData.passPercentage || 50);
     const isPassed = percentage >= passingMarks;
 
     /* SAVE RESULT (PASS & FAIL BOTH) */
-    try {
-        await fetch("/api/quiz/complete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                mobile: userMobile,
-                courseId,
-                score: percentage,
-                passed: isPassed
-            })
-        });
-    } catch (err) {
-        console.error("Save error", err);
+    if (userMobile) {
+        try {
+            await fetch("/api/quiz/complete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    mobile: userMobile,
+                    courseId,
+                    score: percentage,
+                    passed: isPassed
+                })
+            });
+        } catch (err) {
+            console.error("Save error", err);
+        }
+    } else {
+        alert("Not logged in. Progress won't be saved.");
     }
 
     /* SHOW RESULT UI */
@@ -126,25 +159,28 @@ async function submitQuiz(e) {
 function showResultUI(passed, score, passingMarks) {
     const quizQuestions = document.getElementById("quiz-questions");
     const submitBtn = document.getElementById("submit-quiz-btn");
+    const headerTitle = document.querySelector("h1"); // Adjust title
 
     // ❌ Submit button hamesha hata do
     if (submitBtn) submitBtn.style.display = "none";
+    if (headerTitle) headerTitle.textContent = "Quiz Results";
 
     quizQuestions.innerHTML = `
         <div class="quiz-result ${passed ? "pass" : "fail"}">
             <h2>${passed ? "🎉 Congratulations!" : "❌ Quiz Failed"}</h2>
             <p>Your Score: <b>${score}%</b></p>
             <p>Passing Marks: <b>${passingMarks}%</b></p>
+            
+            ${passed ? '<p style="color:green; margin-top:10px;">You have officially passed this course!</p>' : ''}
 
             <div style="margin-top:20px;">
-                ${
-                    passed
-                        ? `
+                ${passed
+            ? `
                           <button class="primary-btn" onclick="goToCourse()">
-                              Continue to Course
+                              Claim Certificate
                           </button>
                         `
-                        : `
+            : `
                           <button class="secondary-btn" onclick="backToCourse()">
                               Back to Course
                           </button>
@@ -152,7 +188,7 @@ function showResultUI(passed, score, passingMarks) {
                               Retry Quiz
                           </button>
                         `
-                }
+        }
             </div>
         </div>
     `;
@@ -162,11 +198,12 @@ function showResultUI(passed, score, passingMarks) {
  * ACTIONS
  *********************************/
 function goToCourse() {
-    window.location.href = `/courses?courseId=${courseId}&quizResult=pass`;
+    // Redirect to courses.html where the certificate logic exists
+    window.location.href = `/courses.html?courseId=${courseId}&quizResult=pass`;
 }
 
 function backToCourse() {
-    window.location.href = `/courses?courseId=${courseId}`;
+    window.location.href = `/courses.html?courseId=${courseId}`;
 }
 
 function retryQuiz() {
