@@ -408,7 +408,7 @@
             function loadAllData() {
                 loadShlokasAdmin(); loadCoursesAdmin(); loadQuizzes(); loadCertificates();
                 loadTestimonials(); loadBlogPosts(); loadArtwork(); loadSiteSettings();
-                loadAdhyayForCourses(); loadCoursesForQuiz(); loadStudents();
+                loadAdhyayForCourses(); loadCoursesForQuiz(); loadStudentsV2();
             }
 
             /* --- TAB SWITCHING --- */
@@ -896,6 +896,149 @@
                 sel.innerHTML = '<option value="">Select Course</option>';
                 list.forEach(c => sel.innerHTML += `<option value="${c._id}">${c.title}</option>`);
             }
+            // --- Detailed Student Management ---
+            async function loadStudentsV2() {
+                const r = await fetch(`/api/admin/detailed-students?password=${adminPassword}`);
+                const list = await r.json();
+                const box = document.getElementById('student-list');
+                box.innerHTML = '';
+                if (!list.length) {
+                    box.innerHTML = '<div style="color:var(--text-muted);">No students registered yet.</div>';
+                    return;
+                }
+                list.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = 'shloka-admin-item';
+                    div.style.cursor = 'pointer';
+                    div.onclick = (e) => {
+                        if (e.target.tagName !== 'BUTTON') viewStudentDetails(s);
+                    };
+                    div.innerHTML = `
+                        <div style="flex:1;">
+                            <strong>${s.name}</strong> 
+                            <span style="font-size:0.9rem; color:var(--text-muted); margin-left:10px;">${s.mobile}</span><br>
+                            <small style="color:var(--text-muted);">
+                                Enrolled: ${s.enrolledCourses?.length || 0} | Passed: ${s.passedCourses?.length || 0}
+                            </small>
+                        </div>
+                        <div class="admin-buttons">
+                            <button class="edit-button" onclick='viewStudentDetails(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="delete-button" onclick="deleteStudent('${s._id}')">Delete</button>
+                        </div>
+                    `;
+                    box.appendChild(div);
+                });
+            }
+
+            window.viewStudentDetails = (s) => {
+                let enrolledHtml = '<div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"><h4>📚 Enrolled Courses</h4>';
+                if (s.enrolledCourses && s.enrolledCourses.length > 0) {
+                    s.enrolledCourses.forEach(c => {
+                        const completed = c.completedShlokas || 0;
+                        const total = c.totalShlokas || 0;
+                        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+                        enrolledHtml += `
+                            <div style="background:#f8f9fa; padding:10px; margin:8px 0; border-radius:6px; border-left:3px solid #ff9800;">
+                                <strong>${c.courseTitle}</strong><br>
+                                <small>Progress: ${completed}/${total} shlokas (${percentage}%)</small>
+                                <div style="background:#e0e0e0; height:6px; border-radius:3px; margin-top:5px; overflow:hidden;">
+                                    <div style="background:#ff9800; height:100%; width:${percentage}%;"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    enrolledHtml += '<p style="color:var(--text-muted); font-size:0.9rem;">No courses enrolled yet.</p>';
+                }
+                enrolledHtml += '</div>';
+
+                let passedHtml = '<div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"><h4>✅ Passed Courses</h4>';
+                if (s.passedCourses && s.passedCourses.length > 0) {
+                    s.passedCourses.forEach(c => {
+                        const score = c.quizScore || 0;
+                        passedHtml += `
+                            <div style="background:#e8f5e9; padding:10px; margin:8px 0; border-radius:6px; border-left:3px solid #4caf50;">
+                                <strong>${c.courseTitle}</strong><br>
+                                <small>Quiz Score: ${score}% ✓</small>
+                            </div>
+                        `;
+                    });
+                } else {
+                    passedHtml += '<p style="color:var(--text-muted); font-size:0.9rem;">No courses passed yet.</p>';
+                }
+                passedHtml += '</div>';
+
+                const html = `
+                    <div style="max-height:500px; overflow-y:auto;">
+                        <div style="margin-bottom:15px;">
+                            <strong>Name:</strong> ${s.name}<br>
+                            <strong>Mobile:</strong> ${s.mobile}
+                        </div>
+                        ${enrolledHtml}
+                        ${passedHtml}
+                        <div style="display:flex; gap:10px; margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
+                            <button onclick="editStudentName('${s._id}', '${s.name}')" class="primary-btn" style="flex:1;">
+                                <i class="fas fa-edit"></i> Edit Name
+                            </button>
+                            <button onclick="deleteStudent('${s._id}')" style="background:#ef4444; color:white; border:none; border-radius:8px; flex:1; cursor:pointer; padding:10px;">
+                                <i class="fas fa-trash"></i> Delete Student
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                openEditModal('Student Profile: ' + s.name, html);
+            };
+
+            window.editStudentName = (id, currentName) => {
+                const html = `
+                    <form id="student-update-form">
+                        <input id="stu-name" value="${currentName}" placeholder="Full Name" required>
+                        <button type="submit" class="primary-btn">Update Name</button>
+                    </form>
+                `;
+
+                openEditModal('Edit Student Name', html);
+
+                document.getElementById('student-update-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const res = await fetch(`/api/admin/student/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: document.getElementById('stu-name').value,
+                            adminPassword: adminPassword
+                        })
+                    });
+
+                    if (res.ok) {
+                        showToast('Student Updated!', 'success');
+                        closeEditModal();
+                        loadStudentsV2();
+                    } else {
+                        showToast('Update failed!', 'error');
+                    }
+                };
+            };
+
+            window.deleteStudent = async (id) => {
+                if (confirm('Delete this student? This will remove their account and all progress.')) {
+                    const res = await fetch(`/api/admin/student/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: adminPassword })
+                    });
+                    if (res.ok) {
+                        showToast('Student Deleted!', 'success');
+                        closeEditModal();
+                        loadStudentsV2();
+                    } else {
+                        showToast('Delete failed!', 'error');
+                    }
+                }
+            };
         });
     </script>
 </body>

@@ -248,6 +248,118 @@ app.put('/api/student/update', async (req, res) => {
     }
 });
 
+// Get detailed students with course progress (for admin)
+app.get('/api/admin/detailed-students', async (req, res) => {
+    try {
+        const { password } = req.query;
+        if (password !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const students = await Student.find().select('name mobile _id').sort({ createdAt: -1 });
+        const courses = await Course.find().populate('shlokas');
+
+        const detailedStudents = await Promise.all(students.map(async (student) => {
+            // Get all progress for this student
+            const progressRecords = await Progress.find({ mobile: student.mobile });
+
+            const enrolledCourses = [];
+            const passedCourses = [];
+
+            for (const progress of progressRecords) {
+                const course = courses.find(c => c._id.toString() === progress.courseId);
+                if (!course) continue;
+
+                const courseData = {
+                    courseId: course._id,
+                    courseTitle: course.title,
+                    completedShlokas: progress.completed?.length || 0,
+                    totalShlokas: course.shlokas?.length || 0
+                };
+
+                if (progress.quizPassed) {
+                    passedCourses.push({
+                        ...courseData,
+                        quizScore: progress.quizScore || 0
+                    });
+                } else {
+                    enrolledCourses.push(courseData);
+                }
+            }
+
+            return {
+                _id: student._id,
+                name: student.name,
+                mobile: student.mobile,
+                enrolledCourses,
+                passedCourses
+            };
+        }));
+
+        res.json(detailedStudents);
+    } catch (err) {
+        console.error('Detailed students error:', err);
+        res.status(500).json({ message: 'Failed to fetch detailed students' });
+    }
+});
+
+
+// Get all students (simple list)
+app.get('/api/students', async (req, res) => {
+    try {
+        const { password } = req.query;
+        if (password !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const students = await Student.find().select('name mobile _id').sort({ createdAt: -1 });
+        res.json(students);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch students' });
+    }
+});
+
+// Update student (admin can only update name)
+app.put('/api/admin/student/:id', async (req, res) => {
+    try {
+        const { adminPassword, name } = req.body;
+        if (adminPassword !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const student = await Student.findById(req.params.id);
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        if (name && name.trim()) {
+            student.name = name.trim();
+            await student.save();
+        }
+
+        res.json({ success: true, student: { name: student.name, mobile: student.mobile } });
+    } catch (err) {
+        res.status(500).json({ message: 'Update failed' });
+    }
+});
+
+// Delete student
+app.delete('/api/admin/student/:id', async (req, res) => {
+    try {
+        const { password } = req.body;
+        if (password !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        await Student.findByIdAndDelete(req.params.id);
+        // Also delete related progress
+        await Progress.deleteMany({ mobile: (await Student.findById(req.params.id))?.mobile });
+
+        res.json({ success: true, message: 'Student deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Delete failed' });
+    }
+});
+
 // --- Shloka APIs ---
 app.get('/api/shlokas', async (req, res) => {
     try {
@@ -1147,6 +1259,80 @@ app.get('/api/admin/stats', async (req, res) => {
     }
 });
 
+// --- V2 Admin Student Endpoints ---
+app.get('/api/admin/detailed-students-v2', async (req, res) => {
+    if (req.query.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json([]);
+    }
+    try {
+        const students = await Student.find().sort({ createdAt: -1 }).lean();
+        const allProgress = await Progress.find().lean();
+        const allCourses = await Course.find().select('title adhyay').lean();
+
+        const courseMap = {};
+        allCourses.forEach(c => courseMap[c._id.toString()] = c);
+
+        const progressByMobile = {};
+        allProgress.forEach(p => {
+            if (!progressByMobile[p.mobile]) progressByMobile[p.mobile] = [];
+            progressByMobile[p.mobile].push(p);
+        });
+
+        const enriched = students.map(s => {
+            const myProgress = progressByMobile[s.mobile] || [];
+            const detailedCourses = myProgress.map(p => {
+                const c = courseMap[p.courseId];
+                return {
+                    courseId: p.courseId,
+                    title: c ? c.title : 'Unknown Course',
+                    quizPassed: p.quizPassed
+                };
+            });
+
+            return {
+                ...s,
+                coursesEnrolledCount: detailedCourses.length,
+                quizzesPassedCount: detailedCourses.filter(d => d.quizPassed).length,
+                detailedCourses: detailedCourses,
+                lastActive: myProgress.length > 0 ? myProgress.sort((a, b) => b.updatedAt - a.updatedAt)[0].updatedAt : s.createdAt
+            };
+        });
+        res.json(enriched);
+    } catch (err) {
+        console.error("Detailed stud v2 error:", err);
+        res.status(500).json([]);
+    }
+});
+
+app.put('/api/admin/student/:id', async (req, res) => {
+    if (req.body.adminPassword !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const { id } = req.params;
+        const updates = { ...req.body };
+        delete updates.adminPassword;
+        await Student.findByIdAndUpdate(id, updates);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false });
+    }
+});
+
+app.delete('/api/admin/student/:id', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const { id } = req.params;
+        await Student.findByIdAndDelete(id);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false });
+    }
+});
+
+
 // --- Security Headers Middleware ---
 app.use((req, res, next) => {
     res.setHeader('X-Frame-Options', 'DENY');
@@ -1163,3 +1349,5 @@ app.listen(PORT, () => {
 
 // Vercel ke liye zaroori
 module.exports = app;
+
+
