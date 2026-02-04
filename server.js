@@ -1031,25 +1031,28 @@ app.post('/api/certificate/request', async (req, res) => {
 });
 
 // ================= CERTIFICATES LIST (ADMIN) =================
-// GET ALL CERTIFICATES
-app.get('/api/certificates', async (req, res) => {
-    const list = await Certificate.find().sort({ createdAt: -1 });
-    res.json(list);
-});
-
-// DELETE CERTIFICATE
-app.delete('/api/certificates/:id', async (req, res) => {
-    await Certificate.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-});
 
 app.get('/api/certificates', async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         const certificates = await Certificate.find().sort({ createdAt: -1 });
         res.json(Array.isArray(certificates) ? certificates : []);
     } catch (err) {
         console.error('CERTIFICATE LOAD ERROR:', err);
         res.status(500).json([]);
+    }
+});
+
+// DELETE CERTIFICATE
+app.delete('/api/certificates/:id', async (req, res) => {
+    try {
+        await Certificate.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
     }
 });
 
