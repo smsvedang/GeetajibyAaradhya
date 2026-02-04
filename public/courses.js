@@ -141,7 +141,6 @@ async function openCourse(courseId) {
                         <div id="player-${shloka._id}"></div>
                     </div>
                     <div class="card-content">
-                        <span style="color:var(--primary); font-weight:800; font-size:0.8rem; text-transform:uppercase;">Lesson ${idx + 1}</span>
                         <h3 style="margin:5px 0 10px;">Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
                         <p class="shloka-text">${shloka.text ? shloka.text.replace(/\n/g, '<br>') : 'Sacred translation...'}</p>
                         <p id="status-${shloka._id}" class="status-badge status-pending">⏳ Not completed</p>
