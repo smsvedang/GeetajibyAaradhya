@@ -144,12 +144,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/adhyay-:adhyay/shlok-:shloka', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'shloka.html'));
 });
-app.get('/course/:slug', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'courses.html'));
-});
-app.get('/blog/:slug', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'blog.html'));
-});
 
 // --- MongoDB Connection ---
 const dbURI = process.env.MONGO_URI;

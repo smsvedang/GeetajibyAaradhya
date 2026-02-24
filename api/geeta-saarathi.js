@@ -128,12 +128,48 @@ function buildCrisisResponse() {
     ].join('\n');
 }
 
+function buildWarningResponse() {
+    return [
+        '⚠️ System Warning',
+        'Geeta Saarathi server mein connection issue hai.',
+        'Kripya internet connection check karein aur dobara try karein.',
+        '',
+        '🔧 Technical Details',
+        'Groq API response time: slow',
+        'Please check your network and retry.',
+        '',
+        '💡 Suggestion',
+        'Network stable hone ka wait karein, phir message bhejen.'
+    ].join('\n');
+}
+
+function buildNetworkErrorResponse() {
+    return [
+        '⚠️ Network Connection Issue',
+        'Server se connection nahi ho paya hai.',
+        '',
+        '🔍 Possible Reasons',
+        '- Internet connection unstable',
+        '- Server maintenance chal raha hai',
+        '- API rate limit exceed ho gayi',
+        '',
+        '💡 What to do',
+        'Kuch der wait karke dobara try karein.',
+        'Persistent ho to admin se contact karein.'
+    ].join('\n');
+}
+
 function buildAboutSaarathiResponse() {
     return [
+        '📋 Geeta Saarathi ke Baare Mein',
         'Main Geeta Saarathi hoon, Bhagavad Gita adharit guidance tool.',
         'Main therapy replacement nahi hoon, sirf margdarshan ke liye hoon.',
+        '',
+        '🔒 Privacy Notice',
         'Aapka chat content database me save nahi hota.',
         'Sirf daily usage counter (used_today / daily_limit) maintain hota hai.',
+        '',
+        '💬 How to Use',
         'Aap apni paristhiti likhen, main Gita ke sandarbh me structured margdarshan dunga.'
     ].join('\n');
 }
@@ -243,7 +279,8 @@ module.exports = async (req, res) => {
         const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
         if (student.used_today >= dailyLimit) {
             return res.status(429).json({
-                response: 'Daily Limit Complete',
+                response: '⚠️ Daily Limit Exceeded\n\nAapne aaj ki daily limit puri kar di hai. Kal dobara guidance le sakte ho.\n\n💡 Tip: Rest karo, Gita padho, aur kal phir se margdarshan lo.',
+                warning: 'daily_limit_exceeded',
                 remaining_limit: 0,
                 daily_limit: dailyLimit
             });
@@ -257,7 +294,8 @@ module.exports = async (req, res) => {
         // Check if adding this input would exceed window limit
         if (currentWindowTokens + inputTokens > MAX_TOKENS_PER_WINDOW) {
             return res.json({
-                response: 'Is vartalaap ki seema poori ho gayi hai. Aap naya margdarshan prarambh kar sakte hain.',
+                response: '⚠️ Conversation Token Limit Reached\n\nIs vartalaap ki seema poori ho gayi hai. Kripya naya conversation shuru karein.\n\n💡 Tips:\n- Chhote aur direct sawal poochen\n- Thodi der pause karke naya session lein',
+                warning: 'window_token_limit_exceeded',
                 window_expired: true,
                 current_tokens: currentWindowTokens,
                 max_tokens: MAX_TOKENS_PER_WINDOW,
@@ -268,6 +306,7 @@ module.exports = async (req, res) => {
 
         let responseText = '';
         let shouldConsumeLimit = true;
+        let warningType = null;
         const lower = normalize(message);
         if (GREETINGS.has(lower)) {
             responseText = buildGreeting();
@@ -278,10 +317,21 @@ module.exports = async (req, res) => {
         } else if (isCrisisMessage(message)) {
             responseText = buildCrisisResponse();
         } else {
-            const groqResponse = await askGroq(message);
-            responseText = groqResponse && hasAllSections(groqResponse)
-                ? groqResponse
-                : fallbackStructuredResponse();
+            try {
+                const groqResponse = await askGroq(message);
+                if (!groqResponse) {
+                    responseText = buildNetworkErrorResponse();
+                    warningType = 'network_error';
+                } else if (hasAllSections(groqResponse)) {
+                    responseText = groqResponse;
+                } else {
+                    responseText = fallbackStructuredResponse();
+                    warningType = 'response_format_fallback';
+                }
+            } catch (err) {
+                responseText = buildNetworkErrorResponse();
+                warningType = 'api_error';
+            }
         }
 
         // ✅ SCRIPTURE VALIDATION LAYER (PRD v6.1)
@@ -303,7 +353,7 @@ module.exports = async (req, res) => {
         await student.save();
 
         const remaining = Math.max(0, dailyLimit - student.used_today);
-        return res.json({
+        const responseObj = {
             response: responseText,
             remaining_limit: remaining,
             daily_limit: dailyLimit,
@@ -313,8 +363,19 @@ module.exports = async (req, res) => {
                 max_tokens: MAX_TOKENS_PER_WINDOW,
                 is_new_window: windowInfo.isNewWindow
             }
-        });
+        };
+        
+        if (warningType) {
+            responseObj.warning = warningType;
+        }
+        
+        return res.json(responseObj);
     } catch (e) {
-        return res.status(500).json({ message: 'Geeta Saarathi unavailable' });
+        return res.status(500).json({ 
+            message: '⚠️ Critical Error',
+            warning: 'system_error',
+            details: 'Geeta Saarathi currently unavailable. Kripya baad mein try karein.',
+            error_logged: true
+        });
     }
 };
