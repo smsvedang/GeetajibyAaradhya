@@ -43,7 +43,7 @@ async function loadCourses() {
         const shortDesc = desc.length > 140 ? desc.slice(0, 140).trim() + '...' : desc;
         const courseSlug = course.slug || (course.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         list.innerHTML += `
-<a class="course-card-premium" href="/course/${courseSlug}">
+<a class="course-card-premium" href="/course/${courseSlug}?id=${course._id}">
     <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
     <div class="course-info">
         ${statusBadge}
@@ -51,7 +51,7 @@ async function loadCourses() {
         <p>${shortDesc}</p>
         <div style="font-weight:700; color:var(--primary); margin-top:auto; display:flex; align-items:center; gap:8px;">
             <span>Explore Curriculum <i class="fas fa-arrow-right"></i></span>
-            <a href="/course/${courseSlug}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
+            <a href="/course/${courseSlug}?id=${course._id}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
         </div>
     </div>
 </a>

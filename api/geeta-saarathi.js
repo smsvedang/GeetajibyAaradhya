@@ -4,8 +4,18 @@ const Student = require('../models/Student');
 const DEFAULT_DAILY_LIMIT = 3;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+const WINDOW_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes
+const MAX_TOKENS_PER_WINDOW = 1200; // Token limit per window
 
 const GREETINGS = new Set(['hi', 'hello', 'namaste', 'namaskar', 'hare krishna']);
+
+// ✅ Forbidden scripture references (non-Bhagavad Gita)
+const FORBIDDEN_TERMS = new Set([
+    'yoga sutra', 'yogasutra', 'patanjali',
+    'upanishad', 'upanishads', 'vedantas', 'vedanta',
+    'rigveda', 'yajurveda', 'samaveda', 'atharvaveda',
+    'brahma', 'brahmin', 'brahma sutra', 'brahmasutra'
+].map(x => x.toLowerCase()));
 
 function normalize(s = '') {
     return String(s).trim().toLowerCase();
@@ -40,6 +50,11 @@ async function syncDailyLimit(student) {
     if (!student.last_reset_date || student.last_reset_date !== today) {
         student.last_reset_date = today;
         student.used_today = 0;
+        // Reset window when day resets
+        student.current_window_id = null;
+        student.window_start_time = null;
+        student.window_token_used = 0;
+        student.window_active = false;
     }
     if (!Number.isFinite(student.daily_limit) || student.daily_limit <= 0) {
         student.daily_limit = DEFAULT_DAILY_LIMIT;
@@ -49,6 +64,43 @@ async function syncDailyLimit(student) {
     }
     await student.save();
 }
+
+// ✅ Window Management (PRD v6.1)
+function generateWindowId() {
+    return `window_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+async function checkAndResetWindow(student) {
+    const now = Date.now();
+    const windowExpired = student.window_start_time && 
+        (now - new Date(student.window_start_time).getTime()) > WINDOW_TIMEOUT_MS;
+    
+    if (!student.window_active || windowExpired) {
+        // Window is inactive or expired, create new one
+        student.current_window_id = generateWindowId();
+        student.window_start_time = new Date();
+        student.window_token_used = 0;
+        student.window_active = true;
+        await student.save();
+        return { isNewWindow: true, windowId: student.current_window_id };
+    }
+    return { isNewWindow: false, windowId: student.current_window_id };
+}
+
+// ✅ Token Counting (Estimation: ~4 chars = 1 token)
+function estimateTokens(text = '') {
+    return Math.ceil(String(text).length / 4);
+}
+
+// ✅ Scripture Validation Layer (Strict Bhagavad Gita only)
+function validateScripture(text = '') {
+    const t = normalize(text);
+    for (const term of FORBIDDEN_TERMS) {
+        if (t.includes(term)) {
+            return false; // Contains forbidden scripture
+        }
+    }
+    return true; // Only Bhagavad Gita references
 
 function buildGreeting() {
     return 'Namaste. Main Geeta Saarathi hoon. Aap apni samasya likhiye, main Gita ke adhar par margdarshan dunga.';
@@ -197,6 +249,23 @@ module.exports = async (req, res) => {
             });
         }
 
+        // ✅ WINDOW-BASED COUNTING (PRD v6.1)
+        const windowInfo = await checkAndResetWindow(student);
+        const inputTokens = estimateTokens(message);
+        const currentWindowTokens = student.window_token_used || 0;
+        
+        // Check if adding this input would exceed window limit
+        if (currentWindowTokens + inputTokens > MAX_TOKENS_PER_WINDOW) {
+            return res.json({
+                response: 'Is vartalaap ki seema poori ho gayi hai. Aap naya margdarshan prarambh kar sakte hain.',
+                window_expired: true,
+                current_tokens: currentWindowTokens,
+                max_tokens: MAX_TOKENS_PER_WINDOW,
+                remaining_limit: Math.max(0, dailyLimit - student.used_today),
+                daily_limit: dailyLimit
+            });
+        }
+
         let responseText = '';
         let shouldConsumeLimit = true;
         const lower = normalize(message);
@@ -215,17 +284,35 @@ module.exports = async (req, res) => {
                 : fallbackStructuredResponse();
         }
 
+        // ✅ SCRIPTURE VALIDATION LAYER (PRD v6.1)
+        if (!validateScripture(responseText)) {
+            responseText = fallbackStructuredResponse();
+        }
+
+        // ✅ COUNT TOKENS IN WINDOW
+        const outputTokens = estimateTokens(responseText);
+        const totalWindowTokens = currentWindowTokens + inputTokens + outputTokens;
+        
         if (shouldConsumeLimit) {
             student.used_today += 1;
             student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
-            await student.save();
         }
+        
+        // Update window token count
+        student.window_token_used = totalWindowTokens;
+        await student.save();
 
         const remaining = Math.max(0, dailyLimit - student.used_today);
         return res.json({
             response: responseText,
             remaining_limit: remaining,
-            daily_limit: dailyLimit
+            daily_limit: dailyLimit,
+            window_status: {
+                window_id: student.current_window_id,
+                tokens_used: totalWindowTokens,
+                max_tokens: MAX_TOKENS_PER_WINDOW,
+                is_new_window: windowInfo.isNewWindow
+            }
         });
     } catch (e) {
         return res.status(500).json({ message: 'Geeta Saarathi unavailable' });

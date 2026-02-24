@@ -9,6 +9,13 @@ const studentSchema = new mongoose.Schema({
     used_today: { type: Number, default: 0 },
     last_reset_date: { type: String },
     ai_usage_count: { type: Number, default: 0 },
+    
+    // Window-based guidance system (PRD v6.1)
+    current_window_id: { type: String, default: null },
+    window_start_time: { type: Date, default: null },
+    window_token_used: { type: Number, default: 0 },
+    window_active: { type: Boolean, default: false },
+    
     createdAt: { type: Date, default: Date.now }
 });
 
