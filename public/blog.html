@@ -252,8 +252,6 @@
             const pageTitle = document.getElementById('page-title');
             const listContainer = document.getElementById('blog-list-container');
             const singleContainer = document.getElementById('single-blog-container');
-            const params = new URLSearchParams(window.location.search);
-            const postId = params.get('id');
             const pathParts = window.location.pathname.split('/').filter(Boolean);
             const postSlug = pathParts[0] === 'blog' ? pathParts[1] : null;
 
@@ -282,11 +280,10 @@
                     }
                 } catch (e) { console.error("Settings load error", e); }
 
-                if (postId || postSlug) {
+                // PRD v6.2: Use slug-based routing
+                if (postSlug) {
                     const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                    const response = postId
-                        ? await fetch(`/api/blog/${postId}${cacheBuster}`)
-                        : await fetch(`/api/blog/by-slug/${postSlug}${cacheBuster}`);
+                    const response = await fetch(`/api/blog/${postSlug}${cacheBuster}`);
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Blog post not found');
