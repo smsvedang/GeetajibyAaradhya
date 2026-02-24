@@ -30,6 +30,8 @@
     .gs-foot{position:sticky;bottom:0;background:#fff;padding:10px;border-top:1px solid #fde2c8;display:flex;gap:8px}
     .gs-input{flex:1;border:1px solid #fcb67f;border-radius:8px;padding:10px;font:inherit;font-size:14px;resize:vertical;min-height:40px;max-height:120px}
     .gs-send{border:none;background:#ff7a00;color:#fff;border-radius:8px;padding:0 14px;cursor:pointer}
+    .gs-warning-footer{background:#fff3cd;border-top:1px solid #fde2c8;padding:8px 10px;font-size:12px;color:#856404;line-height:1.4;text-align:center}
+    .gs-warning-footer strong{display:block;margin-bottom:3px;color:#7c2d12}
     .gs-disabled .gs-input,.gs-disabled .gs-send{opacity:.5;cursor:not-allowed}
     @media (max-width:640px){#geeta-saarathi-root{right:10px;bottom:10px}.gs-trigger{width:56px;height:56px}}
     `;
@@ -60,6 +62,10 @@
         <div id="gs-foot" class="gs-foot">
           <textarea id="gs-input" class="gs-input" placeholder="Apni samasya likhiye..."></textarea>
           <button id="gs-send" class="gs-send">Send</button>
+        </div>
+        <div class="gs-warning-footer">
+          <strong>⚠️ Important Notice</strong>
+          Main Geeta Saarathi hoon - therapy replacement nahi. Crisis mein Tele-MANAS: 14416 call karein.
         </div>
       </div>
       <button id="gs-trigger" class="gs-trigger" aria-label="Open Geeta Saarathi">${chakraSvg()}</button>
