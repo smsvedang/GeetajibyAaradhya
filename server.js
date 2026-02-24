@@ -11,12 +11,66 @@ const app = express();
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 const DEFAULT_DAILY_LIMIT = 3;
+const DEFAULT_SESSION_LIMIT = 100; // Unlimited messages per session, but limited sessions
 const IST_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
 });
+const IST_TIME_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+});
+
+// Varied fallback shlokas to avoid repetition
+const FALLBACK_SHLOKAS = [
+    {
+        adhyay: 2,
+        shloka: 14,
+        text: 'मात्रास्पर्शास्तु कौन्तेय शीतोष्णसुखदुःखदाः।',
+        hindi: 'Sukh aur dukh ane-jane ho sakte hain. Yeh samasya aapke jiwan ka ek hissa hai.',
+        english: 'Pleasures and pains are temporary states; this situation is part of life.'
+    },
+    {
+        adhyay: 3,
+        shloka: 35,
+        text: 'श्रेयान्स्वधर्मो विगुणः परधर्मात्स्वनुष्ठितात्।',
+        hindi: 'Apna dharm impar ho, par dosron ka dharm zyada behtar ho. Apne dharm se hi karo.',
+        english: 'It is better to follow your own path, however imperfectly, than to follow another\'s perfectly.'
+    },
+    {
+        adhyay: 2,
+        shloka: 47,
+        text: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।',
+        hindi: 'Aapka hak sirf karm par hai, falon par kabhi nahi. Karm karo, parinaam chhod do.',
+        english: 'You have the right to your actions, never to their results. Do your duty without attachment.'
+    },
+    {
+        adhyay: 6,
+        shloka: 6,
+        text: 'बन्धुरात्मात्मनस्तस्य येनात्मैवात्मना जितः।',
+        hindi: 'Jo apne aap par niyantran rakh sakte hain, ve apne aap ke mithra hote hain.',
+        english: 'One who can control oneself is their own best friend.'
+    },
+    {
+        adhyay: 18,
+        shloka: 63,
+        text: 'तस्मादज्ञानं सर्वं घ्नित्वा ज्ञानेन चात्मनः।',
+        hindi: 'Sabhi gyan se apne aap ko jano. Yeh rah hai dharm aur moksh ki taraf.',
+        english: 'Seek knowledge about yourself. This is the path to righteousness and liberation.'
+    },
+    {
+        adhyay: 5,
+        shloka: 18,
+        text: 'विद्यावध्या ब्राह्मणे विधिं अधिष्ठासु विपश्चितः।',
+        hindi: 'Gyan se gyan samasya ka hal hota hai. Apna dimag shuddh rakho.',
+        english: 'Knowledge dissolves ignorance. Keep your mind clear and focused.'
+    }
+];
 
 function getTodayDateString() {
     return IST_DATE_FORMATTER.format(new Date());
@@ -245,14 +299,31 @@ const pushTokenSchema = new mongoose.Schema({
 });
 const PushToken = mongoose.model('PushToken', pushTokenSchema);
 
-// --- 9. Student/User Model ---
+// --- 9. ChatSession Model (Window/Session tracking) ---
+const chatSessionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
+    sessionId: { type: String, unique: true, required: true },
+    startedAt: { type: Date, default: Date.now },
+    lastMessageAt: { type: Date, default: Date.now },
+    messageCount: { type: Number, default: 0 },
+    messages: [{
+        role: { type: String, enum: ['user', 'assistant'] },
+        content: String,
+        timestamp: { type: Date, default: Date.now }
+    }],
+    isActive: { type: Boolean, default: true },
+    expiresAt: { type: Date, index: true, default: () => new Date(Date.now() + 24 * 60 * 60 * 1000) } // 24 hour expiry
+});
+const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
+
+// --- 10. Student/User Model ---
 const studentSchema = new mongoose.Schema({
     name: { type: String, required: true },
     mobile: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['student', 'admin'], default: 'student' },
-    daily_limit: { type: Number, default: DEFAULT_DAILY_LIMIT },
-    used_today: { type: Number, default: 0 },
+    daily_limit: { type: Number, default: DEFAULT_DAILY_LIMIT }, // Number of sessions per day
+    sessions_today: { type: Number, default: 0 }, // Sessions opened today
     last_reset_date: { type: String, default: getTodayDateString },
     ai_usage_count: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
@@ -338,41 +409,92 @@ async function sendAutoPush(title, body, url = DEFAULT_PUSH_URL) {
     }
 }
 
-async function ensureDailyLimitState(student) {
+function getRandomFallbackShloka() {
+    return FALLBACK_SHLOKAS[Math.floor(Math.random() * FALLBACK_SHLOKAS.length)];
+}
+
+function isGitaQuestionMessage(message = '') {
+    const text = message.toLowerCase();
+    const keywords = [
+        'kya hai', 'kya karte', 'matlab', 'sikh', 'kaun hai', 'konsa', 'kis type', 
+        'what is', 'how to', 'what does', 'teach me', 'explain', 'difference',
+        'गीता', 'भगवान', 'कृष्ण', 'अर्जुन', 'धर्म', 'कर्म', 'ज्ञान', 'भक्ति'
+    ];
+    return keywords.some((keyword) => text.includes(keyword));
+}
+
+function formatGitaAnswer(question, answer, shlokaRef = null) {
+    // Format for Gita knowledge Q&A (not crisis/personal guidance)
+    let response = [
+        '📚 Gita Knowledge Answer',
+        '',
+        '❓ Aapka Question',
+        question,
+        '',
+        '💡 Answer',
+        answer,
+        ''
+    ];
+    
+    if (shlokaRef) {
+        response.push('📖 Related References');
+        response.push(`Bhagavad Gita ${shlokaRef.adhyay}.${shlokaRef.shloka}`);
+        response.push('');
+        response.push('🕉 Sanskrit');
+        response.push(shlokaRef.text);
+    }
+    
+    return response.join('\n');
+}
+
+async function ensureSessionState(student, sessionId) {
     const today = getTodayDateString();
     if (typeof student.daily_limit !== 'number' || student.daily_limit <= 0) {
         student.daily_limit = DEFAULT_DAILY_LIMIT;
     }
-    if (typeof student.used_today !== 'number' || student.used_today < 0) {
-        student.used_today = 0;
+    if (typeof student.sessions_today !== 'number' || student.sessions_today < 0) {
+        student.sessions_today = 0;
     }
     if (!student.last_reset_date) {
         student.last_reset_date = today;
     }
+    // Reset if new day
     if (student.last_reset_date !== today) {
-        student.used_today = 0;
+        student.sessions_today = 0;
         student.last_reset_date = today;
     }
     await student.save();
     return student;
 }
 
-async function callGroqForSaarathi(message) {
+async function callGroqForSaarathi(message, conversationHistory = []) {
     if (!process.env.GROQ_API_KEY) {
         return null;
     }
 
     const systemPrompt = [
         'You are GEETA SAARATHI. Reply in compassionate Hinglish.',
-        'Always include all sections exactly with these headings:',
+        'User behavior modes:',
+        '1. IF asking Gita knowledge Q (what is karma, who is Krishna etc), answer SHORT (2-3 lines) + "📖 Relevant Shloka:" reference',
+        '2. IF personal problem/crisis/guidance needed, respond with all 6 sections with proper format',
+        '3. IF question unclear, ASK clarification (like ChatGPT) - say "Aapka matlab kya hai?" or "Kripya samjhayein"',
+        '4. NEVER force shloka format if not needed',
+        '5. For context continuation, refer to previous messages in this window/session',
+        '',
+        'IF must use full format, include these headings:',
         '🔍 Manasik Avastha Vishleshan',
         '📖 Adhyay + Shlok Number',
         '🕉 Sanskrit Shlok',
         '📘 Hindi Meaning',
         '📗 English Meaning',
-        '🪔 Practical Margdarshan',
-        'Keep the guidance concise, practical, and spiritually grounded.'
+        '🪔 Practical Margdarshan'
     ].join('\n');
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...conversationHistory,
+        { role: 'user', content: message }
+    ];
 
     const response = await fetch(GROQ_API_URL, {
         method: 'POST',
@@ -382,12 +504,9 @@ async function callGroqForSaarathi(message) {
         },
         body: JSON.stringify({
             model: GROQ_MODEL,
-            temperature: 0.4,
-            max_tokens: 700,
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: message }
-            ]
+            temperature: 0.5,
+            max_tokens: 500,
+            messages: messages
         })
     });
 
@@ -398,7 +517,8 @@ async function callGroqForSaarathi(message) {
     const payload = await response.json();
     const content = payload?.choices?.[0]?.message?.content?.trim();
     if (!content) return null;
-    if (!ensureStructuredSections(content)) return null;
+    
+    // Accept response even without full shloka format (unless it's a crisis)
     return content;
 }
 
@@ -426,7 +546,7 @@ app.post('/api/student/register', async (req, res) => {
             mobile,
             password,
             daily_limit: DEFAULT_DAILY_LIMIT,
-            used_today: 0,
+            sessions_today: 0,
             last_reset_date: getTodayDateString()
         });
         await newStudent.save();
@@ -437,7 +557,7 @@ app.post('/api/student/register', async (req, res) => {
                 name: newStudent.name,
                 mobile: newStudent.mobile,
                 daily_limit: newStudent.daily_limit,
-                used_today: newStudent.used_today
+                sessions_today: newStudent.sessions_today
             }
         });
     } catch (err) {
@@ -451,7 +571,7 @@ app.post('/api/student/login', async (req, res) => {
         const { mobile, password } = req.body;
         const student = await Student.findOne({ mobile, password });
         if (!student) return res.status(401).json({ message: 'Invalid mobile or password' });
-        await ensureDailyLimitState(student);
+        await ensureSessionState(student, null);
         res.json({
             success: true,
             student: {
@@ -459,7 +579,7 @@ app.post('/api/student/login', async (req, res) => {
                 name: student.name,
                 mobile: student.mobile,
                 daily_limit: student.daily_limit,
-                used_today: student.used_today
+                sessions_today: student.sessions_today
             }
         });
     } catch (err) {
@@ -490,7 +610,7 @@ app.put('/api/student/update', async (req, res) => {
                 name: student.name,
                 mobile: student.mobile,
                 daily_limit: student.daily_limit,
-                used_today: student.used_today
+                sessions_today: student.sessions_today
             }
         });
     } catch (err) {
@@ -498,12 +618,15 @@ app.put('/api/student/update', async (req, res) => {
     }
 });
 
-// --- GEETA SAARATHI ---
+// --- GEETA SAARATHI (UPDATED WITH SESSION LIMIT) ---
 app.post('/api/geeta-saarathi', async (req, res) => {
     try {
-        const { message, userId } = req.body || {};
+        const { message, userId, sessionId } = req.body || {};
         if (!userId) {
             return res.status(401).json({ message: 'Login required', response: null });
+        }
+        if (!sessionId) {
+            return res.status(400).json({ message: 'SessionId required' });
         }
         if (!message || !String(message).trim()) {
             return res.status(400).json({ message: 'Message is required' });
@@ -514,68 +637,117 @@ app.post('/api/geeta-saarathi', async (req, res) => {
             return res.status(401).json({ message: 'Invalid user' });
         }
 
-        await ensureDailyLimitState(student);
+        // Ensure session state
+        await ensureSessionState(student, sessionId);
 
-        const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
-        if (student.used_today >= dailyLimit) {
-            return res.status(429).json({
-                response: 'Aaj ka aapka margdarshan limit poora ho chuka hai. Kripya kal dobara prayas karein.',
-                remaining_limit: 0,
-                used_today: student.used_today,
-                daily_limit: dailyLimit
+        // Find or create chat session
+        let chatSession = await ChatSession.findOne({ sessionId, userId });
+        let isNewSession = false;
+
+        if (!chatSession) {
+            // Check if user has exceeded daily session limit
+            const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
+            if (student.sessions_today >= dailyLimit) {
+                return res.status(429).json({
+                    response: `Aaj ka aapka ${dailyLimit} windows ka limit poora ho chuka hai. Kripya kal dobara prayas karein.`,
+                    sessions_limit: dailyLimit,
+                    sessions_today: student.sessions_today,
+                    message_count: 0,
+                    is_new_session: true
+                });
+            }
+
+            // Create new session
+            isNewSession = true;
+            chatSession = new ChatSession({
+                userId,
+                sessionId,
+                messageCount: 0,
+                messages: []
             });
+            
+            student.sessions_today += 1;
+            student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
+            await student.save();
         }
 
+        // Conversation history from this session (for context)
+        const conversationHistory = chatSession.messages.slice(-10).map(m => ({
+            role: m.role,
+            content: m.content
+        }));
+
         let responseText;
-        let shouldConsumeLimit = true;
+        let addedToHistory = false;
+
         if (isGreetingMessage(message)) {
             responseText = 'Namaste. Main Geeta Saarathi hoon. Aap apni samasya likhiye, main Gita ke adhar par margdarshan dunga.';
-            shouldConsumeLimit = false;
+            addedToHistory = true;
         } else if (isAboutSaarathiMessage(message)) {
             responseText = aboutSaarathiResponse();
-            shouldConsumeLimit = false;
+            addedToHistory = true;
         } else if (isCrisisMessage(message)) {
             responseText = crisisResponse();
+            addedToHistory = true;
         } else {
-            responseText = await callGroqForSaarathi(message);
+            // Try AI with context
+            responseText = await callGroqForSaarathi(message, conversationHistory);
+            
             if (!responseText) {
+                // AI failed - return varied fallback shloka (not always 2.47)
+                const fallback = getRandomFallbackShloka();
                 responseText = [
                     '🔍 Manasik Avastha Vishleshan',
-                    'Aap manasik uljhan aur bhavnaatmak dabav ke daur se guzar rahe hain.',
+                    'Aap mansik uljhan aur bhavnaatmak dabav ke daur se guzar rahe hain.',
                     '',
                     '📖 Adhyay + Shlok Number',
-                    'Bhagavad Gita 2.47',
+                    `Bhagavad Gita ${fallback.adhyay}.${fallback.shloka}`,
                     '',
                     '🕉 Sanskrit Shlok',
-                    'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।',
+                    fallback.text,
                     '',
                     '📘 Hindi Meaning',
-                    'Aapka adhikar karm par hai, parinaam par nahi.',
+                    fallback.hindi,
                     '',
                     '📗 English Meaning',
-                    'Your right is to action alone, never to the fruits.',
+                    fallback.english,
                     '',
                     '🪔 Practical Margdarshan',
                     'Aaj ke liye ek chhota nishchit karm chuniyega, use poore dhyan se kijiye, aur parinaam ka bhaar chhod dijiye.'
                 ].join('\n');
             }
+            addedToHistory = true;
         }
 
-        if (shouldConsumeLimit) {
-            student.used_today += 1;
-            student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
-            await student.save();
+        // Store conversation in session
+        if (addedToHistory) {
+            chatSession.messages.push({
+                role: 'user',
+                content: message,
+                timestamp: new Date()
+            });
+            chatSession.messages.push({
+                role: 'assistant',
+                content: responseText,
+                timestamp: new Date()
+            });
+            chatSession.messageCount += 1;
+            chatSession.lastMessageAt = new Date();
+            await chatSession.save();
         }
 
         return res.json({
             response: responseText,
-            remaining_limit: Math.max(0, dailyLimit - student.used_today),
-            used_today: student.used_today,
-            daily_limit: dailyLimit,
-            privacy_notice: 'Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap gopniya hai.'
+            session_id: sessionId,
+            is_new_session: isNewSession,
+            message_count: chatSession.messageCount,
+            sessions_limit: student.daily_limit,
+            sessions_today: student.sessions_today,
+            privacy_notice: 'Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap in this window gopniya hai.'
         });
     } catch (err) {
-        return res.status(500).json({ message: 'Saarathi temporarily unavailable' });
+        console.error('Saarathi error:', err);
+        return res.status(500).json({ message: 'Saarathi temporarily unavailable', response: null });
     }
 });
 
@@ -603,10 +775,96 @@ app.post('/api/admin-update-limit', async (req, res) => {
             success: true,
             userId: student._id,
             daily_limit: student.daily_limit,
-            used_today: student.used_today
+            sessions_today: student.sessions_today
         });
     } catch {
         return res.status(500).json({ message: 'Limit update failed' });
+    }
+});
+
+// --- GITA Q&A API (Knowledge questions, not personal guidance) ---
+app.post('/api/gita-qa', async (req, res) => {
+    try {
+        const { question, userId, sessionId } = req.body || {};
+        if (!question || !String(question).trim()) {
+            return res.status(400).json({ message: 'Question is required' });
+        }
+
+        if (!process.env.GROQ_API_KEY) {
+            return res.status(500).json({ message: 'AI service unavailable' });
+        }
+
+        const systemPrompt = [
+            'You are GITA KNOWLEDGE EXPERT. Answer questions about Bhagavad Gita topics.',
+            'Response format:',
+            '1. Answer the question in 2-3 lines in Hinglish',
+            '2. Then mention "📖 Related Shloka: Gita X.Y" with that shloka reference',
+            '3. Do NOT use full guidance format (no 🔍 Manasik Avastha etc)',
+            '4. Be concise, educational, factual.',
+            'Examples:',
+            'Q: Karma kya hota hai? A: Karma matlab action. Har karma ka falon hota hai. 📖 Related Shloka: Gita 3.9',
+            'Q: Krishna kaun hain? A: Krishna bhagwan hain jo Arjun ko Gita samjhate hain. 📖 Related Shloka: Gita 10.8'
+        ].join('\n');
+
+        const response = await fetch(GROQ_API_URL, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                temperature: 0.3,
+                max_tokens: 300,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: question }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            return res.status(500).json({ message: 'AI service error' });
+        }
+
+        const payload = await response.json();
+        const answer = payload?.choices?.[0]?.message?.content?.trim();
+        
+        if (!answer) {
+            return res.json({
+                answer: 'Yeh prashna Gita ke bare mein samjhane layak hai. Kripya specific topic puche.',
+                is_knowledge_qa: true
+            });
+        }
+
+        // Store in session if userId and sessionId provided
+        if (userId && sessionId) {
+            const chatSession = await ChatSession.findOne({ sessionId, userId });
+            if (chatSession) {
+                chatSession.messages.push({
+                    role: 'user',
+                    content: question,
+                    timestamp: new Date()
+                });
+                chatSession.messages.push({
+                    role: 'assistant',
+                    content: answer,
+                    timestamp: new Date()
+                });
+                chatSession.messageCount += 1;
+                await chatSession.save();
+            }
+        }
+
+        return res.json({
+            answer,
+            is_knowledge_qa: true,
+            question
+        });
+
+    } catch (err) {
+        console.error('Gita Q&A error:', err);
+        return res.status(500).json({ message: 'Gita Q&A service error' });
     }
 });
 
@@ -626,7 +884,7 @@ app.post('/api/reset-daily-limit', async (req, res) => {
         if (userId) {
             const student = await Student.findByIdAndUpdate(
                 userId,
-                { used_today: 0, last_reset_date: today },
+                { sessions_today: 0, last_reset_date: today },
                 { new: true }
             );
             if (!student) {
@@ -635,7 +893,7 @@ app.post('/api/reset-daily-limit', async (req, res) => {
             return res.json({ success: true, reset: 1, today });
         }
 
-        const result = await Student.updateMany({}, { used_today: 0, last_reset_date: today });
+        const result = await Student.updateMany({}, { sessions_today: 0, last_reset_date: today });
         return res.json({ success: true, reset: result.modifiedCount || 0, today });
     } catch {
         return res.status(500).json({ message: 'Reset failed' });
@@ -651,7 +909,7 @@ app.get('/api/admin/detailed-students', async (req, res) => {
         }
 
         const students = await Student.find()
-            .select('name mobile _id daily_limit used_today last_reset_date ai_usage_count')
+            .select('name mobile _id daily_limit sessions_today last_reset_date ai_usage_count')
             .sort({ createdAt: -1 });
         const courses = await Course.find().populate('shlokas');
 
@@ -688,7 +946,7 @@ app.get('/api/admin/detailed-students', async (req, res) => {
                 name: student.name,
                 mobile: student.mobile,
                 daily_limit: student.daily_limit || DEFAULT_DAILY_LIMIT,
-                used_today: student.used_today || 0,
+                sessions_today: student.sessions_today || 0,
                 ai_usage_count: student.ai_usage_count || 0,
                 last_reset_date: student.last_reset_date || getTodayDateString(),
                 enrolledCourses,
