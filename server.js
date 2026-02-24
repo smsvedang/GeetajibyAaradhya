@@ -72,6 +72,30 @@ function isCrisisMessage(message = '') {
     return keywords.some((keyword) => text.includes(keyword));
 }
 
+function isGreetingMessage(message = '') {
+    const text = message.toLowerCase().trim();
+    return ['hi', 'hello', 'namaste', 'namaskar', 'hare krishna'].includes(text);
+}
+
+function isAboutSaarathiMessage(message = '') {
+    const text = message.toLowerCase();
+    const keywords = [
+        'who are you', 'about you', 'tum kaun', 'aap kaun', 'geeta saarathi kya',
+        'what can you do', 'tum kya karte ho', 'aap kya karte ho', 'privacy', 'data save'
+    ];
+    return keywords.some((keyword) => text.includes(keyword));
+}
+
+function aboutSaarathiResponse() {
+    return [
+        'Main Geeta Saarathi hoon, Bhagavad Gita adharit guidance tool.',
+        'Main therapy replacement nahi hoon, sirf margdarshan ke liye hoon.',
+        'Aapka chat content database me save nahi hota.',
+        'Sirf daily usage counter maintain hota hai.',
+        'Aap apni paristhiti likhen, main Gita ke sandarbh me margdarshan dunga.'
+    ].join('\n');
+}
+
 function crisisResponse() {
     return [
         '🔍 Manasik Avastha Vishleshan',
@@ -504,7 +528,14 @@ app.post('/api/geeta-saarathi', async (req, res) => {
         }
 
         let responseText;
-        if (isCrisisMessage(message)) {
+        let shouldConsumeLimit = true;
+        if (isGreetingMessage(message)) {
+            responseText = 'Namaste. Main Geeta Saarathi hoon. Aap apni samasya likhiye, main Gita ke adhar par margdarshan dunga.';
+            shouldConsumeLimit = false;
+        } else if (isAboutSaarathiMessage(message)) {
+            responseText = aboutSaarathiResponse();
+            shouldConsumeLimit = false;
+        } else if (isCrisisMessage(message)) {
             responseText = crisisResponse();
         } else {
             responseText = await callGroqForSaarathi(message);
@@ -531,9 +562,11 @@ app.post('/api/geeta-saarathi', async (req, res) => {
             }
         }
 
-        student.used_today += 1;
-        student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
-        await student.save();
+        if (shouldConsumeLimit) {
+            student.used_today += 1;
+            student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
+            await student.save();
+        }
 
         return res.json({
             response: responseText,

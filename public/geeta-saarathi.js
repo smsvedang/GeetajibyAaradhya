@@ -9,6 +9,8 @@
     .gs-modal{display:none;position:absolute;right:0;bottom:74px;width:min(380px,calc(100vw - 22px));background:#fff;border:1px solid #ffd9b8;border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.22)}
     .gs-head{background:#ff7a00;color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
     .gs-head-left{display:flex;align-items:center;gap:8px;font-weight:700}
+    .gs-head-actions{display:flex;align-items:center;gap:6px}
+    .gs-icon-btn{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:4px 7px;cursor:pointer}
     .gs-progress-wrap{text-align:right;min-width:120px}
     .gs-progress{display:flex;justify-content:flex-end;gap:3px;margin-bottom:2px}
     .gs-seg{width:14px;height:6px;border-radius:999px;background:rgba(255,255,255,.45)}
@@ -22,6 +24,9 @@
     .gs-msg{padding:9px 10px;border-radius:9px;white-space:pre-wrap;line-height:1.38;font-size:14px}
     .gs-user{background:#fff7ed;border:1px solid #fed7aa;align-self:flex-end}
     .gs-ai{background:#f8fafc;border:1px solid #e2e8f0;align-self:flex-start}
+    .gs-ai-wrap{align-self:flex-start;max-width:100%}
+    .gs-msg-actions{display:flex;gap:6px;margin-top:5px}
+    .gs-msg-btn{border:1px solid #e5e7eb;background:#fff;border-radius:6px;padding:3px 7px;font-size:12px;cursor:pointer}
     .gs-foot{position:sticky;bottom:0;background:#fff;padding:10px;border-top:1px solid #fde2c8;display:flex;gap:8px}
     .gs-input{flex:1;border:1px solid #fcb67f;border-radius:8px;padding:10px;font:inherit;font-size:14px;resize:vertical;min-height:40px;max-height:120px}
     .gs-send{border:none;background:#ff7a00;color:#fff;border-radius:8px;padding:0 14px;cursor:pointer}
@@ -43,7 +48,10 @@
             <div id="gs-progress" class="gs-progress"></div>
             <div id="gs-progress-text" class="gs-progress-text">0/3</div>
           </div>
-          <button id="gs-close" style="border:none;background:transparent;color:#fff;font-size:18px;cursor:pointer">✕</button>
+          <div class="gs-head-actions">
+            <button id="gs-new-window" class="gs-icon-btn" title="Open fresh window">↗</button>
+            <button id="gs-close" class="gs-icon-btn" title="Close">✕</button>
+          </div>
         </div>
         <div class="gs-body">
           <div class="gs-privacy">Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap gopniya hai.</div>
@@ -61,6 +69,7 @@
     const modal = root.querySelector('#gs-modal');
     const trigger = root.querySelector('#gs-trigger');
     const closeBtn = root.querySelector('#gs-close');
+    const newWindowBtn = root.querySelector('#gs-new-window');
     const chat = root.querySelector('#gs-chat');
     const input = root.querySelector('#gs-input');
     const sendBtn = root.querySelector('#gs-send');
@@ -78,7 +87,62 @@
         try { return JSON.parse(localStorage.getItem('gitadhya_user')) || null; } catch { return null; }
     }
 
+    async function copyText(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async function shareText(text) {
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: 'Geeta Saarathi', text });
+                return true;
+            }
+            return copyText(text);
+        } catch {
+            return false;
+        }
+    }
+
     function addMessage(content, cls) {
+        if (cls === 'gs-ai') {
+            const wrap = document.createElement('div');
+            wrap.className = 'gs-ai-wrap';
+            const n = document.createElement('div');
+            n.className = `gs-msg ${cls}`;
+            n.textContent = content;
+            const actions = document.createElement('div');
+            actions.className = 'gs-msg-actions';
+            actions.innerHTML = `
+                <button class="gs-msg-btn" data-act="copy">Copy</button>
+                <button class="gs-msg-btn" data-act="share">Share</button>
+            `;
+            actions.addEventListener('click', async function (e) {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                if (btn.dataset.act === 'copy') {
+                    const ok = await copyText(content);
+                    btn.textContent = ok ? 'Copied' : 'Failed';
+                }
+                if (btn.dataset.act === 'share') {
+                    const ok = await shareText(content);
+                    btn.textContent = ok ? 'Shared' : 'Failed';
+                }
+                setTimeout(() => {
+                    if (btn.dataset.act === 'copy') btn.textContent = 'Copy';
+                    if (btn.dataset.act === 'share') btn.textContent = 'Share';
+                }, 1200);
+            });
+            wrap.appendChild(n);
+            wrap.appendChild(actions);
+            chat.appendChild(wrap);
+            chat.scrollTop = chat.scrollHeight;
+            return;
+        }
         const n = document.createElement('div');
         n.className = `gs-msg ${cls}`;
         n.textContent = content;
@@ -162,6 +226,12 @@
         if (!open) fetchLimitState();
     });
     closeBtn.addEventListener('click', function () { modal.style.display = 'none'; });
+    newWindowBtn.addEventListener('click', function () {
+        const url = new URL(window.location.href);
+        url.searchParams.set('gs_new', String(Date.now()));
+        chat.innerHTML = '';
+        window.open(url.toString(), '_blank', 'noopener,noreferrer');
+    });
     sendBtn.addEventListener('click', sendMessage);
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {

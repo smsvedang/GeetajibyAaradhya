@@ -19,6 +19,22 @@ function isCrisisMessage(message = '') {
     ].some((k) => t.includes(k));
 }
 
+function isAboutSaarathi(message = '') {
+    const t = normalize(message);
+    return [
+        'who are you',
+        'about you',
+        'tum kaun',
+        'aap kaun',
+        'geeta saarathi kya',
+        'what can you do',
+        'tum kya karte ho',
+        'aap kya karte ho',
+        'privacy',
+        'data save'
+    ].some((k) => t.includes(k));
+}
+
 async function syncDailyLimit(student) {
     const today = getTodayInIST();
     if (!student.last_reset_date || student.last_reset_date !== today) {
@@ -57,6 +73,16 @@ function buildCrisisResponse() {
         '',
         '🪔 Practical Margdarshan',
         'Abhi turant Tele-MANAS: 14416 ya 1-800-891-4416 par call karein. Kisi trusted vyakti ko abhi batayein.'
+    ].join('\n');
+}
+
+function buildAboutSaarathiResponse() {
+    return [
+        'Main Geeta Saarathi hoon, Bhagavad Gita adharit guidance tool.',
+        'Main therapy replacement nahi hoon, sirf margdarshan ke liye hoon.',
+        'Aapka chat content database me save nahi hota.',
+        'Sirf daily usage counter (used_today / daily_limit) maintain hota hai.',
+        'Aap apni paristhiti likhen, main Gita ke sandarbh me structured margdarshan dunga.'
     ].join('\n');
 }
 
@@ -172,9 +198,14 @@ module.exports = async (req, res) => {
         }
 
         let responseText = '';
+        let shouldConsumeLimit = true;
         const lower = normalize(message);
         if (GREETINGS.has(lower)) {
             responseText = buildGreeting();
+            shouldConsumeLimit = false;
+        } else if (isAboutSaarathi(message)) {
+            responseText = buildAboutSaarathiResponse();
+            shouldConsumeLimit = false;
         } else if (isCrisisMessage(message)) {
             responseText = buildCrisisResponse();
         } else {
@@ -184,9 +215,11 @@ module.exports = async (req, res) => {
                 : fallbackStructuredResponse();
         }
 
-        student.used_today += 1;
-        student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
-        await student.save();
+        if (shouldConsumeLimit) {
+            student.used_today += 1;
+            student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
+            await student.save();
+        }
 
         const remaining = Math.max(0, dailyLimit - student.used_today);
         return res.json({
