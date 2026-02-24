@@ -469,6 +469,7 @@ async function ensureSessionState(student, sessionId) {
 
 async function callGroqForSaarathi(message, conversationHistory = []) {
     if (!process.env.GROQ_API_KEY) {
+        console.error('❌ GROQ_API_KEY not configured');
         return null;
     }
 
@@ -496,30 +497,41 @@ async function callGroqForSaarathi(message, conversationHistory = []) {
         { role: 'user', content: message }
     ];
 
-    const response = await fetch(GROQ_API_URL, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            model: GROQ_MODEL,
-            temperature: 0.5,
-            max_tokens: 500,
-            messages: messages
-        })
-    });
+    try {
+        const response = await fetch(GROQ_API_URL, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                temperature: 0.5,
+                max_tokens: 500,
+                messages: messages
+            })
+        });
 
-    if (!response.ok) {
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error(`🔴 Groq API Error [${response.status}]:`, errText);
+            return null;
+        }
+
+        const payload = await response.json();
+        const content = payload?.choices?.[0]?.message?.content?.trim();
+        if (!content) {
+            console.error('❌ Groq API returned empty content:', payload);
+            return null;
+        }
+        
+        console.log('✅ Groq API Success');
+        // Accept response even without full shloka format (unless it's a crisis)
+        return content;
+    } catch (err) {
+        console.error('❌ Groq API Exception:', err.message);
         return null;
     }
-
-    const payload = await response.json();
-    const content = payload?.choices?.[0]?.message?.content?.trim();
-    if (!content) return null;
-    
-    // Accept response even without full shloka format (unless it's a crisis)
-    return content;
 }
 
 // --- API Routes ---
@@ -557,7 +569,8 @@ app.post('/api/student/register', async (req, res) => {
                 name: newStudent.name,
                 mobile: newStudent.mobile,
                 daily_limit: newStudent.daily_limit,
-                sessions_today: newStudent.sessions_today
+                sessions_today: newStudent.sessions_today,
+                ai_usage_count: newStudent.ai_usage_count || 0
             }
         });
     } catch (err) {
@@ -585,7 +598,8 @@ app.post('/api/student/login', async (req, res) => {
                 name: student.name,
                 mobile: student.mobile,
                 daily_limit: student.daily_limit,
-                sessions_today: student.sessions_today
+                sessions_today: student.sessions_today,
+                ai_usage_count: student.ai_usage_count || 0
             }
         });
     } catch (err) {
@@ -616,7 +630,8 @@ app.put('/api/student/update', async (req, res) => {
                 name: student.name,
                 mobile: student.mobile,
                 daily_limit: student.daily_limit,
-                sessions_today: student.sessions_today
+                sessions_today: student.sessions_today,
+                ai_usage_count: student.ai_usage_count || 0
             }
         });
     } catch (err) {
@@ -662,6 +677,7 @@ app.post('/api/geeta-saarathi', async (req, res) => {
                     response: `Aaj ka aapka ${dailyLimit} windows ka limit poora ho chuka hai. Kripya kal dobara prayas karein.`,
                     sessions_limit: dailyLimit,
                     sessions_today: student.sessions_today,
+                    ai_usage_count: student.ai_usage_count || 0,
                     message_count: 0,
                     is_new_session: true
                 });
@@ -754,6 +770,7 @@ app.post('/api/geeta-saarathi', async (req, res) => {
             message_count: chatSession.messageCount,
             sessions_limit: student.daily_limit,
             sessions_today: student.sessions_today,
+            ai_usage_count: student.ai_usage_count || 0,
             privacy_notice: 'Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap in this window gopniya hai.'
         });
     } catch (err) {
@@ -786,7 +803,8 @@ app.post('/api/admin-update-limit', async (req, res) => {
             success: true,
             userId: student._id,
             daily_limit: student.daily_limit,
-            sessions_today: student.sessions_today
+            sessions_today: student.sessions_today,
+            ai_usage_count: student.ai_usage_count || 0
         });
     } catch {
         return res.status(500).json({ message: 'Limit update failed' });
