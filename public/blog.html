@@ -216,8 +216,7 @@
 
             const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
             const excerpt = (post.content || '').replace(/\n/g, ' ').slice(0, 160);
-            const postSlug = post.slug || (post.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-            const shareUrl = `${window.location.origin}/blog/${postSlug}`;
+            const shareUrl = `${window.location.origin}/blog.html?id=${post._id}`;
             const shareTitle = post.title + " - by Gitadhya";
             const shareText = "Check out this blog post from Gitadhya!";
 
@@ -226,9 +225,9 @@
                 <div class="blog-date">${postDate}</div>
                 ${post.imageUrl ? `<img src="${post.imageUrl}" class="blog-image" alt="${post.title}">` : ''}
                 <p>${excerpt}${excerpt.length >= 160 ? '...' : ''}</p>
-                <div style="font-weight:700; color:var(--primary); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="location.href='/blog/${postSlug}'">
+                <div style="font-weight:700; color:var(--primary); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="location.href='/blog.html?id=${post._id}'">
                     <span>Read Wisdom <i class="fas fa-arrow-right"></i></span>
-                    <a href="/blog/${postSlug}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
+                    <a href="/blog.html?id=${post._id}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
                 </div>
                 <div class="blog-card-actions">
                     <button class="shloka-action-button like-button" data-id="${post._id}" ${isLiked ? 'disabled' : ''}>
@@ -252,8 +251,8 @@
             const pageTitle = document.getElementById('page-title');
             const listContainer = document.getElementById('blog-list-container');
             const singleContainer = document.getElementById('single-blog-container');
-            const pathParts = window.location.pathname.split('/').filter(Boolean);
-            const postSlug = pathParts[0] === 'blog' ? pathParts[1] : null;
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('id');
 
             try {
                 // Load site info for social links
@@ -280,10 +279,9 @@
                     }
                 } catch (e) { console.error("Settings load error", e); }
 
-                // PRD v6.2: Use slug-based routing
-                if (postSlug) {
+                if (postId) {
                     const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                    const response = await fetch(`/api/blog/${postSlug}${cacheBuster}`);
+                    const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Blog post not found');
