@@ -477,7 +477,7 @@ async function callGroqForSaarathi(message, conversationHistory = []) {
         'User behavior modes:',
         '1. IF asking Gita knowledge Q (what is karma, who is Krishna etc), answer SHORT (2-3 lines) + "📖 Relevant Shloka:" reference',
         '2. IF personal problem/crisis/guidance needed, respond with all 6 sections with proper format',
-        '3. IF question unclear, ASK clarification (like ChatGPT) - say "Aapka matlab kya hai?" or "Kripya samjhayein"',
+        '3. NEVER ask reverse questions or ask for clarification. Always provide direct answer based on what user said.',
         '4. NEVER force shloka format if not needed',
         '5. For context continuation, refer to previous messages in this window/session',
         '',
@@ -569,9 +569,15 @@ app.post('/api/student/register', async (req, res) => {
 app.post('/api/student/login', async (req, res) => {
     try {
         const { mobile, password } = req.body;
-        const student = await Student.findOne({ mobile, password });
+        let student = await Student.findOne({ mobile, password });
         if (!student) return res.status(401).json({ message: 'Invalid mobile or password' });
+        
+        // Ensure student state is fresh (check if day reset needed)
         await ensureSessionState(student, null);
+        
+        // Refresh student data after state check
+        student = await Student.findOne({ mobile, password });
+        
         res.json({
             success: true,
             student: {
@@ -632,13 +638,16 @@ app.post('/api/geeta-saarathi', async (req, res) => {
             return res.status(400).json({ message: 'Message is required' });
         }
 
-        const student = await Student.findById(userId);
+        let student = await Student.findById(userId);
         if (!student) {
             return res.status(401).json({ message: 'Invalid user' });
         }
 
         // Ensure session state
         await ensureSessionState(student, sessionId);
+        
+        // Refresh student after ensureSessionState to get updated daily counts
+        student = await Student.findById(userId);
 
         // Find or create chat session
         let chatSession = await ChatSession.findOne({ sessionId, userId });
@@ -646,6 +655,7 @@ app.post('/api/geeta-saarathi', async (req, res) => {
 
         if (!chatSession) {
             // Check if user has exceeded daily session limit
+            // This only checks for NEW sessions (new windows)
             const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
             if (student.sessions_today >= dailyLimit) {
                 return res.status(429).json({
@@ -657,7 +667,7 @@ app.post('/api/geeta-saarathi', async (req, res) => {
                 });
             }
 
-            // Create new session
+            // Create new session (ONLY for truly new windows)
             isNewSession = true;
             chatSession = new ChatSession({
                 userId,
@@ -666,6 +676,7 @@ app.post('/api/geeta-saarathi', async (req, res) => {
                 messages: []
             });
             
+            // Only increment for NEW session
             student.sessions_today += 1;
             student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
             await student.save();
@@ -882,6 +893,7 @@ app.post('/api/reset-daily-limit', async (req, res) => {
 
         const today = getTodayDateString();
         if (userId) {
+            // Force fresh update and reload from DB
             const student = await Student.findByIdAndUpdate(
                 userId,
                 { sessions_today: 0, last_reset_date: today },
@@ -890,7 +902,19 @@ app.post('/api/reset-daily-limit', async (req, res) => {
             if (!student) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            return res.json({ success: true, reset: 1, today });
+            // Return updated student data so frontend can refresh immediately
+            return res.json({ 
+                success: true, 
+                reset: 1, 
+                today,
+                student: {
+                    userId: student._id,
+                    name: student.name,
+                    mobile: student.mobile,
+                    daily_limit: student.daily_limit,
+                    sessions_today: student.sessions_today
+                }
+            });
         }
 
         const result = await Student.updateMany({}, { sessions_today: 0, last_reset_date: today });
