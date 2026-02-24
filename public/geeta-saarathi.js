@@ -49,7 +49,7 @@
             <div id="gs-progress-text" class="gs-progress-text">0/3</div>
           </div>
           <div class="gs-head-actions">
-            <button id="gs-new-window" class="gs-icon-btn" title="Open fresh window">↗</button>
+            <button id="gs-new-window" class="gs-icon-btn" title="Fresh chat">↗</button>
             <button id="gs-close" class="gs-icon-btn" title="Close">✕</button>
           </div>
         </div>
@@ -227,10 +227,10 @@
     });
     closeBtn.addEventListener('click', function () { modal.style.display = 'none'; });
     newWindowBtn.addEventListener('click', function () {
-        const url = new URL(window.location.href);
-        url.searchParams.set('gs_new', String(Date.now()));
         chat.innerHTML = '';
-        window.open(url.toString(), '_blank', 'noopener,noreferrer');
+        input.value = '';
+        addMessage('Nayi margdarshan window tayyar hai. Aap apni baat likhiye.', 'gs-ai');
+        fetchLimitState();
     });
     sendBtn.addEventListener('click', sendMessage);
     input.addEventListener('keydown', function (e) {

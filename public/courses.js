@@ -19,7 +19,6 @@ const gitadhyaUser = JSON.parse(localStorage.getItem('gitadhya_user'));
 const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
 
 const params = new URLSearchParams(window.location.search);
-const autoCourseId = params.get('courseId');
 const pathParts = window.location.pathname.split('/').filter(Boolean);
 const pathCourseSlug = pathParts[0] === 'course' ? pathParts[1] : null;
 
@@ -43,7 +42,7 @@ async function loadCourses() {
         const shortDesc = desc.length > 140 ? desc.slice(0, 140).trim() + '...' : desc;
         const courseSlug = course.slug || (course.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         list.innerHTML += `
-<a class="course-card-premium" href="/course/${courseSlug}?id=${course._id}">
+<a class="course-card-premium" href="/course/${courseSlug}">
     <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
     <div class="course-info">
         ${statusBadge}
@@ -51,7 +50,7 @@ async function loadCourses() {
         <p>${shortDesc}</p>
         <div style="font-weight:700; color:var(--primary); margin-top:auto; display:flex; align-items:center; gap:8px;">
             <span>Explore Curriculum <i class="fas fa-arrow-right"></i></span>
-            <a href="/course/${courseSlug}?id=${course._id}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
+            <a href="/course/${courseSlug}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
         </div>
     </div>
 </a>
@@ -64,10 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadCourses();
     });
 
-    if (autoCourseId) {
-        setTimeout(() => openCourse(autoCourseId), 500);
-    } else if (pathCourseSlug) {
-        setTimeout(() => openCourseBySlug(pathCourseSlug), 500);
+    // PRD v6.2: Use slug-based routing (no more courseId parameter)
+    if (pathCourseSlug) {
+        setTimeout(() => openCourse(pathCourseSlug), 500);
     }
 });
 
@@ -104,12 +102,12 @@ document.addEventListener('click', async (e) => {
 });
 
 /***********************
- * OPEN COURSE
+ * OPEN COURSE (PRD v6.2: Slug-based)
  ***********************/
-async function openCourse(courseId) {
+async function openCourse(courseSlug) {
     await loadSiteSettings();
 
-    localStorage.setItem('active_course', courseId);
+    localStorage.setItem('active_course', courseSlug);
 
     // UI SWITCH
     const listSection = document.getElementById('course-list-view');
@@ -122,8 +120,15 @@ async function openCourse(courseId) {
 
     window.scrollTo(0, 0);
 
-    const res = await fetch(`/api/courses/${courseId}`);
+    // PRD v6.2: Fetch by slug directly
+    const res = await fetch(`/api/courses/${courseSlug}`);
+    if (!res.ok) {
+        console.error('Course not found:', courseSlug);
+        return;
+    }
     currentCourse = await res.json();
+    
+    // Ensure URL is clean slug-based
     if (currentCourse && currentCourse.slug) {
         history.replaceState({}, '', `/course/${currentCourse.slug}`);
     }
@@ -186,16 +191,6 @@ async function openCourse(courseId) {
 
     updateProgressBar();
     checkQuizUnlock();
-}
-
-async function openCourseBySlug(slug) {
-    await loadSiteSettings();
-    const res = await fetch(`/api/courses/by-slug/${slug}`);
-    if (!res.ok) {
-        return;
-    }
-    const course = await res.json();
-    return openCourse(course._id);
 }
 
 /***********************
