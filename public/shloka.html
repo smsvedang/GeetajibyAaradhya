@@ -321,7 +321,10 @@
   </div>
 
   <div class="card-content">
-    <h3>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+    <h3 style="display:flex; align-items:center; gap:8px;">
+      <span>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</span>
+      <a href="/adhyay-${shloka.adhyay}/shlok-${shloka.shloka}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="text-decoration:none; color:var(--primary);">↗</a>
+    </h3>
     <p class="shloka-text">${formattedText}</p>
 
     <div class="shloka-actions">

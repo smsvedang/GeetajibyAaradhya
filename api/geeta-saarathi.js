@@ -1,0 +1,200 @@
+const { connectDb, getTodayInIST, parseBody } = require('./_lib/db');
+const Student = require('../models/Student');
+
+const DEFAULT_DAILY_LIMIT = 3;
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+
+const GREETINGS = new Set(['hi', 'hello', 'namaste', 'namaskar', 'hare krishna']);
+
+function normalize(s = '') {
+    return String(s).trim().toLowerCase();
+}
+
+function isCrisisMessage(message = '') {
+    const t = normalize(message);
+    return [
+        'suicide', 'self harm', 'kill myself', 'end my life', 'want to die',
+        'khudkushi', 'marna chahta', 'marna chahti', 'apni jaan'
+    ].some((k) => t.includes(k));
+}
+
+async function syncDailyLimit(student) {
+    const today = getTodayInIST();
+    if (!student.last_reset_date || student.last_reset_date !== today) {
+        student.last_reset_date = today;
+        student.used_today = 0;
+    }
+    if (!Number.isFinite(student.daily_limit) || student.daily_limit <= 0) {
+        student.daily_limit = DEFAULT_DAILY_LIMIT;
+    }
+    if (!Number.isFinite(student.used_today) || student.used_today < 0) {
+        student.used_today = 0;
+    }
+    await student.save();
+}
+
+function buildGreeting() {
+    return 'Namaste. Main Geeta Saarathi hoon. Aap apni samasya likhiye, main Gita ke adhar par margdarshan dunga.';
+}
+
+function buildCrisisResponse() {
+    return [
+        '🔍 Manasik Avastha Vishleshan',
+        'Aap gehri mansik peeda mein lag rahe hain. Kripya turant support lijiye.',
+        '',
+        '📖 Adhyay + Shlok Number',
+        'Bhagavad Gita 2.14',
+        '',
+        '🕉 Full Sanskrit Shlok (complete verse)',
+        'मात्रास्पर्शास्तु कौन्तेय शीतोष्णसुखदुःखदाः। आगमापायिनोऽनित्यास्तांस्तितिक्षस्व भारत।।',
+        '',
+        '📘 Hindi Meaning',
+        'Sukh-dukh aate-jate aur anitya hain; is samay ko dhairya se paar kijiye.',
+        '',
+        '📗 English Meaning',
+        'Pleasure and pain are temporary; endure this phase with steadiness.',
+        '',
+        '🪔 Practical Margdarshan',
+        'Abhi turant Tele-MANAS: 14416 ya 1-800-891-4416 par call karein. Kisi trusted vyakti ko abhi batayein.'
+    ].join('\n');
+}
+
+function fallbackStructuredResponse() {
+    return [
+        '🔍 Manasik Avastha Vishleshan',
+        'Aap manasik asantulan aur parinaam ki chinta se prabhavit hain.',
+        '',
+        '📖 Adhyay + Shlok Number',
+        'Bhagavad Gita 2.47',
+        '',
+        '🕉 Full Sanskrit Shlok (complete verse)',
+        'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि।।',
+        '',
+        '📘 Hindi Meaning',
+        'Aapka adhikar karm par hai, phal par nahi.',
+        '',
+        '📗 English Meaning',
+        'You are entitled to action, not to the fruits of action.',
+        '',
+        '🪔 Practical Margdarshan',
+        'Aaj ke liye ek nishchit karm chun kar bina chinta ke poora kijiye, parinaam ko chhod dijiye.'
+    ].join('\n');
+}
+
+function hasAllSections(text = '') {
+    return [
+        '🔍 Manasik Avastha Vishleshan',
+        '📖 Adhyay + Shlok Number',
+        '🕉 Full Sanskrit Shlok (complete verse)',
+        '📘 Hindi Meaning',
+        '📗 English Meaning',
+        '🪔 Practical Margdarshan'
+    ].every((h) => text.includes(h));
+}
+
+async function askGroq(userMessage) {
+    if (!process.env.GROQ_API_KEY) return null;
+    const systemPrompt = [
+        'You are Geeta Saarathi.',
+        'Always reply in respectful Hinglish.',
+        'For guidance replies, include these exact sections only once:',
+        '🔍 Manasik Avastha Vishleshan',
+        '📖 Adhyay + Shlok Number',
+        '🕉 Full Sanskrit Shlok (complete verse)',
+        '📘 Hindi Meaning',
+        '📗 English Meaning',
+        '🪔 Practical Margdarshan',
+        'Sanskrit verse must be full, not partial.'
+    ].join('\n');
+
+    const r = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: GROQ_MODEL,
+            temperature: 0.3,
+            max_tokens: 700,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userMessage }
+            ]
+        })
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data?.choices?.[0]?.message?.content?.trim() || null;
+}
+
+module.exports = async (req, res) => {
+    if (!['GET', 'POST'].includes(req.method)) {
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
+    try {
+        await connectDb();
+        const body = parseBody(req);
+        const userId = (req.method === 'GET' ? req.query.userId : body.userId) || '';
+        if (!userId) {
+            return res.status(401).json({ message: 'Login required' });
+        }
+
+        const student = await Student.findById(userId);
+        if (!student) {
+            return res.status(401).json({ message: 'Invalid user' });
+        }
+        await syncDailyLimit(student);
+
+        if (req.method === 'GET') {
+            const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
+            const remaining = Math.max(0, dailyLimit - Number(student.used_today || 0));
+            return res.json({
+                remaining_limit: remaining,
+                daily_limit: dailyLimit,
+                privacy_notice: 'Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap gopniya hai.'
+            });
+        }
+
+        const message = String(body.message || '').trim();
+        if (!message) {
+            return res.status(400).json({ message: 'message is required' });
+        }
+
+        const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
+        if (student.used_today >= dailyLimit) {
+            return res.status(429).json({
+                response: 'Daily Limit Complete',
+                remaining_limit: 0,
+                daily_limit: dailyLimit
+            });
+        }
+
+        let responseText = '';
+        const lower = normalize(message);
+        if (GREETINGS.has(lower)) {
+            responseText = buildGreeting();
+        } else if (isCrisisMessage(message)) {
+            responseText = buildCrisisResponse();
+        } else {
+            const groqResponse = await askGroq(message);
+            responseText = groqResponse && hasAllSections(groqResponse)
+                ? groqResponse
+                : fallbackStructuredResponse();
+        }
+
+        student.used_today += 1;
+        student.ai_usage_count = Number(student.ai_usage_count || 0) + 1;
+        await student.save();
+
+        const remaining = Math.max(0, dailyLimit - student.used_today);
+        return res.json({
+            response: responseText,
+            remaining_limit: remaining,
+            daily_limit: dailyLimit
+        });
+    } catch (e) {
+        return res.status(500).json({ message: 'Geeta Saarathi unavailable' });
+    }
+};

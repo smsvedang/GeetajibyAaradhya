@@ -35,6 +35,17 @@ function shlokaSlug(adhyay, shloka) {
     return `adhyay-${Number(adhyay)}-shlok-${Number(shloka)}`;
 }
 
+function makeCertificateId(courseTitle, mobile) {
+    const courseCode = String(courseTitle || 'GEN')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 8) || 'GEN';
+    const studentId = String(mobile || '').slice(-4) || '0000';
+    const year = new Date().getFullYear();
+    return `GS-${courseCode}-${studentId}-${year}`;
+}
+
 function cleanClientPath(input) {
     if (!input || typeof input !== 'string') return DEFAULT_PUSH_URL;
     const pathOnly = input.trim();
@@ -1529,25 +1540,46 @@ app.delete('/api/certificates/:id', async (req, res) => {
 // CREATE CERTIFICATE (ADMIN)
 app.post('/api/certificates/create', async (req, res) => {
     try {
-        const { name, mobile, courseTitle, percentage, language, password } = req.body;
+        const { studentId, name, mobile, courseTitle, percentage, language, certificateId, password } = req.body;
 
-        // Simple admin password check matching other routes
-        // (Assuming logic from other routes involves checking against a variable or config)
-        // If not strictly enforced globally, we will just proceed or check against env/const if available in context.
-        // Based on previous file views, 'password' is sent in body. 
-        // We will assume the frontend sends the correct one and maybe add a check if we knew the stored one.
-        // For now, allow creation.
+        if (password !== process.env.ADMIN_PASSWORD) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(404).json({ success: false, message: 'Student not found' });
+        }
+
+        const allProgress = await Progress.find({ mobile: student.mobile });
+        if (!allProgress.length) {
+            return res.status(400).json({ success: false, message: 'Student is not enrolled in any course' });
+        }
+        const enrolledCourseIds = allProgress.map((p) => p.courseId).filter(Boolean);
+        const enrolledCourses = await Course.find({ _id: { $in: enrolledCourseIds } }).select('title').lean();
+        const enrolledTitles = new Set(enrolledCourses.map((c) => c.title));
+        if (!enrolledTitles.has(courseTitle)) {
+            return res.status(400).json({ success: false, message: 'Selected course is not enrolled for this student' });
+        }
+
+        const existing = await Certificate.findOne({ mobile: student.mobile, courseTitle });
+        if (existing) {
+            return res.status(409).json({ success: false, message: 'Certificate already exists' });
+        }
+
+        const generatedId = certificateId || makeCertificateId(courseTitle, student.mobile);
 
         await Certificate.create({
-            name,
-            mobile,
+            name: name || student.name,
+            mobile: student.mobile,
             courseTitle,
+            certificateId: generatedId,
             percentage,
             language,
             status: 'approved' // Admin created certificates are auto-approved
         });
 
-        res.json({ success: true, message: 'Certificate created manually' });
+        res.json({ success: true, message: 'Certificate created', certificateId: generatedId });
     } catch (err) {
         console.error("Manual cert create error:", err);
         res.status(500).json({ success: false, message: 'Failed to create certificate' });

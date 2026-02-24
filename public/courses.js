@@ -49,7 +49,10 @@ async function loadCourses() {
         ${statusBadge}
         <h3>${course.title}</h3>
         <p>${shortDesc}</p>
-        <div style="font-weight:700; color:var(--primary); margin-top:auto;">Explore Curriculum <i class="fas fa-arrow-right"></i></div>
+        <div style="font-weight:700; color:var(--primary); margin-top:auto; display:flex; align-items:center; gap:8px;">
+            <span>Explore Curriculum <i class="fas fa-arrow-right"></i></span>
+            <a href="/course/${courseSlug}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
+        </div>
     </div>
 </a>
 `;
@@ -153,7 +156,10 @@ async function openCourse(courseId) {
                         <div id="player-${shloka._id}"></div>
                     </div>
                     <div class="card-content">
-                        <h3 style="margin:5px 0 10px;">Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</h3>
+                        <h3 style="margin:5px 0 10px; display:flex; align-items:center; gap:8px;">
+                            <span>Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}</span>
+                            <a href="/adhyay-${shloka.adhyay}/shlok-${shloka.shloka}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="text-decoration:none; color:var(--primary);">↗</a>
+                        </h3>
                         <p class="shloka-text">${shloka.text ? shloka.text.replace(/\n/g, '<br>') : 'Sacred translation...'}</p>
                         <p id="status-${shloka._id}" class="status-badge status-pending">⏳ Not completed</p>
                         <div class="shloka-actions">

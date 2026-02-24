@@ -3,6 +3,10 @@
 
   "builds": [
     {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "server.js",
       "use": "@vercel/node"
     },
@@ -13,6 +17,18 @@
   ],
 
   "routes": [
+    {
+      "src": "^/api/geeta-saarathi$",
+      "dest": "api/geeta-saarathi.js"
+    },
+    {
+      "src": "^/api/admin-update-limit$",
+      "dest": "api/admin-update-limit.js"
+    },
+    {
+      "src": "^/api/analytics$",
+      "dest": "api/analytics.js"
+    },
     {
       "src": "^/api/(.*)",
       "dest": "server.js"

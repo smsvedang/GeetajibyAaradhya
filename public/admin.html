@@ -202,17 +202,21 @@
             <div id="tab-certificates" class="content-page">
                 <h1>Certificates</h1>
                 <div class="stat-card" style="margin-bottom:30px; border-left:5px solid var(--secondary);">
-                    <h3>Issue Manual Certificate</h3>
+                    <h3>Issue Automated Certificate</h3>
                     <form id="manual-cert-form" style="box-shadow:none; border:none; padding:0;">
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
-                            <input id="mc-name" placeholder="Student Name" required>
-                            <input id="mc-mobile" placeholder="Mobile Number" required>
-                            <input id="mc-course" placeholder="Course Title" required>
+                            <select id="mc-student" required>
+                                <option value="">Select Student</option>
+                            </select>
+                            <select id="mc-course" required>
+                                <option value="">Select Enrolled Course</option>
+                            </select>
                             <input id="mc-percentage" type="number" placeholder="Percentage % (Optional)">
                             <select id="mc-lang">
                                 <option value="hi">Hindi</option>
                                 <option value="en">English</option>
                             </select>
+                            <input id="mc-cert-id" placeholder="Certificate ID" readonly>
                         </div>
                         <button type="submit">Issue Certificate Immediately <i class="fas fa-check-circle"></i></button>
                     </form>
@@ -263,8 +267,17 @@
 
             <div id="tab-analytics" class="content-page">
                 <h1>Usage Analytics</h1>
+                <div id="analytics-overview" style="display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:12px; margin-bottom:20px;"></div>
                 <div class="stat-card" style="margin-bottom:20px;">
                     <h3>Student-wise</h3>
+                    <div style="display:flex; gap:8px; margin-bottom:10px;">
+                        <input id="analytics-search" placeholder="Search student..." style="max-width:260px;">
+                        <select id="analytics-sort" style="max-width:240px;">
+                            <option value="ai_used_today">Sort: AI Used Today</option>
+                            <option value="course_completion_percent">Sort: Completion %</option>
+                            <option value="shlok_views">Sort: Shlok Views</option>
+                        </select>
+                    </div>
                     <div id="analytics-student"></div>
                 </div>
                 <div class="stat-card" style="margin-bottom:20px;">
@@ -340,6 +353,7 @@
             let adminPassword = '';
             let settingsCache = {};
             let coursesCache = [];
+            let studentsDetailedCache = [];
 
             /* --- UI HELPERS --- */
             window.showToast = (msg, type = 'info') => {
@@ -453,6 +467,7 @@
                 loadShlokasAdmin(); loadCoursesAdmin(); loadQuizzes(); loadCertificates();
                 loadTestimonials(); loadBlogPosts(); loadArtwork(); loadSiteSettings();
                 loadAdhyayForCourses(); loadCoursesForQuiz(); loadStudentsV2(); loadAnalytics();
+                loadCertificateFormStudents();
             }
 
             /* --- TAB SWITCHING --- */
@@ -783,18 +798,37 @@
             window.approveCert = async id => { await fetch('/api/certificates/approve/' + id, { method: 'PUT' }); loadCertificates(); showToast('Approved!', 'success'); };
             window.deleteCert = async id => { if (confirm('Delete?')) { await fetch('/api/certificates/' + id, { method: 'DELETE' }); loadCertificates(); } };
 
+            document.getElementById('mc-student').onchange = (e) => {
+                loadCertificateCoursesForStudent(e.target.value);
+            };
+            document.getElementById('mc-course').onchange = () => {
+                const studentId = document.getElementById('mc-student').value;
+                const courseTitle = document.getElementById('mc-course').value;
+                const certIdInput = document.getElementById('mc-cert-id');
+                const student = studentsDetailedCache.find((s) => s._id === studentId);
+                certIdInput.value = student && courseTitle ? makeCertificateId(courseTitle, student.mobile) : '';
+            };
+
             document.getElementById('manual-cert-form').onsubmit = async e => {
                 e.preventDefault();
                 try {
+                    const studentId = document.getElementById('mc-student').value;
+                    const courseTitle = document.getElementById('mc-course').value;
+                    const student = studentsDetailedCache.find((s) => s._id === studentId);
+                    if (!student || !courseTitle) {
+                        return showToast('Select student and enrolled course', 'error');
+                    }
                     const r = await fetch('/api/certificates/create', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            name: document.getElementById('mc-name').value,
-                            mobile: document.getElementById('mc-mobile').value,
-                            courseTitle: document.getElementById('mc-course').value,
+                            studentId,
+                            name: student.name,
+                            mobile: student.mobile,
+                            courseTitle,
                             percentage: document.getElementById('mc-percentage').value,
                             language: document.getElementById('mc-lang').value,
+                            certificateId: document.getElementById('mc-cert-id').value,
                             password: adminPassword
                         })
                     });
@@ -985,6 +1019,7 @@
             async function loadStudentsV2() {
                 const r = await fetch(`/api/admin/detailed-students?password=${adminPassword}`);
                 const list = await r.json();
+                studentsDetailedCache = Array.isArray(list) ? list : [];
                 const box = document.getElementById('student-list');
                 box.innerHTML = '';
                 if (!list.length) {
@@ -1024,6 +1059,53 @@
                         </div>
                     `;
                     box.appendChild(div);
+                });
+                loadCertificateFormStudents();
+            }
+
+            function makeCourseCode(title) {
+                return String(title || 'GEN')
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .slice(0, 8) || 'GEN';
+            }
+            function makeStudentCode(mobile) {
+                const m = String(mobile || '');
+                return m.slice(-4) || '0000';
+            }
+            function makeCertificateId(courseTitle, mobile) {
+                const year = new Date().getFullYear();
+                return `GS-${makeCourseCode(courseTitle)}-${makeStudentCode(mobile)}-${year}`;
+            }
+            function loadCertificateFormStudents() {
+                const studentSel = document.getElementById('mc-student');
+                if (!studentSel) return;
+                studentSel.innerHTML = '<option value="">Select Student</option>';
+                studentsDetailedCache.forEach((s) => {
+                    studentSel.innerHTML += `<option value="${s._id}">${s.name} (${s.mobile})</option>`;
+                });
+            }
+            function loadCertificateCoursesForStudent(studentId) {
+                const courseSel = document.getElementById('mc-course');
+                const certIdInput = document.getElementById('mc-cert-id');
+                if (!courseSel) return;
+                courseSel.innerHTML = '<option value="">Select Enrolled Course</option>';
+                certIdInput.value = '';
+                const student = studentsDetailedCache.find((s) => s._id === studentId);
+                if (!student) return;
+
+                const allCourses = [...(student.enrolledCourses || []), ...(student.passedCourses || [])];
+                const uniqueByTitle = [];
+                const seen = new Set();
+                allCourses.forEach((c) => {
+                    const title = c.courseTitle;
+                    if (!title || seen.has(title)) return;
+                    seen.add(title);
+                    uniqueByTitle.push(c);
+                });
+                uniqueByTitle.forEach((c) => {
+                    courseSel.innerHTML += `<option value="${c.courseTitle}">${c.courseTitle}</option>`;
                 });
             }
 
@@ -1195,32 +1277,85 @@
             };
 
             async function loadAnalytics() {
-                const res = await fetch(`/api/admin/analytics?password=${adminPassword}`);
+                const res = await fetch(`/api/analytics?password=${adminPassword}`);
                 if (!res.ok) return;
                 const data = await res.json();
 
                 const sBox = document.getElementById('analytics-student');
                 const shBox = document.getElementById('analytics-shlok');
                 const cBox = document.getElementById('analytics-course');
-                if (!sBox || !shBox || !cBox) return;
+                const oBox = document.getElementById('analytics-overview');
+                const searchInput = document.getElementById('analytics-search');
+                const sortInput = document.getElementById('analytics-sort');
+                if (!sBox || !shBox || !cBox || !oBox) return;
 
-                sBox.innerHTML = (data.student_wise || []).slice(0, 20).map(s => `
-                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
-                        <strong>${s.name}</strong> (${s.mobile}) | AI: ${s.ai_usage_count} | Completion: ${s.course_completion_percent}%
-                    </div>
-                `).join('') || '<div>No data</div>';
+                const overview = data.overview || {};
+                oBox.innerHTML = `
+                    <div class="stat-card"><h3>Total Students</h3><span class="stat-number">${overview.total_students || 0}</span></div>
+                    <div class="stat-card"><h3>Active Today</h3><span class="stat-number">${overview.active_today || 0}</span></div>
+                    <div class="stat-card"><h3>AI Usage Today</h3><span class="stat-number">${overview.ai_usage_today || 0}</span></div>
+                    <div class="stat-card"><h3>Total Courses</h3><span class="stat-number">${overview.total_courses || 0}</span></div>
+                `;
 
-                shBox.innerHTML = (data.shlok_wise || []).slice(0, 20).map(s => `
-                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
-                        Adhyay ${s.adhyay}, Shlok ${s.shloka} | Views: ${s.views} | Listens: ${s.listens}
-                    </div>
-                `).join('') || '<div>No data</div>';
+                const allStudents = Array.isArray(data.student_usage) ? data.student_usage : [];
+                function renderStudentTable() {
+                    const q = (searchInput.value || '').trim().toLowerCase();
+                    const key = sortInput.value || 'ai_used_today';
+                    const filtered = allStudents
+                        .filter((s) => !q || String(s.name || '').toLowerCase().includes(q))
+                        .sort((a, b) => Number(b[key] || 0) - Number(a[key] || 0));
+                    sBox.innerHTML = `
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead><tr><th align="left">Student Name</th><th align="left">AI Used Today</th><th align="left">Daily Limit</th><th align="left">Shlok Views</th><th align="left">Course Completion %</th></tr></thead>
+                            <tbody>
+                                ${filtered.map((s) => `
+                                    <tr style="border-top:1px solid #eee;">
+                                        <td style="padding:8px 0;">${s.name || '-'}</td>
+                                        <td>${s.ai_used_today || 0}</td>
+                                        <td>${s.daily_limit || 3}</td>
+                                        <td>${s.shlok_views || 0}</td>
+                                        <td>${s.course_completion_percent || 0}%</td>
+                                    </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+                renderStudentTable();
+                searchInput.oninput = renderStudentTable;
+                sortInput.onchange = renderStudentTable;
 
-                cBox.innerHTML = (data.course_wise || []).map(c => `
-                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
-                        <strong>${c.title}</strong> | Enrolled: ${c.enrollment_count} | Completion Rate: ${c.completion_rate}%
-                    </div>
-                `).join('') || '<div>No data</div>';
+                const shlokRows = Array.isArray(data.shlok_analytics) ? data.shlok_analytics : [];
+                const topView = shlokRows.length ? Math.max(...shlokRows.map((s) => Number(s.views || 0))) : 0;
+                shBox.innerHTML = `
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead><tr><th align="left">Adhyay</th><th align="left">Shlok</th><th align="left">Views</th><th align="left">Listens</th></tr></thead>
+                        <tbody>
+                            ${shlokRows.slice(0, 30).map((s) => `
+                                <tr style="border-top:1px solid #eee; ${Number(s.views || 0) === topView && topView > 0 ? 'background:#fff7ed;' : ''}">
+                                    <td style="padding:8px 0;">${s.adhyay}</td>
+                                    <td>${s.shlok}</td>
+                                    <td>${s.views}</td>
+                                    <td>${s.listens}</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                const courseRows = Array.isArray(data.course_analytics) ? data.course_analytics : [];
+                cBox.innerHTML = `
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead><tr><th align="left">Course Name</th><th align="left">Enrolled Count</th><th align="left">Completed Count</th><th align="left">Avg Progress %</th></tr></thead>
+                        <tbody>
+                            ${courseRows.map((c) => `
+                                <tr style="border-top:1px solid #eee;">
+                                    <td style="padding:8px 0;">${c.course_name}</td>
+                                    <td>${c.enrolled_count}</td>
+                                    <td>${c.completed_count}</td>
+                                    <td>${c.avg_progress_percent}%</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                `;
             }
         });
     </script>

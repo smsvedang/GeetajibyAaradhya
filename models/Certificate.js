@@ -5,6 +5,7 @@ const CertificateSchema = new mongoose.Schema({
     email: String,
     mobile: String,
     courseTitle: String,
+    certificateId: String,
     language: String,
     percentage: Number, // Added percentage field
     status: {

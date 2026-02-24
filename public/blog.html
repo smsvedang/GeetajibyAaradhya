@@ -226,8 +226,9 @@
                 <div class="blog-date">${postDate}</div>
                 ${post.imageUrl ? `<img src="${post.imageUrl}" class="blog-image" alt="${post.title}">` : ''}
                 <p>${excerpt}${excerpt.length >= 160 ? '...' : ''}</p>
-                <div style="font-weight:700; color:var(--primary); cursor:pointer;" onclick="location.href='/blog/${postSlug}'">
-                    Read Wisdom <i class="fas fa-arrow-right"></i>
+                <div style="font-weight:700; color:var(--primary); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="location.href='/blog/${postSlug}'">
+                    <span>Read Wisdom <i class="fas fa-arrow-right"></i></span>
+                    <a href="/blog/${postSlug}" target="_blank" rel="noopener noreferrer" title="Open in new tab" style="margin-left:auto; color:var(--primary); text-decoration:none;">↗</a>
                 </div>
                 <div class="blog-card-actions">
                     <button class="shloka-action-button like-button" data-id="${post._id}" ${isLiked ? 'disabled' : ''}>
