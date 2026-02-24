@@ -79,6 +79,9 @@
                 <button class="sidebar-button" data-tab="tab-students">
                     <i class="fas fa-users"></i> <span>Students</span>
                 </button>
+                <button class="sidebar-button" data-tab="tab-analytics">
+                    <i class="fas fa-chart-pie"></i> <span>Analytics</span>
+                </button>
                 <button class="sidebar-button" data-tab="tab-about">
                     <i class="fas fa-cog"></i> <span>Site Settings</span>
                 </button>
@@ -251,7 +254,27 @@
             <!-- TAB: STUDENTS -->
             <div id="tab-students" class="content-page">
                 <h1>Registered Students</h1>
+                <div class="stat-card" style="margin-bottom:20px;">
+                    <h3>User Limit Management</h3>
+                    <p style="color:var(--text-muted); margin-bottom:10px;">View and update `used_today` / `daily_limit` for each user.</p>
+                </div>
                 <div class="admin-item-list" id="student-list"></div>
+            </div>
+
+            <div id="tab-analytics" class="content-page">
+                <h1>Usage Analytics</h1>
+                <div class="stat-card" style="margin-bottom:20px;">
+                    <h3>Student-wise</h3>
+                    <div id="analytics-student"></div>
+                </div>
+                <div class="stat-card" style="margin-bottom:20px;">
+                    <h3>Shlok-wise</h3>
+                    <div id="analytics-shlok"></div>
+                </div>
+                <div class="stat-card">
+                    <h3>Course-wise</h3>
+                    <div id="analytics-course"></div>
+                </div>
             </div>
 
             <!-- TAB: ARTWORK -->
@@ -300,6 +323,7 @@
                     <form id="push-form" style="box-shadow:none; border:none; padding:0;">
                         <input id="push-title" placeholder="Title" required>
                         <textarea id="push-body" placeholder="Message..." required></textarea>
+                        <input id="push-url" placeholder="Deep link URL (e.g. /course/karma-yoga)">
                         <button type="submit">Broadcast Now <i class="fas fa-broadcast-tower"></i></button>
                     </form>
                 </div>
@@ -428,7 +452,7 @@
             function loadAllData() {
                 loadShlokasAdmin(); loadCoursesAdmin(); loadQuizzes(); loadCertificates();
                 loadTestimonials(); loadBlogPosts(); loadArtwork(); loadSiteSettings();
-                loadAdhyayForCourses(); loadCoursesForQuiz(); loadStudentsV2();
+                loadAdhyayForCourses(); loadCoursesForQuiz(); loadStudentsV2(); loadAnalytics();
             }
 
             /* --- TAB SWITCHING --- */
@@ -918,7 +942,16 @@
 
             document.getElementById('push-form').onsubmit = async e => {
                 e.preventDefault();
-                const r = await fetch('/api/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: document.getElementById('push-title').value, body: document.getElementById('push-body').value, password: adminPassword }) });
+                const r = await fetch('/api/push/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: document.getElementById('push-title').value,
+                        body: document.getElementById('push-body').value,
+                        url: document.getElementById('push-url').value,
+                        password: adminPassword
+                    })
+                });
                 if (r.ok) {
                     let d = await r.json();
                     const parts = [];
@@ -972,10 +1005,20 @@
                             <small style="color:var(--text-muted);">
                                 Enrolled: ${s.enrolledCourses?.length || 0} | Passed: ${s.passedCourses?.length || 0}
                             </small>
+                            <br>
+                            <small style="color:var(--text-muted);">
+                                Daily Limit: ${s.daily_limit || 3} | Used Today: ${s.used_today || 0}
+                            </small>
                         </div>
                         <div class="admin-buttons">
                             <button class="edit-button" onclick='viewStudentDetails(${JSON.stringify(s).replace(/'/g, "&#39;")})'>
                                 <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="edit-button" onclick="updateStudentLimit('${s._id}', ${s.daily_limit || 3})">
+                                Set Limit
+                            </button>
+                            <button class="edit-button" onclick="resetStudentLimit('${s._id}')">
+                                Reset Today
                             </button>
                             <button class="delete-button" onclick="deleteStudent('${s._id}')">Delete</button>
                         </div>
@@ -1026,7 +1069,9 @@
                     <div style="max-height:500px; overflow-y:auto;">
                         <div style="margin-bottom:15px;">
                             <strong>Name:</strong> ${s.name}<br>
-                            <strong>Mobile:</strong> ${s.mobile}
+                            <strong>Mobile:</strong> ${s.mobile}<br>
+                            <strong>Daily Limit:</strong> ${s.daily_limit || 3}<br>
+                            <strong>Used Today:</strong> ${s.used_today || 0}
                         </div>
                         ${enrolledHtml}
                         ${passedHtml}
@@ -1109,8 +1154,80 @@
                     }
                 }
             };
+
+            window.updateStudentLimit = async (studentId, currentLimit) => {
+                const value = prompt('Enter new daily limit:', String(currentLimit || 3));
+                if (!value) return;
+                const limit = Number(value);
+                if (!Number.isInteger(limit) || limit <= 0) {
+                    return showToast('Invalid limit', 'error');
+                }
+                const res = await fetch('/api/admin-update-limit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        adminPassword,
+                        userId: studentId,
+                        new_limit: limit
+                    })
+                });
+                if (res.ok) {
+                    showToast('Daily limit updated', 'success');
+                    loadStudentsV2();
+                } else {
+                    const err = await res.json();
+                    showToast(err.message || 'Failed to update limit', 'error');
+                }
+            };
+
+            window.resetStudentLimit = async (studentId) => {
+                const res = await fetch('/api/reset-daily-limit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: adminPassword, userId: studentId })
+                });
+                if (res.ok) {
+                    showToast('Today usage reset', 'success');
+                    loadStudentsV2();
+                } else {
+                    showToast('Reset failed', 'error');
+                }
+            };
+
+            async function loadAnalytics() {
+                const res = await fetch(`/api/admin/analytics?password=${adminPassword}`);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const sBox = document.getElementById('analytics-student');
+                const shBox = document.getElementById('analytics-shlok');
+                const cBox = document.getElementById('analytics-course');
+                if (!sBox || !shBox || !cBox) return;
+
+                sBox.innerHTML = (data.student_wise || []).slice(0, 20).map(s => `
+                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
+                        <strong>${s.name}</strong> (${s.mobile}) | AI: ${s.ai_usage_count} | Completion: ${s.course_completion_percent}%
+                    </div>
+                `).join('') || '<div>No data</div>';
+
+                shBox.innerHTML = (data.shlok_wise || []).slice(0, 20).map(s => `
+                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
+                        Adhyay ${s.adhyay}, Shlok ${s.shloka} | Views: ${s.views} | Listens: ${s.listens}
+                    </div>
+                `).join('') || '<div>No data</div>';
+
+                cBox.innerHTML = (data.course_wise || []).map(c => `
+                    <div style="padding:8px 0; border-bottom:1px solid #eee;">
+                        <strong>${c.title}</strong> | Enrolled: ${c.enrollment_count} | Completion Rate: ${c.completion_rate}%
+                    </div>
+                `).join('') || '<div>No data</div>';
+            }
         });
     </script>
+  <script src="/geeta-saarathi.js"></script>
 </body>
 
 </html>
+
+
+

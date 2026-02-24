@@ -25,6 +25,16 @@ const progressSchema = new mongoose.Schema({
     quizScore: {
         type: Number,
         default: 0
+    },
+
+    enrolled: {
+        type: Boolean,
+        default: true
+    },
+
+    enrolledAt: {
+        type: Date,
+        default: Date.now
     }
 
 }, { timestamps: true });

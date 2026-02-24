@@ -20,6 +20,8 @@ const userMobile = gitadhyaUser ? gitadhyaUser.mobile : '';
 
 const params = new URLSearchParams(window.location.search);
 const autoCourseId = params.get('courseId');
+const pathParts = window.location.pathname.split('/').filter(Boolean);
+const pathCourseSlug = pathParts[0] === 'course' ? pathParts[1] : null;
 
 /***********************
  * LOAD COURSES LIST
@@ -39,8 +41,9 @@ async function loadCourses() {
             : `<div class="course-status-badge completed">All Shlokas Included</div>`;
         const desc = (course.description || 'A spiritual odyssey through the verses of the Geeta.').replace(/\s+/g, ' ').trim();
         const shortDesc = desc.length > 140 ? desc.slice(0, 140).trim() + '...' : desc;
+        const courseSlug = course.slug || (course.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         list.innerHTML += `
-<a class="course-card-premium" href="courses.html?courseId=${course._id}">
+<a class="course-card-premium" href="/course/${courseSlug}">
     <div class="course-image-box" style="background-image: url('${course.imageUrl || '/favicon.png'}')"></div>
     <div class="course-info">
         ${statusBadge}
@@ -60,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (autoCourseId) {
         setTimeout(() => openCourse(autoCourseId), 500);
+    } else if (pathCourseSlug) {
+        setTimeout(() => openCourseBySlug(pathCourseSlug), 500);
     }
 });
 
@@ -116,6 +121,9 @@ async function openCourse(courseId) {
 
     const res = await fetch(`/api/courses/${courseId}`);
     currentCourse = await res.json();
+    if (currentCourse && currentCourse.slug) {
+        history.replaceState({}, '', `/course/${currentCourse.slug}`);
+    }
 
     completedShlokas.clear();
     quizPassed = false;
@@ -126,6 +134,10 @@ async function openCourse(courseId) {
     document.getElementById('view-course-title').textContent = currentCourse.title;
     document.getElementById('view-course-desc').textContent = currentCourse.description || 'Embark on a spiritual journey of the soul.';
     document.getElementById('view-course-img').src = currentCourse.imageUrl || '/favicon.png';
+    const enrollBtn = document.getElementById('enroll-btn');
+    if (enrollBtn) {
+        enrollBtn.style.display = 'inline-flex';
+    }
 
     const shlokaBox = document.getElementById('course-shlokas');
     if (shlokaBox) {
@@ -134,7 +146,7 @@ async function openCourse(courseId) {
             const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
             const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
             const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-            const shareUrl = `${window.location.origin}/shloka.html?id=${shloka._id}`;
+            const shareUrl = `${window.location.origin}/adhyay-${shloka.adhyay}/shlok-${shloka.shloka}`;
             shlokaBox.innerHTML += `
                 <div class="shloka-item-card">
                     <div class="card-video-container">
@@ -168,6 +180,16 @@ async function openCourse(courseId) {
 
     updateProgressBar();
     checkQuizUnlock();
+}
+
+async function openCourseBySlug(slug) {
+    await loadSiteSettings();
+    const res = await fetch(`/api/courses/by-slug/${slug}`);
+    if (!res.ok) {
+        return;
+    }
+    const course = await res.json();
+    return openCourse(course._id);
 }
 
 /***********************
@@ -205,11 +227,17 @@ function initPlayers() {
  ***********************/
 async function saveProgress() {
     if (!currentCourse || !userMobile) return;
-    await fetch('/api/progress/save', {
+    const response = await fetch('/api/progress/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobile: userMobile, courseId: currentCourse._id, completed: [...completedShlokas] })
     });
+    if (response.ok) {
+        const payload = await response.json();
+        if (payload.autoEnrolled && payload.courseName) {
+            showToast(`You have been enrolled in ${payload.courseName}`);
+        }
+    }
     updateProgressBar();
 }
 
@@ -330,6 +358,51 @@ async function requestCertificate() {
 function goBack() {
     window.location.href = 'courses.html';
 }
+
+async function enrollCurrentCourse() {
+    if (!currentCourse || !userMobile) {
+        showToast('Login required to enroll');
+        return;
+    }
+    const res = await fetch(`/api/courses/${currentCourse._id}/enroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: userMobile })
+    });
+    const data = await res.json();
+    if (res.ok && data.enrolled) {
+        showToast(`You have been enrolled in ${data.courseName}`);
+    } else {
+        showToast(data.message || 'Enrollment failed');
+    }
+}
+
+function showToast(message) {
+    let toast = document.getElementById('enroll-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'enroll-toast';
+        toast.style.position = 'fixed';
+        toast.style.left = '50%';
+        toast.style.bottom = '20px';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = '#111827';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 14px';
+        toast.style.borderRadius = '8px';
+        toast.style.zIndex = '99999';
+        toast.style.fontWeight = '600';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2400);
+}
+
+window.enrollCurrentCourse = enrollCurrentCourse;
 
 function getExpectedTotalShlokas() {
     if (!currentCourse) return 0;

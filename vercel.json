@@ -75,6 +75,18 @@
       "src": "^/artwork$",
       "dest": "public/artwork.html"
     },
+    {
+      "src": "^/adhyay-(\\d+)/shlok-(\\d+)$",
+      "dest": "public/shloka.html"
+    },
+    {
+      "src": "^/course/[^/]+$",
+      "dest": "public/courses.html"
+    },
+    {
+      "src": "^/blog/[^/]+$",
+      "dest": "public/blog.html"
+    },
 
     {
       "src": "/(.*)",

@@ -313,7 +313,7 @@
       const isLiked = localStorage.getItem('liked_' + shloka._id) === 'true';
       const shareTitle = `Aaradhya Soni - Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
       const shareText = `Listen to Aaradhya's recitation of Gita Adhyay ${shloka.adhyay}, Shloka ${shloka.shloka}`;
-      const shareUrl = window.location.href;
+      const shareUrl = `${window.location.origin}/adhyay-${shloka.adhyay}/shlok-${shloka.shloka}`;
 
       item.innerHTML = `
   <div class="card-video-container">
@@ -348,20 +348,25 @@
       if (!currentUser) showAuth();
       const container = document.getElementById('single-shloka-container');
 
-      // 1. URL se ID nikalo (e.g., ?id=12345)
+      // 1. URL se ID ya clean route params nikalo
       const params = new URLSearchParams(window.location.search);
       const shlokaId = params.get('id'); // 'id' se fetch karein
+      const pathMatch = window.location.pathname.match(/^\/adhyay-(\d+)\/shlok-(\d+)$/);
 
-      if (!shlokaId) {
-        container.innerHTML = "<p>Error: No shloka ID provided.</p>";
-        return;
-      }
-
-      // 2. Puraane API route se data fetch karo
+      // 2. API route se data fetch karo
       try {
         // [FIX] Cache buster add kiya gaya
         const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-        const response = await fetch(`/api/shloka/${shlokaId}${cacheBuster}`);
+        const apiPath = shlokaId
+          ? `/api/shloka/${shlokaId}${cacheBuster}`
+          : pathMatch
+            ? `/api/shloka/by-reference/${pathMatch[1]}/${pathMatch[2]}${cacheBuster}`
+            : null;
+        if (!apiPath) {
+          container.innerHTML = "<p>Error: No shloka identifier provided.</p>";
+          return;
+        }
+        const response = await fetch(apiPath);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -473,6 +478,11 @@
       createPendingPlayers();
     }
   </script>
+  <script src="/geeta-saarathi.js"></script>
 </body>
 
 </html>
+
+
+
+

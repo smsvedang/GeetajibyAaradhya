@@ -216,7 +216,8 @@
 
             const isLiked = localStorage.getItem('liked_blog_' + post._id) === 'true';
             const excerpt = (post.content || '').replace(/\n/g, ' ').slice(0, 160);
-            const shareUrl = `${window.location.origin}/blog.html?id=${post._id}`;
+            const postSlug = post.slug || (post.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            const shareUrl = `${window.location.origin}/blog/${postSlug}`;
             const shareTitle = post.title + " - by Gitadhya";
             const shareText = "Check out this blog post from Gitadhya!";
 
@@ -225,7 +226,7 @@
                 <div class="blog-date">${postDate}</div>
                 ${post.imageUrl ? `<img src="${post.imageUrl}" class="blog-image" alt="${post.title}">` : ''}
                 <p>${excerpt}${excerpt.length >= 160 ? '...' : ''}</p>
-                <div style="font-weight:700; color:var(--primary); cursor:pointer;" onclick="location.href='blog.html?id=${post._id}'">
+                <div style="font-weight:700; color:var(--primary); cursor:pointer;" onclick="location.href='/blog/${postSlug}'">
                     Read Wisdom <i class="fas fa-arrow-right"></i>
                 </div>
                 <div class="blog-card-actions">
@@ -252,6 +253,8 @@
             const singleContainer = document.getElementById('single-blog-container');
             const params = new URLSearchParams(window.location.search);
             const postId = params.get('id');
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const postSlug = pathParts[0] === 'blog' ? pathParts[1] : null;
 
             try {
                 // Load site info for social links
@@ -278,9 +281,11 @@
                     }
                 } catch (e) { console.error("Settings load error", e); }
 
-                if (postId) {
+                if (postId || postSlug) {
                     const cacheBuster = `?cache_buster=${new Date().getTime()}`;
-                    const response = await fetch(`/api/blog/${postId}${cacheBuster}`);
+                    const response = postId
+                        ? await fetch(`/api/blog/${postId}${cacheBuster}`)
+                        : await fetch(`/api/blog/by-slug/${postSlug}${cacheBuster}`);
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.message || 'Blog post not found');
@@ -364,6 +369,11 @@
 
     </script>
     <script src="pwa.js"></script>
+  <script src="/geeta-saarathi.js"></script>
 </body>
 
 </html>
+
+
+
+
