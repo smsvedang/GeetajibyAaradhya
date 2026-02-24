@@ -817,9 +817,28 @@ app.get('/api/shloka/:param', async (req, res) => {
         // ✅ PRD v6.2: Try slug lookup first (adhyay-X-shlok-Y format)
         if (!isMongoObjectId(param)) {
             shloka = await Shloka.findOne({ slug: param });
+            
+            // If slug not found, try parsing adhyay-shlok format
+            if (!shloka && param.includes('-shlok-')) {
+                const match = param.match(/adhyay-(\d+)-shlok-(\d+)/);
+                if (match) {
+                    shloka = await Shloka.findOne({
+                        adhyay: Number(match[1]),
+                        shloka: Number(match[2])
+                    });
+                }
+            }
+            
             if (!shloka) {
                 return res.status(404).json({ message: 'Shloka not found' });
             }
+            
+            // If slug was missing, update it before returning
+            if (!shloka.slug) {
+                shloka.slug = shlokaSlug(shloka.adhyay, shloka.shloka);
+                await shloka.save();
+            }
+            
             return res.json(shloka);
         }
 
@@ -829,10 +848,16 @@ app.get('/api/shloka/:param', async (req, res) => {
             return res.status(404).json({ message: 'Shloka not found' });
         }
         
+        // If old ObjectId URL and slug is missing, set it
+        if (!shloka.slug) {
+            shloka.slug = shlokaSlug(shloka.adhyay, shloka.shloka);
+            await shloka.save();
+        }
+        
         // If old ObjectId URL, signal frontend to redirect
         res.json({ ...shloka.toObject(), _shouldRedirectToSlug: true });
     } catch (err) {
-        res.status(500).json({ message: 'Shloka laane mein error' });
+        res.status(500).json({ message: 'Shloka laane mein error', error: err.message });
     }
 });
 
@@ -1101,9 +1126,20 @@ app.get('/api/blog', async (req, res) => {
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
         const posts = await Blog.find().sort({ createdAt: -1 });
+        
+        // Ensure all posts have slugs (auto-generate if missing)
+        let updated = false;
+        for (const post of posts) {
+            if (!post.slug) {
+                post.slug = toSlug(post.title);
+                await post.save();
+                updated = true;
+            }
+        }
+        
         res.json(posts);
     } catch (err) {
-        res.status(500).json({ message: 'Blog posts laane mein error' });
+        res.status(500).json({ message: 'Blog posts laane mein error', error: err.message });
     }
 });
 
@@ -1120,9 +1156,28 @@ app.get('/api/blog/:param', async (req, res) => {
         // ✅ PRD v6.2: Try slug lookup first
         if (!isMongoObjectId(param)) {
             post = await Blog.findOne({ slug: param });
+            
+            // If slug not found, try matching by title as fallback for old posts
+            if (!post) {
+                const titleFromSlug = param
+                    .split('-')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+                post = await Blog.findOne({ 
+                    title: { $regex: titleFromSlug, $options: 'i' } 
+                });
+            }
+            
             if (!post) {
                 return res.status(404).json({ message: 'Blog post not found' });
             }
+            
+            // If slug was missing, update it before returning
+            if (!post.slug) {
+                post.slug = toSlug(post.title);
+                await post.save();
+            }
+            
             return res.json(post);
         }
 
@@ -1132,11 +1187,17 @@ app.get('/api/blog/:param', async (req, res) => {
             return res.status(404).json({ message: 'Blog post not found' });
         }
         
+        // If old ObjectId URL and slug is missing, set it
+        if (!post.slug) {
+            post.slug = toSlug(post.title);
+            await post.save();
+        }
+        
         // If old ObjectId URL, signal frontend to redirect
         res.json({ ...post.toObject(), _shouldRedirectToSlug: true });
     } catch (err) {
         console.error("ERROR FETCHING BLOG POST:", err);
-        res.status(500).json({ message: 'Blog post laane mein error' });
+        res.status(500).json({ message: 'Blog post laane mein error', error: err.message });
     }
 });
 
@@ -1156,6 +1217,49 @@ app.post('/api/blog/like/:id', async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ message: 'Error liking post' });
+    }
+});
+
+// Migration endpoint: Add missing slugs to existing blog posts
+app.post('/api/blog-migrate-slugs', async (req, res) => {
+    if (req.body.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+    try {
+        // Find all blog posts without slug
+        const postsWithoutSlug = await Blog.find({ $or: [{ slug: null }, { slug: undefined }, { slug: '' }] });
+        
+        let updated = 0;
+        for (const post of postsWithoutSlug) {
+            post.slug = toSlug(post.title);
+            await post.save();
+            updated++;
+        }
+        
+        res.json({ 
+            success: true, 
+            message: `Blog post slugs migrated successfully - ${updated} posts updated`,
+            updated: updated
+        });
+    } catch (err) {
+        console.error('Blog slug migration error:', err);
+        res.status(500).json({ message: 'Blog slug migration error', error: err.message });
+    }
+});
+
+// Debug endpoint: Check all blog posts
+app.get('/api/blog-debug', async (req, res) => {
+    if (req.query.password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ message: 'Password galat hai' });
+    }
+    try {
+        const posts = await Blog.find().select('_id title slug createdAt');
+        res.json({ 
+            total: posts.length,
+            posts: posts
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching blog debug info' });
     }
 });
 
@@ -1247,9 +1351,24 @@ app.get('/api/courses/:param', async (req, res) => {
         // ✅ PRD v6.2: Try slug lookup first
         if (!isMongoObjectId(param)) {
             course = await Course.findOne({ slug: param }).populate('shlokas');
+            
+            // If slug not found, try matching by title as fallback for old courses
+            if (!course) {
+                course = await Course.findOne({ 
+                    title: { $regex: param.replace(/-/g, ' '), $options: 'i' } 
+                }).populate('shlokas');
+            }
+            
             if (!course) {
                 return res.status(404).json({ error: 'Course not found' });
             }
+            
+            // If slug was missing, update it before returning
+            if (!course.slug) {
+                course.slug = toSlug(course.title);
+                await course.save();
+            }
+            
             return res.json(course);
         }
 
@@ -1259,28 +1378,36 @@ app.get('/api/courses/:param', async (req, res) => {
             return res.status(404).json({ error: 'Course not found' });
         }
         
+        // If old ObjectId URL and slug is missing, set it
+        if (!course.slug) {
+            course.slug = toSlug(course.title);
+            await course.save();
+        }
+        
         // If old ObjectId URL, signal frontend to redirect
         res.json({ ...course.toObject(), _shouldRedirectToSlug: true });
     } catch (err) {
         console.error('Course fetch error:', err);
-        res.status(500).json({ error: 'Course fetch failed' });
+        res.status(500).json({ error: 'Course fetch failed', errorMessage: err.message });
     }
-});
-app.get('/api/courses/by-slug/:slug', async (req, res) => {
-    let course = await Course.findOne({ slug: req.params.slug }).populate('shlokas');
-    if (!course) {
-        const all = await Course.find().populate('shlokas');
-        course = all.find((c) => toSlug(c.title) === req.params.slug);
-    }
-    if (!course) return res.status(404).json({ error: 'Course not found' });
-    res.json(course);
 });
 app.get('/api/courses', async (req, res) => {
     try {
         const courses = await Course.find().populate('shlokas');
+        
+        // Ensure all courses have slugs (auto-generate if missing)
+        let updated = false;
+        for (const course of courses) {
+            if (!course.slug) {
+                course.slug = toSlug(course.title);
+                await course.save();
+                updated = true;
+            }
+        }
+        
         res.json(courses);
     } catch (err) {
-        res.status(500).json({ message: 'Courses laane mein error' });
+        res.status(500).json({ message: 'Courses laane mein error', error: err.message });
     }
 });
 app.post('/api/courses', async (req, res) => {
