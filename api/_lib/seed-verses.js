@@ -298,18 +298,22 @@ async function seedVerses() {
         console.log(`   - Created: ${created}`);
         console.log(`   - Updated: ${updated}`);
         console.log(`   - Total: ${TAGGED_VERSES.length}`);
-        
-        process.exit(0);
+
+        // Return stats so this function can be safely called from server code
+        return { created, updated, total: TAGGED_VERSES.length };
     } catch (err) {
         console.error('❌ Seeding failed:', err.message);
         console.error(err);
-        process.exit(1);
+        // Throw so callers (server) can handle the error without exiting the process
+        throw err;
     }
 }
 
 // Run if executed directly
 if (require.main === module) {
-    seedVerses();
+    seedVerses()
+        .then(() => process.exit(0))
+        .catch(() => process.exit(1));
 }
 
 module.exports = { seedVerses, TAGGED_VERSES };
