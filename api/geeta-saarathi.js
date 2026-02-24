@@ -101,6 +101,7 @@ function validateScripture(text = '') {
         }
     }
     return true; // Only Bhagavad Gita references
+}
 
 function buildGreeting() {
     return 'Namaste. Main Geeta Saarathi hoon. Aap apni samasya likhiye, main Gita ke adhar par margdarshan dunga.';
@@ -371,10 +372,13 @@ module.exports = async (req, res) => {
         
         return res.json(responseObj);
     } catch (e) {
+        console.error('Geeta Saarathi API Error:', e.message || e);
+        console.error('Stack:', e.stack);
         return res.status(500).json({ 
-            message: '⚠️ Critical Error',
+            response: '⚠️ Critical Error\n\nGeeta Saarathi currently unavailable. Kripya baad mein try karein.',
             warning: 'system_error',
-            details: 'Geeta Saarathi currently unavailable. Kripya baad mein try karein.',
+            remaining_limit: 0,
+            daily_limit: 3,
             error_logged: true
         });
     }

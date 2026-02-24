@@ -135,8 +135,44 @@ async function openCourse(courseId) {
     document.getElementById('view-course-title').textContent = currentCourse.title;
     document.getElementById('view-course-desc').textContent = currentCourse.description || 'Embark on a spiritual journey of the soul.';
     document.getElementById('view-course-img').src = currentCourse.imageUrl || '/favicon.png';
+    
+    // Check enrollment status and update button
     const enrollBtn = document.getElementById('enroll-btn');
-    if (enrollBtn) {
+    if (enrollBtn && gitadhyaUser && gitadhyaUser.mobile) {
+        try {
+            const progressRes = await fetch(`/api/progress/${encodeURIComponent(gitadhyaUser.mobile)}/${currentCourse._id}`);
+            if (progressRes.ok) {
+                const progressData = await progressRes.json();
+                if (progressData && progressData.enrolled) {
+                    // Already enrolled - update button
+                    enrollBtn.textContent = '✓ Enrolled';
+                    enrollBtn.disabled = true;
+                    enrollBtn.style.opacity = '0.6';
+                    enrollBtn.style.cursor = 'not-allowed';
+                    enrollBtn.onclick = null;
+                    enrollBtn.style.display = 'inline-flex';
+                } else {
+                    // Not enrolled - show enroll button
+                    enrollBtn.textContent = 'Enroll';
+                    enrollBtn.disabled = false;
+                    enrollBtn.style.opacity = '1';
+                    enrollBtn.style.cursor = 'pointer';
+                    enrollBtn.onclick = enrollCurrentCourse;
+                    enrollBtn.style.display = 'inline-flex';
+                }
+            } else {
+                // Assume not enrolled if check fails
+                if (enrollBtn) {
+                    enrollBtn.style.display = 'inline-flex';
+                }
+            }
+        } catch (err) {
+            // If check fails, show enroll button
+            if (enrollBtn) {
+                enrollBtn.style.display = 'inline-flex';
+            }
+        }
+    } else if (enrollBtn) {
         enrollBtn.style.display = 'inline-flex';
     }
 
@@ -366,6 +402,16 @@ async function enrollCurrentCourse() {
     const data = await res.json();
     if (res.ok && data.enrolled) {
         showToast(`You have been enrolled in ${data.courseName}`);
+        
+        // Update button after successful enrollment
+        const enrollBtn = document.getElementById('enroll-btn');
+        if (enrollBtn) {
+            enrollBtn.textContent = '✓ Enrolled';
+            enrollBtn.disabled = true;
+            enrollBtn.style.opacity = '0.6';
+            enrollBtn.style.cursor = 'not-allowed';
+            enrollBtn.onclick = null; // Remove click handler
+        }
     } else {
         showToast(data.message || 'Enrollment failed');
     }
