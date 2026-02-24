@@ -1,5 +1,13 @@
 const { connectDb, getTodayInIST, parseBody } = require('./_lib/db');
 const Student = require('../models/Student');
+const { 
+    selectBestVerse, 
+    updateVerseTracking, 
+    createVerseContextForAI,
+    getPrimaryEmotion,
+    validateVerseInResponse,
+    getFallbackVerse
+} = require('./_lib/sil');
 
 const DEFAULT_DAILY_LIMIT = 3;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -50,11 +58,13 @@ async function syncDailyLimit(student) {
     if (!student.last_reset_date || student.last_reset_date !== today) {
         student.last_reset_date = today;
         student.used_today = 0;
+        student.used_shlok_today = []; // Clear daily verse history
         // Reset window when day resets
         student.current_window_id = null;
         student.window_start_time = null;
         student.window_token_used = 0;
         student.window_active = false;
+        student.used_shlok_this_window = []; // Clear window verse history
     }
     if (!Number.isFinite(student.daily_limit) || student.daily_limit <= 0) {
         student.daily_limit = DEFAULT_DAILY_LIMIT;
@@ -208,8 +218,10 @@ function hasAllSections(text = '') {
     ].every((h) => text.includes(h));
 }
 
-async function askGroq(userMessage) {
+async function askGroq(userMessage, selectedVerse, verseContext) {
     if (!process.env.GROQ_API_KEY) return null;
+    
+    // Enhanced system prompt with SIL guidance
     const systemPrompt = [
         'You are Geeta Saarathi.',
         'Always reply in respectful Hinglish.',
@@ -220,17 +232,24 @@ async function askGroq(userMessage) {
         '📘 Hindi Meaning',
         '📗 English Meaning',
         '🪔 Practical Margdarshan',
-        'Sanskrit verse must be full, not partial.'
+        'Sanskrit verse must be full, not partial.',
+        '',
+        '🔥 CRITICAL INSTRUCTION (from Shlok Intelligence Layer):',
+        `User's emotions: ${verseContext.user_emotions}`,
+        `Recommended verse: Bhagavad Gita ${verseContext.recommended_verse}`,
+        `Select Bhagavad Gita ${verseContext.recommended_verse} UNLESS there is a significantly better match from the Gita.`,
+        'NEVER default to 2.47 (Karma Yoga) unless the concern is specifically about action/duty attachment.',
+        'AVOID repeating the same verse consecutively.'
     ].join('\n');
 
-    const r = await fetch(GROQ_API_URL, {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: GROQ_MODEL,
+            model: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
             temperature: 0.3,
             max_tokens: 700,
             messages: [
@@ -319,17 +338,46 @@ module.exports = async (req, res) => {
             responseText = buildCrisisResponse();
         } else {
             try {
-                const groqResponse = await askGroq(message);
+                // 1) Use SIL to choose best verse candidates based on emotion and history
+                const selectedVerse = await selectBestVerse(message, student);
+                const verseContext = createVerseContextForAI(selectedVerse, selectedVerse.emotions || []);
+
+                // 2) Ask model with SIL constraints (allow up to 2 attempts if model falls back to 2.47)
+                let groqResponse = await askGroq(message, selectedVerse, verseContext);
+                let validation = { isValid: true };
+                if (groqResponse) {
+                    validation = validateVerseInResponse(groqResponse, selectedVerse, selectedVerse.emotions || []);
+                }
+
                 if (!groqResponse) {
                     responseText = buildNetworkErrorResponse();
                     warningType = 'network_error';
+                } else if (!validation.isValid) {
+                    // Retry once more with the same constraints
+                    const groqResponse2 = await askGroq(message, selectedVerse, verseContext);
+                    const validation2 = groqResponse2 ? validateVerseInResponse(groqResponse2, selectedVerse, selectedVerse.emotions || []) : { isValid: false };
+                    if (groqResponse2 && validation2.isValid && hasAllSections(groqResponse2)) {
+                        responseText = groqResponse2;
+                    } else {
+                        // Fail-safe: return structured fallback without relying on default 2.47
+                        const fb = getFallbackVerse();
+                        responseText = fallbackStructuredResponse();
+                        warningType = 'ai_defaulted_247';
+                        // prefer sending the fallback verse info in tracking
+                        await updateVerseTracking(student, fb.key);
+                    }
                 } else if (hasAllSections(groqResponse)) {
                     responseText = groqResponse;
+                    // update tracking for selected verse
+                    if (selectedVerse && selectedVerse.key) {
+                        await updateVerseTracking(student, selectedVerse.key);
+                    }
                 } else {
                     responseText = fallbackStructuredResponse();
                     warningType = 'response_format_fallback';
                 }
             } catch (err) {
+                console.error('SIL integration error:', err);
                 responseText = buildNetworkErrorResponse();
                 warningType = 'api_error';
             }
