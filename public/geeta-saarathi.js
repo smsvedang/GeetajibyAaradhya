@@ -167,7 +167,7 @@
             progress.appendChild(seg);
         }
         if (remaining === 0) {
-            progressText.textContent = 'Daily Limit Complete';
+            progressText.textContent = 'Daily Limit Complete (Reset 00:00 IST)';
             progressText.classList.remove('pulse');
             foot.classList.add('gs-disabled');
             input.disabled = true;

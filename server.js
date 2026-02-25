@@ -11,6 +11,7 @@ const app = express();
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 const DEFAULT_DAILY_LIMIT = 11;
+const DAILY_RESET_NOTE = 'Limit har din 00:00 (12:00 AM IST) par reset ho jaati hai.';
 const DEFAULT_SESSION_LIMIT = 100; // Unlimited messages per session, but limited sessions
 const IST_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata',
@@ -674,12 +675,13 @@ app.post('/api/geeta-saarathi', async (req, res) => {
             const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
             if (student.sessions_today >= dailyLimit) {
                 return res.status(429).json({
-                    response: `Aaj ka aapka ${dailyLimit} windows ka limit poora ho chuka hai. Kripya kal dobara prayas karein.`,
+                    response: `Aaj ka aapka ${dailyLimit} windows ka limit poora ho chuka hai. ${DAILY_RESET_NOTE}`,
                     sessions_limit: dailyLimit,
                     sessions_today: student.sessions_today,
                     ai_usage_count: student.ai_usage_count || 0,
                     message_count: 0,
-                    is_new_session: true
+                    is_new_session: true,
+                    limit_reset_note: DAILY_RESET_NOTE
                 });
             }
 

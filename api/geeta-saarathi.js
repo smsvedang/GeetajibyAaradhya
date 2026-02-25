@@ -9,7 +9,8 @@ const {
     getFallbackVerse
 } = require('./_lib/sil');
 
-const DEFAULT_DAILY_LIMIT = 3;
+const DEFAULT_DAILY_LIMIT = 11;
+const DAILY_RESET_NOTE = 'Limit har din 00:00 (12:00 AM IST) par reset ho jaati hai.';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 const WINDOW_TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes
@@ -287,6 +288,7 @@ module.exports = async (req, res) => {
             return res.json({
                 remaining_limit: remaining,
                 daily_limit: dailyLimit,
+                reset_time_ist: '00:00',
                 privacy_notice: 'Aapki samasya kisi server par save nahi ki jaati. Yeh vartalaap gopniya hai.'
             });
         }
@@ -299,10 +301,11 @@ module.exports = async (req, res) => {
         const dailyLimit = Number(student.daily_limit || DEFAULT_DAILY_LIMIT);
         if (student.used_today >= dailyLimit) {
             return res.status(429).json({
-                response: '⚠️ Daily Limit Exceeded\n\nAapne aaj ki daily limit puri kar di hai. Kal dobara guidance le sakte ho.\n\n💡 Tip: Rest karo, Gita padho, aur kal phir se margdarshan lo.',
+                response: `⚠️ Daily Limit Exceeded\n\nAapne aaj ki daily limit puri kar di hai. ${DAILY_RESET_NOTE}\n\n💡 Tip: Rest karo, Gita padho, aur kal phir se margdarshan lo.`,
                 warning: 'daily_limit_exceeded',
                 remaining_limit: 0,
-                daily_limit: dailyLimit
+                daily_limit: dailyLimit,
+                limit_reset_note: DAILY_RESET_NOTE
             });
         }
 
@@ -417,6 +420,9 @@ module.exports = async (req, res) => {
         if (warningType) {
             responseObj.warning = warningType;
         }
+        if (remaining === 0) {
+            responseObj.limit_reset_note = DAILY_RESET_NOTE;
+        }
         
         return res.json(responseObj);
     } catch (e) {
@@ -426,7 +432,7 @@ module.exports = async (req, res) => {
             response: '⚠️ Critical Error\n\nGeeta Saarathi currently unavailable. Kripya baad mein try karein.',
             warning: 'system_error',
             remaining_limit: 0,
-            daily_limit: 3,
+            daily_limit: DEFAULT_DAILY_LIMIT,
             error_logged: true
         });
     }
