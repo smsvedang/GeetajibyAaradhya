@@ -48,7 +48,7 @@
           </div>
           <div class="gs-progress-wrap">
             <div id="gs-progress" class="gs-progress"></div>
-            <div id="gs-progress-text" class="gs-progress-text">0/3</div>
+            <div id="gs-progress-text" class="gs-progress-text">0/11</div>
           </div>
           <div class="gs-head-actions">
             <button id="gs-new-window" class="gs-icon-btn" title="Fresh chat">↗</button>
@@ -83,7 +83,7 @@
     const progress = root.querySelector('#gs-progress');
     const progressText = root.querySelector('#gs-progress-text');
 
-    let limitState = { daily_limit: 3, remaining_limit: 3 };
+    let limitState = { daily_limit: 11, remaining_limit: 11 };
 
     function chakraSvg() {
         return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 1.8v3.2M12 19v3.2M1.8 12H5M19 12h3.2M4.2 4.2l2.2 2.2M17.6 17.6l2.2 2.2M19.8 4.2l-2.2 2.2M6.4 17.6l-2.2 2.2"/></svg>';
@@ -157,7 +157,7 @@
     }
 
     function renderProgress() {
-        const daily = Math.max(1, Number(limitState.daily_limit || 3));
+        const daily = Math.max(1, Number(limitState.daily_limit || 11));
         const remaining = Math.max(0, Number(limitState.remaining_limit || 0));
         const used = Math.max(0, daily - remaining);
         progress.innerHTML = '';
@@ -189,7 +189,7 @@
             if (!r.ok) return;
             const data = await r.json();
             limitState = {
-                daily_limit: Number(data.daily_limit || 3),
+                daily_limit: Number(data.daily_limit || 11),
                 remaining_limit: Number(data.remaining_limit ?? 0)
             };
             renderProgress();

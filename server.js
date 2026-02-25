@@ -10,7 +10,7 @@ const admin = require('firebase-admin');
 const app = express();
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
-const DEFAULT_DAILY_LIMIT = 3;
+const DEFAULT_DAILY_LIMIT = 11;
 const DEFAULT_SESSION_LIMIT = 100; // Unlimited messages per session, but limited sessions
 const IST_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata',
@@ -449,7 +449,7 @@ function formatGitaAnswer(question, answer, shlokaRef = null) {
 
 async function ensureSessionState(student, sessionId) {
     const today = getTodayDateString();
-    if (typeof student.daily_limit !== 'number' || student.daily_limit <= 0) {
+    if (typeof student.daily_limit !== 'number' || student.daily_limit <= 0 || student.daily_limit === 3) {
         student.daily_limit = DEFAULT_DAILY_LIMIT;
     }
     if (typeof student.sessions_today !== 'number' || student.sessions_today < 0) {
