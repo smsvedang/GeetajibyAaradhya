@@ -30,6 +30,14 @@
       "dest": "api/analytics.js"
     },
     {
+      "src": "^/api/reset-daily-limit$",
+      "dest": "api/reset-daily-limit.js"
+    },
+    {
+      "src": "^/api/admin/detailed-students$",
+      "dest": "api/admin-detailed-students.js"
+    },
+    {
       "src": "^/api/(.*)",
       "dest": "server.js"
     },
